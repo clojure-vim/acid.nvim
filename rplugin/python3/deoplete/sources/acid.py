@@ -51,12 +51,9 @@ class Source(Base):
 
     def gather_candidates(self, context):
         def handler(queue):
-            ret = [candidate(j)
+            return [candidate(j)
                    for i in queue
                    for j in i.get("completions", [])]
-            self.debug("Got back: {}".format(ret))
-
-            return ret
 
 
         self.debug("Fetching completions on nREPL for {}".format(
@@ -67,9 +64,13 @@ class Source(Base):
 
         self.debug("Port no is {}".format(port_no()))
 
-        return send(
+        ret = send(
             port_no,
             handler,
             **{"op": "complete",
                "symbol": context["complete_str"],
                "extra-metadata": ["arglists", "doc"]})
+
+        self.debug("Got return {}".format(ret))
+
+        return ret
