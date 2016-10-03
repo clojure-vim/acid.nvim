@@ -17,6 +17,8 @@ def output_to_window(nvim):
     def handler(queue):
         map(buf.append, queue)
 
+    return handler
+
 
 @neovim.plugin
 class Acid(object):
