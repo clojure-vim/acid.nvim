@@ -1,32 +1,25 @@
 # encoding:utf-8
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import nrepl
-from os.path import join as join_path
 from collections import deque
 
-def _port_no(nvim):
-    pwd = nvim.funcs.getcwd()
-    with open(join_path(pwd, ".nrepl-port")) as port:
-        return port.read().strip()
+def _connect(port_no):
+    return nrepl.connect("nrepl://localhost:{}".format(port_no()))
 
-def _connect(nvim):
-    return nrepl.connect("nrepl://localhost:{}".format(_port_no(nvim)))
-
-def _write(ch, data, ns="user"):
-    ch.write({"op": "eval", "code": data, "ns": ns})
+def _write(ch, op="eval", ns="user", **data):
+    data.update({"op": op, "ns": ns})
+    ch.write(data)
     return ch
 
-
-def send(nvim, data, handler):
-    ch = _write(_connect(nvim), data)
+def send(port_no_fn, handler, **data):
+    ch = _write(_connect(port_no_fn), **data)
 
     queue = deque()
-    queue.append({"in": data})
+    queue.append(data)
 
     for out in ch:
         queue.append(out)
-
-    queue.reverse()
+        if "status" in out:
+            break
 
     handler(queue)
-
