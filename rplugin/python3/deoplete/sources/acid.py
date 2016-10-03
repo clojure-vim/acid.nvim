@@ -2,6 +2,14 @@
 
 Sorry.
 """
+import os
+import sys
+
+sys.path.insert(
+    1, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+)
+
+
 from acid.base import send
 from acid.nvim import get_port_no
 from .base import Base
@@ -40,9 +48,10 @@ class Source(Base):
     def __init__(self, vim):
         Base.__init__(self, vim)
         self.name = "acid"
-        self.mark = "CLJ"
+        self.mark = "[acid]"
         self.filetypes = ['clojure']
         self.rank = 200
+        self.info("acid init'ed successfully")
 
     def gather_candidates(self, context):
         def handler(queue):
@@ -51,7 +60,8 @@ class Source(Base):
                             lambda k: "completions" in k,
                             queue)]
 
-        return send(
+        self.debug("Fetching completions on nREPL")
+        ret = send(
             get_port_no,
             handler,
             **{"op": "complete",
@@ -59,3 +69,7 @@ class Source(Base):
                "extra-metadata": ["arglists", "doc"],
                "ns": ns}
         )
+
+        self.debug("Got back: {}".format(ret))
+
+        return ret
