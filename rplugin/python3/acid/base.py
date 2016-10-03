@@ -22,4 +22,4 @@ def send(port_no_fn, handler, **data):
         if "status" in out:
             break
 
-    handler(queue)
+    return handler(queue)

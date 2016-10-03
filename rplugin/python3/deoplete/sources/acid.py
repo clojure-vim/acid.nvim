@@ -2,16 +2,12 @@
 
 Sorry.
 """
-import os
-import sys
+import sys, os
 
-sys.path.insert(
-    1, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-)
+sys.path.append(os.path.dirname(os.path.relpath(__file__)))
 
-
-from acid.base import send
-from acid.nvim import get_port_no
+from acid_core.base import send
+from acid_core.nvim import get_port_no
 from .base import Base
 import nrepl
 
@@ -47,27 +43,34 @@ def candidate(val):
 class Source(Base):
     def __init__(self, vim):
         Base.__init__(self, vim)
+        self.nvim = vim
         self.name = "acid"
         self.mark = "[acid]"
         self.filetypes = ['clojure']
         self.rank = 200
-        self.info("acid init'ed successfully")
 
     def gather_candidates(self, context):
         def handler(queue):
-            completions = filter(lambda k: "completions" in k, queue)
-            self.debug("Got back: {}".format(completions))
-            return [candidate(j) for j in completions]
+            return [candidate(j)
+                    for i in queue
+                    for j in i.get("completions", [])]
 
         self.debug("Fetching completions on nREPL for {}".format(
             context['complete_str']
         ))
 
-        return send(
-            get_port_no,
+        port_no = get_port_no(self.nvim)
+
+        self.debug("Port no is {}".format(port_no()))
+
+        ret = send(
+            port_no,
             handler,
             **{"op": "complete",
                "symbol": context["complete_str"],
                "extra-metadata": ["arglists", "doc"],
-               "ns": ns}
-        )
+               "ns": "acid-complete"})
+
+        self.debug("Got return {}".format(ret))
+
+        return ret
