@@ -55,13 +55,15 @@ class Source(Base):
 
     def gather_candidates(self, context):
         def handler(queue):
-            return [candidate(i)
-                    for i in filter(
-                            lambda k: "completions" in k,
-                            queue)]
+            completions = filter(lambda k: "completions" in k, queue)
+            self.debug("Got back: {}".format(completions))
+            return [candidate(j) for j in completions]
 
-        self.debug("Fetching completions on nREPL")
-        ret = send(
+        self.debug("Fetching completions on nREPL for {}".format(
+            context['complete_str']
+        ))
+
+        return send(
             get_port_no,
             handler,
             **{"op": "complete",
@@ -69,7 +71,3 @@ class Source(Base):
                "extra-metadata": ["arglists", "doc"],
                "ns": ns}
         )
-
-        self.debug("Got back: {}".format(ret))
-
-        return ret
