@@ -10,7 +10,8 @@ sys.path.insert(
 )
 
 
-from acid.base import send
+import acid.base
+print(dir(acid.base))
 from acid.nvim import get_port_no
 from .base import Base
 import nrepl
@@ -63,9 +64,9 @@ class Source(Base):
             context['complete_str']
         ))
 
-        self.debug("calling send: ".format(send))
+        self.debug("calling send: ".format(acid.base.send))
 
-        return send(
+        return acid.base.send(
             get_port_no,
             handler,
             **{"op": "complete",
