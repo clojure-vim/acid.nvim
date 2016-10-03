@@ -18,7 +18,7 @@ def _write(ch, data, ns="user"):
 
 
 def send(nvim, data, handler):
-    ch = _write(_connect(port_no), data)
+    ch = _write(_connect(nvim), data)
 
     queue = deque()
     queue.append({"in": data})
