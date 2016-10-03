@@ -62,6 +62,8 @@ class Source(Base):
 
         port_no = get_port_no(self.nvim)
 
+        self.debug("Port no is {}".format(port_no()))
+
         return send(
             port_no,
             handler,
