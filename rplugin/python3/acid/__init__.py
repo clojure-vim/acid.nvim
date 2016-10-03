@@ -8,6 +8,16 @@ def ignore(queue):
     map(lambda *x: x, queue)
 
 
+def output_to_window(nvim):
+
+    nvim.command("topleft vertical split | enew")
+    bufnr = nvim.current.buffer.number
+    buf = nvim.buffers[bufnr]
+
+    def handler(queue):
+        map(buf.append, queue)
+
+
 @neovim.plugin
 class Acid(object):
 
@@ -17,5 +27,5 @@ class Acid(object):
 
     @neovim.function("AcidEval")
     def acid_eval(self, data):
-
-        send(self.nvim, data, ignore)
+        handler = output_to_window(self.nvim)
+        send(self.nvim, data, handler)
