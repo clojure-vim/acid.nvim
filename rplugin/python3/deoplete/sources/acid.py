@@ -53,7 +53,7 @@ class Source(Base):
         def handler(queue):
             ret = [candidate(j)
                    for i in queue
-                   for j in i.get("completeions", [])]
+                   for j in i.get("completions", [])]
             self.debug("Got back: {}".format(ret))
 
             return ret
