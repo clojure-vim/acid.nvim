@@ -48,7 +48,6 @@ class Source(Base):
         self.mark = "[acid]"
         self.filetypes = ['clojure']
         self.rank = 200
-        self.info("acid init'ed successfully")
 
     def gather_candidates(self, context):
         def handler(queue):
@@ -69,6 +68,4 @@ class Source(Base):
             handler,
             **{"op": "complete",
                "symbol": context["complete_str"],
-               "extra-metadata": ["arglists", "doc"],
-               "ns": ns}
-        )
+               "extra-metadata": ["arglists", "doc"]})

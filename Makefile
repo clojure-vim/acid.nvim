@@ -6,4 +6,4 @@ logs:
 	tail -f ${HOME}/.config/nvim/logs/nvim_acid_log
 
 push:
-	git push && nvr -c 'PlugUpdate acid.nvim'
+	git push && nvr -c 'PlugUpdate acid.nvim | UpdateRemotePlugins'
