@@ -51,11 +51,12 @@ class Source(Base):
 
     def gather_candidates(self, context):
         def handler(queue):
-            completions = filter(lambda k: "completions" in k, queue)
             ret = [candidate(j)
-                   for i in completions
-                   for j in i["completeions"]]
+                   for i in queue
+                   for j in i.get("completeions", [])]
             self.debug("Got back: {}".format(ret))
+
+            return ret
 
 
         self.debug("Fetching completions on nREPL for {}".format(
