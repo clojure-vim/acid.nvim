@@ -2,6 +2,10 @@
 
 Sorry.
 """
+import sys, os
+
+sys.path.append(os.path.dirname(os.path.relpath(__file__)))
+
 from acid_core.base import send
 from acid_core.nvim import get_port_no
 from .base import Base
