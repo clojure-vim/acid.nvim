@@ -5,7 +5,8 @@ from acid.base import send
 
 
 def ignore(queue):
-    [_ for i in queue]
+    map(lambda *x: x, queue)
+
 
 @neovim.plugin
 class Acid(object):
