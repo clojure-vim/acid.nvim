@@ -43,6 +43,7 @@ def candidate(val):
 class Source(Base):
     def __init__(self, vim):
         Base.__init__(self, vim)
+        self.nvim = vim
         self.name = "acid"
         self.mark = "[acid]"
         self.filetypes = ['clojure']
@@ -59,8 +60,10 @@ class Source(Base):
             context['complete_str']
         ))
 
+        port_no = get_port_no(self.nvim)
+
         return send(
-            get_port_no,
+            port_no,
             handler,
             **{"op": "complete",
                "symbol": context["complete_str"],
