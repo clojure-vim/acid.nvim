@@ -59,9 +59,9 @@ class Source(Base):
             context['complete_str']
         ))
 
-        self.debug("calling send: ".format(acid.base.send))
+        self.debug("calling send: ".format(send))
 
-        return acid.base.send(
+        return send(
             get_port_no,
             handler,
             **{"op": "complete",
