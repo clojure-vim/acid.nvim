@@ -17,4 +17,5 @@ class Acid(object):
 
     @neovim.function("AcidEval")
     def acid_eval(self, data):
-        send(data, ignore)
+
+        send(self.nvim, data, ignore)
