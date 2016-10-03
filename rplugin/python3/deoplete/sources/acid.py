@@ -63,6 +63,8 @@ class Source(Base):
             context['complete_str']
         ))
 
+        self.debug("calling send: ".format(send))
+
         return send(
             get_port_no,
             handler,
