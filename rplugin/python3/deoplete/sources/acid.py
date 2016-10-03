@@ -51,7 +51,7 @@ class Source(Base):
 
     def gather_candidates(self, context):
         def handler(queue):
-            completions = filter(lambda k: "completions" in k, queue)
+            completions = list(filter(lambda k: "completions" in k, queue))
             self.debug("Got back: {}".format(completions))
             return [candidate(j) for j in completions]
 
