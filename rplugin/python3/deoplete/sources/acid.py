@@ -2,17 +2,8 @@
 
 Sorry.
 """
-import os
-import sys
-
-sys.path.insert(
-    1, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-)
-
-
-import acid.base
-print(dir(acid.base))
-from acid.nvim import get_port_no
+from acid_core.base import send
+from acid_core.nvim import get_port_no
 from .base import Base
 import nrepl
 
