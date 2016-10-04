@@ -1,1 +1,1 @@
-autocmd BufRead,BufNewFile * if (&ft == "clojure") AcidRequire endif
+autocmd BufRead,BufNewFile *.clj AcidRequire
