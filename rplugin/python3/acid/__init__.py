@@ -26,5 +26,6 @@ class Acid(object):
     @neovim.command("AcidRequire")
     def acid_require(self):
         port_no = get_port_no(self.nvim)
+        ns = get_acid_ns(self.nvim)
         data = "(require '[{} :refer :all])".format(path_to_ns(self.nvim))
-        send(port_no, ignore, **{"code": data, "ns": "acid-complete"})
+        send(port_no, ignore, **{"code": data, "ns": ns})

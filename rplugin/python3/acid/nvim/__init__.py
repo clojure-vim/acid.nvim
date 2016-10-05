@@ -15,6 +15,9 @@ def get_port_no(nvim):
 
     return fn
 
+def get_acid_ns(nvim):
+    return nvim.variables.get('acid_internals_ns', 'acid-complete')
+
 
 def format_payload(payload):
     if type(payload) == str:

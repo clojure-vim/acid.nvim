@@ -7,7 +7,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.relpath(__file__)))
 
 from acid_core.base import send
-from acid_core.nvim import get_port_no
+from acid_core.nvim import get_port_no, get_acid_ns
 from .base import Base
 import nrepl
 
@@ -60,6 +60,7 @@ class Source(Base):
         ))
 
         port_no = get_port_no(self.nvim)
+        ns = get_acid_ns(self.nvim)
 
         self.debug("Port no is {}".format(port_no()))
 
@@ -69,7 +70,7 @@ class Source(Base):
             **{"op": "complete",
                "symbol": context["complete_str"],
                "extra-metadata": ["arglists", "doc"],
-               "ns": "acid-complete"})
+               "ns": ns})
 
         self.debug("Got return {}".format(ret))
 
