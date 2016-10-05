@@ -52,9 +52,8 @@ class Source(Base):
     def gather_candidates(self, context):
         def handler(queue):
             return [candidate(j)
-                   for i in queue
-                   for j in i.get("completions", [])]
-
+                    for i in queue
+                    for j in i.get("completions", [])]
 
         self.debug("Fetching completions on nREPL for {}".format(
             context['complete_str']
@@ -69,7 +68,8 @@ class Source(Base):
             handler,
             **{"op": "complete",
                "symbol": context["complete_str"],
-               "extra-metadata": ["arglists", "doc"]})
+               "extra-metadata": ["arglists", "doc"],
+               "ns": "acid-complete"})
 
         self.debug("Got return {}".format(ret))
 

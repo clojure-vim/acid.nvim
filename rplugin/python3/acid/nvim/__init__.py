@@ -1,5 +1,11 @@
 from os.path import join as join_path
 
+
+def path_to_ns(nvim):
+    path = nvim.funcs.expand("%:r")
+    return ".".join(path.split('/')[1:])
+
+
 def get_port_no(nvim):
     pwd = nvim.funcs.getcwd()
 
