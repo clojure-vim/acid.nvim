@@ -16,7 +16,7 @@ def get_port_no(nvim):
     return fn
 
 def get_acid_ns(nvim):
-    return nvim.variables.get('acid_internals_ns', 'user')
+    return nvim.vars.get('acid_namespace', 'user')
 
 
 def format_payload(payload):
