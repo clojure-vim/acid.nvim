@@ -28,8 +28,7 @@ class Acid(object):
         port_no = get_port_no(self.nvim)
 
         def goto_handler(queue):
-            [ self.nvim.current.buffer.append(str(i)) for i in queue ]
-            msg = queue[0]
+            msg = [i for i in queue if 'resource' in i][0]
             if 'file' in msg:
                 f = msg['file'].split(':')[-1]
                 self.nvim.command("edit {}".format(f))
