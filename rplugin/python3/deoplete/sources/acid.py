@@ -60,9 +60,10 @@ class Source(Base):
         ))
 
         port_no = get_port_no(self.nvim)
-        ns = get_acid_ns(self.nvim)
 
         self.debug("Port no is {}".format(port_no()))
+
+        ns = get_acid_ns(self.nvim)
 
         ret = send(
             port_no,
