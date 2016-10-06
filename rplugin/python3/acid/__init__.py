@@ -23,6 +23,20 @@ class Acid(object):
         port_no = get_port_no(self.nvim)
         send(port_no, handler, **data[0])
 
+    @neovim.function("AcidGoTo")
+    def acid_goto(self, data):
+        symbol, ns = data
+        port_no = get_port_no(self.nvim)
+
+        def goto_handler(queue):
+            msg = queue[0]
+            f = msg['file'].split(':')[-1]
+            c = msg['column']
+            l = msg['line']
+
+            self.nvim.command("edit {}".format(f))
+            self.nvim.funcs.cursor(l, c)
+
     @neovim.command("AcidRequire")
     def acid_require(self):
         port_no = get_port_no(self.nvim)
