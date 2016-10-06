@@ -38,7 +38,7 @@ class Acid(object):
 
             self.nvim.funcs.cursor(l, c)
 
-        send(port_no, goto_handler, **{"op": "info", "symbol": data})
+        send(port_no, goto_handler, **{"op": "info", "symbol": data[0]})
 
     @neovim.command("AcidRequire")
     def acid_require(self):
