@@ -30,11 +30,13 @@ class Acid(object):
 
         def goto_handler(queue):
             msg = queue[0]
-            f = msg['file'].split(':')[-1]
-            c = msg['column']
-            l = msg['line']
+            if 'file' in msg:
+                f = msg['file'].split(':')[-1]
+                self.nvim.command("edit {}".format(f))
 
-            self.nvim.command("edit {}".format(f))
+            c = msg.get('column', 1)
+            l = msg.get('line', 1)
+
             self.nvim.funcs.cursor(l, c)
 
     @neovim.command("AcidRequire")
