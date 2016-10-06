@@ -25,7 +25,6 @@ class Acid(object):
 
     @neovim.function("AcidGoTo")
     def acid_goto(self, data):
-        symbol, ns = data
         port_no = get_port_no(self.nvim)
 
         def goto_handler(queue):
@@ -38,6 +37,8 @@ class Acid(object):
             l = msg.get('line', 1)
 
             self.nvim.funcs.cursor(l, c)
+
+        send(port_no, goto_handler, **{"op": "info", "symbol": data})
 
     @neovim.command("AcidRequire")
     def acid_require(self):
