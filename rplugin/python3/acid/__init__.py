@@ -42,6 +42,9 @@ class Acid(object):
 
             if 'file' in msg:
                 f = find_file_in_path(self.nvim, msg)
+                if f is None:
+                    self.nvim.command("echo 'File not found'")
+                    return
                 self.nvim.command("edit {}".format(f))
 
             c = msg.get('column', 1)

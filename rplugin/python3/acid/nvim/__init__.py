@@ -44,11 +44,6 @@ def output_to_window(nvim):
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
-
-    # Not supporting jars at the moment.
-    if 'jar:' in fname:
-        return
-
     fpath = fname.split(':')[-1]
     project = msg['resource'].split('/')[0]
     foreign_project_fpath = os.path.join(
