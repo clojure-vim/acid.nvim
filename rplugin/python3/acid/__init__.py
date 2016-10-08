@@ -26,9 +26,19 @@ class Acid(object):
     @neovim.function("AcidGoTo")
     def acid_goto(self, data):
         port_no = get_port_no(self.nvim)
+        payload = data[0]
 
         def goto_handler(queue):
-            msg = [i for i in queue if 'resource' in i][0]
+            msg = [i for i in queue if 'resource' in i]
+
+            if not msg:
+                self.nvim.command("echom 'symbol {} not found'".format(
+                    payload
+                ))
+                return
+
+            msg = msg[0]
+
             if 'file' in msg:
                 f = msg['file'].split(':')[-1]
                 self.nvim.command("edit {}".format(f))
@@ -38,7 +48,7 @@ class Acid(object):
 
             self.nvim.funcs.cursor(l, c)
 
-        send(port_no, goto_handler, **{"op": "info", "symbol": data[0]})
+        send(port_no, goto_handler, **{"op": "info", "symbol": payload})
 
     @neovim.command("AcidRequire")
     def acid_require(self):
