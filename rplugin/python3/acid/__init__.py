@@ -50,6 +50,12 @@ class Acid(object):
 
         send(port_no, goto_handler, **{"op": "info", "symbol": payload})
 
+    @neovim.command("AcidGoToDefinition")
+    def acid_goto_def(self):
+        self.nvim.command('normal! "syiw')
+        data = self.nvim.funcs.getreg('s')
+        self.acid_goto([data])
+
     @neovim.command("AcidRequire")
     def acid_require(self):
         port_no = get_port_no(self.nvim)
