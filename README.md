@@ -51,7 +51,7 @@ Also, acid is capable of navigation to symbol definition:
 :AcidGoToDefinition
 
 "or with a mapping
-<C-D> "Same as <C-S-d>
+<C-F>
 ```
 
 ## Cool, I want more

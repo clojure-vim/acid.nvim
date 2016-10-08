@@ -1,1 +1,1 @@
-nmap <C-D> :AcidGoToDefinition<CR>
+nmap <C-F> :AcidGoToDefinition<CR>
