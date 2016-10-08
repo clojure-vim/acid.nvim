@@ -12,3 +12,17 @@ It was initially designed within [iron.nvim](http://github.com/hkupty/iron.nvim)
 It is built fundamentally on neovims async capabilities and rely deeply on clojures
 [refactor-nrepl](https://github.com/clojure-emacs/refactor-nrepl) and
 [nrepl-python-client](https://github.com/cemerick/nrepl-python-client).
+
+## Installing
+
+First, install the python dependencies:
+
+```bash
+pip3 install --user neovim nrepl-python-client janus
+```
+
+Then, add and install acid:
+
+```vim
+Plug 'hkupty/acid.nvim'
+```
