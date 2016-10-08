@@ -2,7 +2,8 @@
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
 from acid.nvim import (
-    get_port_no, output_to_window, path_to_ns
+    get_port_no, output_to_window, path_to_ns,
+    find_file_in_path
 )
 from acid.base import send
 
@@ -40,7 +41,7 @@ class Acid(object):
             msg = msg[0]
 
             if 'file' in msg:
-                f = msg['file'].split(':')[-1]
+                f = find_file_in_path(self.nvim, msg)
                 self.nvim.command("edit {}".format(f))
 
             c = msg.get('column', 1)

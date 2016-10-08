@@ -1,4 +1,4 @@
-from os.path import join as join_path
+import os
 
 
 def path_to_ns(nvim):
@@ -10,7 +10,7 @@ def get_port_no(nvim):
     pwd = nvim.funcs.getcwd()
 
     def fn():
-        with open(join_path(pwd, ".nrepl-port")) as port:
+        with open(os.path.join(pwd, ".nrepl-port")) as port:
             return port.read().strip()
 
     return fn
@@ -41,3 +41,22 @@ def output_to_window(nvim):
 
     return handler
 
+
+def find_file_in_path(nvim, msg):
+    fname = msg['file']
+
+    # Not supporting jars at the moment.
+    if 'jar:' in fname:
+        return
+
+    fpath = fname.split(':')[-1]
+    project = msg['resource'].split('/')[0]
+    foreign_project_fpath = os.path.join(
+        nvim.vars.get('acid_project_root', ''),
+        project, 'src', msg['resource']
+    )
+
+    if os.path.exists(fpath):
+        return fpath
+    elif os.path.exists(foreign_project_fpath):
+        return foreign_project_fpath
