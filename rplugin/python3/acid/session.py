@@ -23,22 +23,16 @@ class SessionHandler(object):
                 'conn': wconn
             }
 
-            def log_all(msg, wc, key):
-                with open(key, 'a') as out:
-                    out.write(str(msg))
-                    out.write('\n')
-
             def clone_handler(msg, wc, key):
                 self.sessions[key]['session'] = msg['new-session']
                 wc.unwatch(key)
 
-            wconn.watch('/tmp/{}'.format(url.split('/')[-1]), {}, log_all)
-            # wconn.watch(url, {'new-session': None}, clone_handler)
+            wconn.watch(url, {'new-session': None}, clone_handler)
             wconn.send({'op': 'clone'})
 
         return self.sessions[url]['conn']
 
-    def add_atomic_watch(self, url, msg_id, handler, n, matches={}):
+    def add_atomic_watch(self, url, msg_id, handler, matches={}):
         "Adds a callback to a msg_id on a connection."
         watcher_key = "{}-watcher".format(msg_id)
         conn = self.get_or_create(url)
@@ -50,8 +44,6 @@ class SessionHandler(object):
 
         matches.update({"id": msg_id})
         conn.watch(watcher_key, matches, patched_handler)
-
-        n.command('echom "Watching {} {}"'.format(watcher_key, matches))
 
         handler.pre_handle()
 
@@ -68,12 +60,11 @@ class SessionHandler(object):
             del self.sessions[url]
 
 
-def send(n, session, address, handler,
+def send(session, address, handler,
          matches={}, op="eval", ns="user", **data):
     msg_id = data.get('id', uuid.uuid4().hex)
     url = "nrepl://{}:{}".format(*address)
     data.update({"op": op, "ns": ns, "id": msg_id})
 
-    n.command('echom "Msg id {}"'.format(msg_id))
-    session.add_atomic_watch(url, msg_id, handler, n, matches)
+    session.add_atomic_watch(url, msg_id, handler, matches)
     session.send(url, data)

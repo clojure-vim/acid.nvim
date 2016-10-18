@@ -31,4 +31,24 @@ class Acid(object):
     def acid_eval(self, data):
         handler = self.handlers.get('Proto')
         address = localhost(self.nvim)
-        send(self.nvim, self.sessions, address, handler, **data[0])
+        send(self.sessions, address, handler, **data[0])
+
+    @neovim.function("AcidGoTo")
+    def acid_goto(self, data):
+        address = localhost(self.nvim)
+        handler = self.handlers.get('Goto')
+        payload = data[0]
+
+        send(
+            self.sessions,
+            address,
+            handler,
+            {"resource": None},
+            **{"op": "info", "symbol": payload}
+        )
+
+    @neovim.command("AcidGoToDefinition")
+    def acid_goto_def(self):
+        self.nvim.command('normal! "syiw')
+        data = self.nvim.funcs.getreg('s')
+        self.acid_goto([data])
