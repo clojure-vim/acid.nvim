@@ -1,19 +1,22 @@
 # 0.1 Navigation
+Deoplete completion will be maintained on
+[async-clj-omni](https://github.com/clojure-vim/async-clj-omni/)
 
-- [ ] Make async **for real**
-  - [ ] Probably use [rxpython](https://github.com/mikhtonyuk/rxpython)
-- [ ] Implement Go To Symbol
+- [x] Make async **for real**
+ - [x] Use WatchableConnection
+- [x] Automatic Require
+ - [x] Autocommand
+- [x] Implement Go To Symbol v1
  - [x] Same Project
- - [ ] Different project with local source
-  - [ ] Warn about different version
- - [ ] Different project with no source (open jar)
-- [ ] Deoplete Completion
-  - [x] Sync
-  - [ ] Async
-- [ ] Automatic import
+- [x] Stable API
 
 # 0.2 Refactoring
 
+- [ ] Docs
+- [ ] Implement Go To Symbol v2
+ - [ ] Different project with local source
+  - [ ] Warn about different version
+ - [ ] Different project with no source (open jar)
 - [ ] Add missing require/import
 - [ ] Convert chained fns to threads
 - [ ] Convert threads back to fns
