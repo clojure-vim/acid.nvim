@@ -1,0 +1,3 @@
+[submodule "deps/nrepl-python-client"]
+	path = deps/nrepl-python-client
+	url = https://github.com/clojure-vim/nrepl-python-client.git
