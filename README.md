@@ -31,26 +31,30 @@ Plug 'hkupty/acid.nvim'
 
 Acid requires you to have a running REPL on the current directory.
 
-If you want to have asynchronous autocompletion with [deoplete](https://github.com/shougo/deoplete), add this snippet to your init.vim:
+Some of the features are outlined below:
 
 ```vim
-let g:deoplete#sources = {}
-let g:deoplete#sources._ = ['buffer', 'file']
+" Evaluating code
 
-" Adds acid as a source to deoplete
-let g:deoplete#sources.clojure = ['acid']
-```
+" Send output of a command to a neovim buffer
+:call AcidEval({'op': 'eval', 'code': '(some-fn "")'})
 
-Also, acid is capable of navigation to symbol definition:
+" Symbol Navigation
 
-```vim
-"with a function
+" With a function
 :call AcidGoTo("some-symbol")
 
-"with a command, getting the symbol under the cursor
+" With a command, getting the symbol under the cursor
 :AcidGoToDefinition
 
-"or with a mapping
+" Or with a mapping
+
+" Requiring current file
+" With a command
+:AcidRequire
+
+" Automatically, for all files
+:let g:acid_auto_require=1
 <C-F>
 ```
 
