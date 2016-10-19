@@ -37,6 +37,11 @@ class Acid(object):
 
     def eval(self, data, *handlers):
         address = localhost(self.nvim)
+
+        if address is None:
+            self.nvim.command('echom "No repl open"')
+            return
+
         handlers = [self.get_handler(i) for i in handlers]
 
         if not 'op' in data:
