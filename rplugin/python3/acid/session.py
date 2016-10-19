@@ -60,11 +60,14 @@ class SessionHandler(object):
             del self.sessions[url]
 
 
-def send(session, address, handler,
-         matches={}, op="eval", ns="user", **data):
-    msg_id = data.get('id', uuid.uuid4().hex)
+def send(session, address, handlers, data):
     url = "nrepl://{}:{}".format(*address)
-    data.update({"op": op, "ns": ns, "id": msg_id})
 
-    session.add_atomic_watch(url, msg_id, handler, matches)
+    msg_id = data.get('id', uuid.uuid4().hex)
+    data.update({"id": msg_id})
+
+    for i in handlers:
+        handler, match = i
+        session.add_atomic_watch(url, msg_id, handler, match)
+
     session.send(url, data)

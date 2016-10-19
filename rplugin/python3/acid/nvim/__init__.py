@@ -46,7 +46,7 @@ def import_extensions(path, source, classname):
 
 def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
-    return ".".join(path.split('/')[1:])
+    return ".".join(path.split('/')[1:]).replace("_","-")
 
 
 def get_port_no(nvim):
