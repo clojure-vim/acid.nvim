@@ -18,7 +18,7 @@ It is built fundamentally on neovims async capabilities and rely deeply on cloju
 First, install the python dependencies:
 
 ```bash
-pip3 install --user neovim nrepl-python-client
+pip3 install --user neovim
 ```
 
 Then, add and install acid:
