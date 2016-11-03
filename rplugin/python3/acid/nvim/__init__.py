@@ -97,7 +97,6 @@ def format_payload(payload):
     finally:
         return ls
 
-
 def find_file_in_path(nvim, msg):
     fname = msg['file']
     fpath = fname.split(':')[-1]

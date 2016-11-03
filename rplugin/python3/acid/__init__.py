@@ -14,35 +14,59 @@ class Acid(object):
     def __init__(self, nvim):
         self.nvim = nvim
         self.sessions = SessionHandler()
-        self.handlers = {}
-        self.init_handlers()
+        self.repls = {}
+        self.extensions = {'handlers': {},
+                           'commands': {}}
+        self._init = False
 
-    def init_handlers(self):
-        for path in find_extensions(self.nvim, 'handlers'):
-            handler = import_extensions(path, 'handlers', 'Handler')
-            if handler:
-                name = handler.name
+    @neovim.command("AcidInit")
+    def init(self):
+        self.init_extensions('handlers', 'Handler')
+        self.init_extensions('commands', 'Command')
+        self.init_vars()
+        self._init = True
 
-                if name not in self.handlers:
-                    self.handlers[name] = handler
-                    handler.init_handler(self.nvim)
+    def init_vars(self):
+        def init_var(var, default=0):
+            self.nvim.vars[var] = self.nvim.vars.get(var, default)
 
-    def get_handler(self, handler):
-        if isinstance(handler, (tuple, list)):
-            handler, match = handler
-        else:
-            handler, match = handler, {}
+        [init_var(i, j)
+         for i, j
+         in [('acid_loaded', 1),
+             ('acid_log_messages', 0),
+             ('acid_auto_require', 1),
+             ('acid_auto_start_repl', 0),
+             ('acid_namespace', 'user'),
+             ('acid_start_repl_fn', 'jobstart'),
+             ('acid_start_repl_args', ['lein repl'])]]
 
-        return (self.handlers.get(handler), match)
+    def init_extensions(self, ext_type, klass):
+        for path in find_extensions(self.nvim, ext_type):
+            extension = import_extensions(path, ext_type, klass)
 
-    def eval(self, data, *handlers):
+            if extension:
+                name = extension.name
+
+                if name not in self.extensions[ext_type]:
+                    self.extensions[ext_type][name] = extension
+                    if ext_type == 'commands':
+                        extension.do_init(self.nvim)
+
+    def add_log_to(self, url):
+        log = self.extensions['handlers'].get('Log').do_init(self.nvim)
+        self.sessions.add_persistent_watch(url, log)
+
+    def command(self, data, handlers):
         address = localhost(self.nvim)
 
         if address is None:
             self.nvim.command('echom "No repl open"')
             return
 
-        handlers = [self.get_handler(i) for i in handlers]
+        url = "nrepl://{}:{}".format(*address)
+
+        if self.nvim.vars['acid_log_messages']:
+            self.add_log_to(url)
 
         if not 'op' in data:
             data.update({'op': 'eval'})
@@ -50,25 +74,20 @@ class Acid(object):
         if not 'ns' in data:
             data.update({'ns': get_acid_ns(self.nvim)})
 
-        send(self.sessions, address, handlers, data)
+        send(self.sessions, url, handlers, data)
 
-    @neovim.function("AcidEval")
+    @neovim.command("AcidCommand", nargs=1)
+    def acid_command(self, args):
+        command = self.extensions['commands'].get(args[0].strip())
+        command.call(self)
+
+    @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
         payload = data[0]
-        self.eval(payload, "Proto")
-
-    @neovim.function("AcidGoTo")
-    def acid_goto(self, data):
-        payload = {"op": "info", "symbol": data[0]}
-        self.eval(payload, ("Goto", {"resource": None}))
-
-    @neovim.command("AcidGoToDefinition")
-    def acid_goto_def(self):
-        self.nvim.command('normal! "syiw')
-        data = self.nvim.funcs.getreg('s')
-        self.acid_goto([data])
+        self.command(payload, [[self.extensions['handlers']['Proto'], {}]])
 
     @neovim.command("AcidRequire")
     def acid_require(self):
         data = "(require '[{} :refer :all])".format(path_to_ns(self.nvim))
-        self.eval({"code": data}, "Ignore")
+        self.eval({"code": data}, [[self.extensions['handlers']['Ignore'], {}]])
+

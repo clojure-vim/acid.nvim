@@ -1,5 +1,6 @@
-from acid.handlers import BaseHandler
+from acid.handlers import SingletonHandler
 from acid.nvim.extras import build_window
+
 
 def format_payload(payload):
     if type(payload) == str:
@@ -7,6 +8,7 @@ def format_payload(payload):
 
     ls = []
     try:
+        session = payload.get('session', '****')
         for k, v in payload.items():
             key = k.lower()
             if key not in {'ns', 'session', 'id'}:
@@ -18,8 +20,8 @@ def format_payload(payload):
                 if header.isspace() or header is "":
                     header, trailer = trailer[0], trailer[1:]
 
-                ls.append("[{: <9}] => {}".format(
-                    key.upper(), str(header)
+                ls.append("[{}][{: <9}] => {}".format(
+                    str(session)[-4:], key.upper(), str(header)
                 ).strip())
 
                 for i in trailer:
@@ -27,20 +29,20 @@ def format_payload(payload):
     finally:
         return ls
 
+class Handler(SingletonHandler):
 
-class Handler(BaseHandler):
-
-    name = "Proto"
+    name = "SharedProto"
 
     def on_init(self):
-        self.bufs = {}
+        self.buf_nr = None
 
-    def on_pre_handle(self, msg_id, *args):
-        buffer_exists = msg_id in self.bufs
-        window_exists = self.nvim.funcs.winbufnr(self.bufs.get(msg_id)) >= 0
+    def on_pre_handle(self, *_):
 
-        if (not buffer_exists or not window_exists):
-            self.buf_nr = build_window(self.nvim, nolist=1, ansiesc=1, close=1)
+        no_shared_buffer = self.buf_nr is None
+        has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
+
+        if (no_shared_buffer or has_no_window):
+            self.buf_nr = build_window(self.nvim, nolist=1, ansiesc=1)
 
     def on_handle(self, msg, *_):
         [self.nvim.buffers[self.buf_nr].append(i)
