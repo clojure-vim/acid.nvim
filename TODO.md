@@ -8,9 +8,19 @@ Deoplete completion will be maintained on
  - [x] Autocommand
 - [x] Implement Go To Symbol v1
  - [x] Same Project
-- [x] Stable API
 
-# 0.2 Refactoring
+# 0.2 API Stabilization
+
+- [x] Stable API
+- [x] Implement commands as extensible structures
+- [x] Implement handlers as extensible structures
+- [x] Add logging to session handler
+- [x] Add logging to messages handler
+  - [x] Add an opt-in variable for logging -> `acid_log_messages`
+
+# 0.3 Refactoring
+
+## Will implement
 
 - [ ] Docs
 - [ ] Implement Go To Symbol v2
@@ -18,6 +28,9 @@ Deoplete completion will be maintained on
   - [ ] Warn about different version
  - [ ] Different project with no source (open jar)
 - [ ] Add missing require/import
+
+## Can possibly be outsourced
+
 - [ ] Convert chained fns to threads
 - [ ] Convert threads back to fns
 - [ ] Extract variables
@@ -33,7 +46,7 @@ Deoplete completion will be maintained on
   - [ ] To `map`
   - [ ] To `set`
 
-# 0.3 Static
+# 0.4 Static
 
 - [ ] Add lein static analysis
   - [ ] [kibit](https://github.com/jonase/kibit)
