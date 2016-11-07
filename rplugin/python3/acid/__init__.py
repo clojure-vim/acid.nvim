@@ -86,11 +86,11 @@ class Acid(object):
         payload = data[0]
         handler = len(data) > 1 and data[1] or 'Proto'
         config = len(data) > 2 and data[2] or None
-        handler = self.extensions['handlers'].get(handler, None)
+        handler_cls = self.extensions['handlers'].get(handler, None)
 
         if handler is not None:
             if config is not None:
-                handler.configure(config)
+                handler = handler_cls.do_init(self.nvim).configure(config)
 
             self.command(payload, handler)
         else:
