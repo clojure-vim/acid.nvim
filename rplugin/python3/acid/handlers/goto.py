@@ -21,6 +21,3 @@ class Handler(BaseHandler):
                 self.nvim.funcs.cursor(l, c)
             else:
                 self.nvim.command("edit +{} {}".format(l, f))
-
-
-

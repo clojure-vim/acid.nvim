@@ -84,7 +84,17 @@ class Acid(object):
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
         payload = data[0]
-        self.command(payload, [[self.extensions['handlers']['Proto'], {}]])
+        handler = len(data) > 1 and data[1] or 'Proto'
+        config = len(data) > 2 and data[2] or None
+        handler = self.extensions['handlers'].get(handler, None)
+
+        if handler is not None:
+            if config is not None:
+                handler.configure(config)
+
+            self.command(payload, handler)
+        else:
+            self.nvim.command('echom "Handler not found"')
 
     @neovim.command("AcidRequire")
     def acid_require(self):

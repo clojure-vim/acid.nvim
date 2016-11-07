@@ -22,6 +22,9 @@ class BaseHandler(object):
         self.nvim = nvim
         self.matcher = {}
 
+    def configure(self, *args):
+        return self
+
     def on_init(self):
         pass
 
