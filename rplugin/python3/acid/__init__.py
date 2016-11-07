@@ -92,7 +92,7 @@ class Acid(object):
             if config is not None:
                 handler = handler_cls.do_init(self.nvim).configure(config)
 
-            self.command(payload, handler)
+            self.command(payload, [handler])
         else:
             self.nvim.command('echom "Handler not found"')
 
