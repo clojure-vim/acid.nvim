@@ -1,5 +1,5 @@
 from acid.handlers import BaseHandler
-from acid.nvim.extras import build_window
+from acid.zen.ui import build_window
 
 def format_payload(payload):
     if type(payload) == str:
@@ -40,7 +40,11 @@ class Handler(BaseHandler):
         window_exists = self.nvim.funcs.winbufnr(self.bufs.get(msg_id)) >= 0
 
         if (not buffer_exists or not window_exists):
-            self.buf_nr = build_window(self.nvim, nolist=1, ansiesc=1, close=1)
+            cmds = ["setlocal nolist"]
+            if self.nvim.funcs.exists(':AnsiEsc'):
+                cmds.append('AnsiEsc')
+
+            self.buf_nr = build_window(self.nvim, close=1, commands=cmds)
 
     def on_handle(self, msg, *_):
         [self.nvim.buffers[self.buf_nr].append(i)
