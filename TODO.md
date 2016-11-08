@@ -23,6 +23,7 @@ Deoplete completion will be maintained on
 ## Will implement
 
 - [ ] Docs
+- [ ] Clojurescript support
 - [ ] Implement Go To Symbol v2
  - [ ] Different project with local source
   - [ ] Warn about different version
