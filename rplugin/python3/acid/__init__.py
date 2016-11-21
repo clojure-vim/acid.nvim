@@ -89,8 +89,10 @@ class Acid(object):
         handler_cls = self.extensions['handlers'].get(handler, None)
 
         if handler is not None:
+            handler = handler_cls.do_init(self.nvim)
+
             if config is not None:
-                handler = handler_cls.do_init(self.nvim).configure(config)
+                handler = handler.configure(config)
 
             self.command(payload, [handler])
         else:
