@@ -52,8 +52,11 @@ class Acid(object):
                     if ext_type == 'commands':
                         extension.do_init(self.nvim)
 
+    def get_handler(name):
+        return self.extensions['handlers'].get(name).do_init(self.nvim)
+
     def add_log_to(self, url):
-        log = self.extensions['handlers'].get('Log').do_init(self.nvim)
+        log = get_handler('Log')
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
@@ -83,17 +86,17 @@ class Acid(object):
         payload = data[0]
         handler = len(data) > 1 and data[1] or 'Proto'
         config = len(data) > 2 and data[2] or None
-        handler_cls = self.extensions['handlers'].get(handler, None)
 
-        if handler is not None:
-            handler = handler_cls.do_init(self.nvim)
+        handler = self.get_handler(handler)
 
-            if config is not None:
-                handler = handler.configure(config)
-
-            self.command(payload, [handler])
-        else:
+        if handler is None:
             self.nvim.command('echom "Handler not found"')
+            return
+
+        if config is not None:
+            handler = handler.configure(config)
+
+        self.command(payload, [handler])
 
     @neovim.command("AcidRequire")
     def acid_require(self):
