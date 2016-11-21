@@ -52,7 +52,7 @@ class Acid(object):
                     if ext_type == 'commands':
                         extension.do_init(self.nvim)
 
-    def get_handler(name):
+    def get_handler(self, name):
         return self.extensions['handlers'].get(name).do_init(self.nvim)
 
     def add_log_to(self, url):
