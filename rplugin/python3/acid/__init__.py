@@ -71,9 +71,6 @@ class Acid(object):
         if not 'op' in data:
             data.update({'op': 'eval'})
 
-        if not 'ns' in data:
-            data.update({'ns': get_acid_ns(self.nvim)})
-
         send(self.sessions, url, handlers, data)
 
     @neovim.command("AcidCommand", nargs=1)
