@@ -18,43 +18,14 @@ Deoplete completion will be maintained on
 - [x] Add logging to messages handler
   - [x] Add an opt-in variable for logging -> `acid_log_messages`
 
-# 0.3 Refactoring
-
-## Will implement
+# 0.3 Structure Hardening
 
 - [x] Allow non-python callbacks
 - [x] Outsource window/screen management
-- [ ] Docs
-- [ ] Clojurescript support
-- [ ] Implement Go To Symbol v2
- - [ ] Different project with local source
-  - [ ] Warn about different version
- - [ ] Different project with no source (open jar)
-- [ ] Add missing require/import
+- [ ] Provide means to build refactoring tools
+- [ ] Provide means to deal with jars
+- [ ] Provide means to build new tools with it
 
-## Can possibly be outsourced
+# 1.0 Simple
 
-- [ ] Convert chained fns to threads
-- [ ] Convert threads back to fns
-- [ ] Extract variables
-  - [ ] To `let`
-  - [ ] To `def`
-- [ ] Extract functions
-  - [ ] To `defn`
-  - [ ] To `fn`
-  - [ ] To `#()`
-- [ ] Change data type
-  - [ ] To `vec`
-  - [ ] To `list`
-  - [ ] To `map`
-  - [ ] To `set`
-
-# 0.4 Static
-
-- [ ] Add lein static analysis
-  - [ ] [kibit](https://github.com/jonase/kibit)
-  - [ ] [bikeshed](https://github.com/dakrone/lein-bikeshed)
-  - [ ] [eastwood](https://github.com/jonase/eastwood)
-- [ ] Neomake integration
-
-# 1.0 
+- [ ] Simplify structures, bindings and connectivity
