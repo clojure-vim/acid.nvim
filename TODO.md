@@ -22,6 +22,8 @@ Deoplete completion will be maintained on
 
 ## Will implement
 
+- [x] Allow non-python callbacks
+- [x] Outsource window/screen management
 - [ ] Docs
 - [ ] Clojurescript support
 - [ ] Implement Go To Symbol v2
