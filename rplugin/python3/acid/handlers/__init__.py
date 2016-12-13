@@ -25,6 +25,9 @@ class BaseHandler(object):
     def configure(self, *args):
         return self
 
+    def add_acid(self, acid):
+        return self
+
     def on_init(self):
         pass
 

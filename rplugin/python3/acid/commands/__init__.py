@@ -1,8 +1,10 @@
+import functools
 
 class BaseCommand(object):
 
     __instances__ = {}
     handlers = ['']
+    with_acid = False
     handlers_var = ''
 
     def __init__(self, nvim):
@@ -51,11 +53,16 @@ class BaseCommand(object):
         inst = cls.__instances__[cls.name]
 
         payload = inst.prepare_payload()
-        payload.update({'op': cls.op})
+
+        if not 'op' in payload:
+            payload.update({'op': cls.op})
 
         get_handler = acid.extensions['handlers'].get
 
         handler_classes = map(get_handler, inst.actual_handlers)
         handlers = map(inst.start_handler, handler_classes)
+
+        if cls.with_acid:
+            handlers = map(lambda h: h.add_acid(acid), handlers)
 
         acid.command(payload, handlers)
