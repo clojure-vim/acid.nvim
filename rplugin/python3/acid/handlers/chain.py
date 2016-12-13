@@ -17,7 +17,7 @@ class Handler(BaseHandler):
         self.handlers = handler
 
     def on_handle(self, msg, *_):
-        self.acid.command(
-            self.transform(msg),
-            map(self.acid.extensions['handlers'].get, self.handlers)
-        )
+        handlers = map(self.acid.extensions['handlers'].get, self.handlers)
+        handlers = map(lambda h: h.do_init(self.nvim), handlers)
+
+        self.acid.command(self.transform(msg), handlers)
