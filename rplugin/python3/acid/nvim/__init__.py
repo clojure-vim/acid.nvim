@@ -48,7 +48,7 @@ def current_file(nvim):
     return nvim.funcs.expand("%:t")
 
 def current_path(nvim):
-    return nvim.funcs.getcwd()
+    return nvim.funcs.expand("%:p:h")
 
 def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
