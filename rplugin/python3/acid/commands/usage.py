@@ -1,5 +1,5 @@
 from acid.commands import BaseCommand
-from acid.nvim import current_file, current_path
+from acid.nvim import current_file, current_path, path_to_ns
 
 class Command(BaseCommand):
 
