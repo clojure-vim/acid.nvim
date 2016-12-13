@@ -30,7 +30,7 @@ class Command(BaseCommand):
         return handler
 
     def prepare_payload(self, *args):
-        self.nvim.call("inputsave")
-        ret = self.nvim.call("input", "acid - eval> ")
-        self.nvim.call("inputrestore")
+        self.nvim.command('normal! "syiw')
+        data = self.nvim.funcs.getreg('s')
+        ns = path_to_ns(self.nvim)
         return {"symbol": data, "ns": ns}
