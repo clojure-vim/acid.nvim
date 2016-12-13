@@ -45,7 +45,7 @@ def import_extensions(path, source, classname):
 
 
 def current_file(nvim):
-    return nvim.funcs.expand("%:t")
+    return nvim.funcs.expand("%:p")
 
 def current_path(nvim):
     return nvim.funcs.getcwd()
