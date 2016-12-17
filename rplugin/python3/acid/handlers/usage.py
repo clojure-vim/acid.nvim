@@ -13,7 +13,7 @@ def transform(msg):
         'serialization-format': 'bencode'
     }
 
-class Handler(BaseHandler, WithFSM):
+class Handler(WithFSM):
 
     name = 'Usage'
 
