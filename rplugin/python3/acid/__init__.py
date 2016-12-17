@@ -19,6 +19,15 @@ class Acid(object):
                            'commands': {}}
         self._init = False
 
+    def context(self):
+        return {
+            'handlers': self.extensions['handlers'],
+            'commands': self.extensions['commands'],
+            'session_handler': self.sessions,
+            'url': localhost(self.nvim),
+            'nvim': self.nvim
+        }
+
     @neovim.command("AcidInit")
     def init(self):
         self.init_extensions('handlers', 'Handler')
@@ -60,13 +69,11 @@ class Acid(object):
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
-        address = localhost(self.nvim)
+        url = localhost(self.nvim)
 
-        if address is None:
+        if url is None:
             self.nvim.command('echom "No repl open"')
             return
-
-        url = "nrepl://{}:{}".format(*address)
 
         if self.nvim.vars['acid_log_messages']:
             self.add_log_to(url)
@@ -79,7 +86,7 @@ class Acid(object):
     @neovim.command("AcidCommand", nargs=1)
     def acid_command(self, args):
         command = self.extensions['commands'].get(args[0].strip())
-        command.call(self)
+        command.call(self.context())
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
@@ -94,7 +101,7 @@ class Acid(object):
             return
 
         if config is not None:
-            handler = handler.configure(config)
+            handler = handler.configure(config, **self.context)
 
         self.command(payload, [handler])
 

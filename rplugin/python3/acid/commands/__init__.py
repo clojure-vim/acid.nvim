@@ -22,11 +22,12 @@ class BaseCommand(object):
     def prepare_payload(self, *args):
         return {}
 
-    def configure(self, handler):
+    def configure(self, context, handler):
+        handler.configure(**context)
         return handler
 
-    def start_handler(self, handler):
-        return self.configure(handler.do_init(self.nvim))
+    def start_handler(self, context, handler):
+        return self.configure(context, handler.do_init())
 
     @classmethod
     def build_interfaces(cls):
@@ -49,7 +50,7 @@ class BaseCommand(object):
         cls.__instances__[cls.name] = inst
 
     @classmethod
-    def call(cls, acid):
+    def call(cls, context):
         inst = cls.__instances__[cls.name]
 
         payload = inst.prepare_payload()
@@ -57,12 +58,9 @@ class BaseCommand(object):
         if not 'op' in payload:
             payload.update({'op': cls.op})
 
-        get_handler = acid.extensions['handlers'].get
+        get_handler = context['handlers'].get
 
         handler_classes = map(get_handler, inst.actual_handlers)
         handlers = map(inst.start_handler, handler_classes)
-
-        if cls.with_acid:
-            handlers = map(lambda h: h.add_acid(acid), handlers)
 
         acid.command(payload, handlers)

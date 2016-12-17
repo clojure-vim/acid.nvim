@@ -64,7 +64,7 @@ def get_port_no(nvim):
 
 def localhost(nvim):
     try:
-        return ['127.0.0.1', get_port_no(nvim)]
+        return ":".join(['nrepl://127.0.0.1', get_port_no(nvim)])
     except:
         return None
 

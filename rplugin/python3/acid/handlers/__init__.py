@@ -1,3 +1,4 @@
+from acid.session import send
 
 def status_finalizer(msg, *_):
     return 'status' in msg
@@ -10,22 +11,19 @@ class BaseHandler(object):
         return "<Handler: {}>".format(self.__class__.name)
 
     @classmethod
-    def do_init(cls, nvim):
-        inst = cls(nvim)
+    def do_init(cls):
         inst.on_init()
         return inst
 
     def with_matcher(self, matcher):
         self.matcher.update(matcher)
 
-    def __init__(self, nvim):
-        self.nvim = nvim
+    def __init__(self):
         self.matcher = {}
 
-    def configure(self, *args):
-        return self
-
-    def add_acid(self, acid):
+    def configure(self, *args, **kwargs):
+        self.nvim = kwargs['nvim']
+        self.handlers = kwargs['handlers']
         return self
 
     def on_init(self):
@@ -74,3 +72,36 @@ class SingletonHandler(BaseHandler):
     @classmethod
     def deinit(cls):
         del SingletonHandler.instances[cls.name]
+
+class WithFSM(BaseHandler):
+
+    initial_state = "init"
+
+    def __repr__(self):
+        return "<FSMHandler: {} on state {}>".format(
+            self.__class__.name, self.current_state
+        )
+
+    def on_init(self):
+        self.current_state = self.initial_state
+        self.current_handler_fn = self.handle_init
+        return self
+
+    def configure(self, *args, **kwargs):
+        super(BaseHandler, self).configure(*args, **kwargs)
+        self.session_handler = kwargs['session_handler']
+        self.url = kwargs['url']
+        return self
+
+    def change_state(self, new_state, payload, *handlers):
+        handlers.append(self)
+        send(self.session_handler, self.url, handlers, payload)
+        self.current_state = new_state
+        self.current_handler_fn = getattr(
+            self,
+            'handle_{}'.format(new_state),
+            lambda *args, **kwargs: None
+        )
+
+    def on_handle(self, msg, wc, key):
+        self.current_handler_fn(msg, wc, key)
