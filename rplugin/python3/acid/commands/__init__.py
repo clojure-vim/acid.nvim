@@ -59,8 +59,9 @@ class BaseCommand(object):
             payload.update({'op': cls.op})
 
         get_handler = context['handlers'].get
+        start_handler = functools.partial(inst.start_handler, context)
 
         handler_classes = map(get_handler, inst.actual_handlers)
-        handlers = map(inst.start_handler, handler_classes)
+        handlers = map(start_handler, handler_classes)
 
         acid.command(payload, handlers)
