@@ -12,6 +12,7 @@ class BaseHandler(object):
 
     @classmethod
     def do_init(cls):
+        inst = cls()
         inst.on_init()
         return inst
 
