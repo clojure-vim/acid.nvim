@@ -22,5 +22,5 @@ class Handler(WithFSM):
         new_data = self.transform(msg)
         self.change_state('usage', new_data)
 
-    def handle_usage(self, *_):
-        pass
+    def handle_usage(self, msg, *_):
+        self.pass_to(msg, 'FileList')

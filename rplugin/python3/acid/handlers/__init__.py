@@ -24,8 +24,13 @@ class BaseHandler(object):
 
     def configure(self, *args, **kwargs):
         self.nvim = kwargs['nvim']
-        self.handlers = kwargs['handlers']
+        self.context = kwargs
         return self
+
+    def pass_to(self, msg, handler):
+        handler = self.context['handlers'].get(handler)
+        handler = handler.do_init().configure(**self.context)
+        handler.on_handle(msg)
 
     def on_init(self):
         pass
@@ -39,10 +44,14 @@ class BaseHandler(object):
     def on_handle(self, *_):
         pass
 
+    def after_finish(self, *_):
+        pass
+
     def gen_handler(self, stop_handler):
         nvim = self.nvim
         finalizer = self.__class__.finalizer
         on_handle = self.on_handle
+        after_finish = self.after_finish
 
         def handler(msg, wc, key):
             try:
@@ -50,6 +59,7 @@ class BaseHandler(object):
             finally:
                 if finalizer(msg, wc, key):
                     stop_handler(wc, key)
+                    after_finish()
 
         return handler
 
