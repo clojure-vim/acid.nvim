@@ -12,8 +12,12 @@ class Handler(BaseHandler):
         self.acc = {}
 
     def on_handle(self, msg, *_):
-        key = msg['occurrence']['name']
-        self.acc[key] = ':edit +{} {}'.format(msg['line-beg'], msg['file'])
+        if 'occurrence' in msg:
+            key = msg['occurrence']['name']
+            self.acc[key] = ':edit +{} {}'.format(
+                msg['occurrence']['line-beg'],
+                msg['occurrence']['file']
+            )
 
     def after_finish(self):
         selection_window(
