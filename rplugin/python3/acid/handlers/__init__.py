@@ -89,7 +89,7 @@ class WithFSM(BaseHandler):
         return self
 
     def configure(self, *args, **kwargs):
-        super(BaseHandler, self).configure(*args, **kwargs)
+        super().configure(*args, **kwargs)
         self.session_handler = kwargs['session_handler']
         self.url = kwargs['url']
         return self
