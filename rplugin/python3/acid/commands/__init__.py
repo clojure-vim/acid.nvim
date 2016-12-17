@@ -50,10 +50,8 @@ class BaseCommand(object):
         cls.__instances__[cls.name] = inst
 
     @classmethod
-    def call(cls, context):
+    def call(cls, acid, context):
         inst = cls.__instances__[cls.name]
-
-        acid = context['acid']
 
         payload = inst.prepare_payload()
 
