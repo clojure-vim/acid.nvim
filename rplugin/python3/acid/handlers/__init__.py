@@ -59,7 +59,7 @@ class BaseHandler(object):
             finally:
                 if finalizer(msg, wc, key):
                     stop_handler(wc, key)
-                    after_finish()
+                    nvim.async_call(lambda: after_finish())
 
         return handler
 
