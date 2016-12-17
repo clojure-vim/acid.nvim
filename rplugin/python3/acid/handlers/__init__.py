@@ -60,9 +60,9 @@ class SingletonHandler(BaseHandler):
         return "<Handler: {}>".format(self.__class__.name)
 
     @classmethod
-    def do_init(cls, nvim):
+    def do_init(cls):
         if not cls.name in SingletonHandler.instances:
-            inst = cls(nvim)
+            inst = cls()
             inst.on_init()
             SingletonHandler.instances[cls.name] = inst
         else:
