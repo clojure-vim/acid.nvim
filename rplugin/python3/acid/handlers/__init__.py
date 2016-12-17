@@ -95,7 +95,8 @@ class WithFSM(BaseHandler):
         return self
 
     def change_state(self, new_state, payload, *handlers):
-        handlers = list(handlers).append(self)
+        handlers = list(handlers)
+        handlers.append(self)
         send(self.session_handler, self.url, handlers, payload)
         self.current_state = new_state
         self.current_handler_fn = getattr(
