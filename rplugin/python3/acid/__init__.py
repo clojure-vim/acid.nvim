@@ -62,10 +62,10 @@ class Acid(object):
                         extension.do_init(self.nvim)
 
     def get_handler(self, name):
-        return self.extensions['handlers'].get(name).do_init(self.nvim)
+        return self.extensions['handlers'].get(name).do_init()
 
     def add_log_to(self, url):
-        log = self.get_handler('Log')
+        log = self.get_handler('Log').configure(**self.context())
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
