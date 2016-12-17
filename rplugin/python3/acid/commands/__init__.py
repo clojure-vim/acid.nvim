@@ -53,6 +53,8 @@ class BaseCommand(object):
     def call(cls, context):
         inst = cls.__instances__[cls.name]
 
+        acid = context['acid']
+
         payload = inst.prepare_payload()
 
         if not 'op' in payload:
