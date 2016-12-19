@@ -52,7 +52,7 @@ class BaseHandler(object):
         pass
 
     def after_finish(self, *_):
-        for h in self.fwd_handlers.items():
+        for h in self.fwd_handlers.values():
             h.after_finish(*_)
 
         self.on_after_finish(*_)
