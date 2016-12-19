@@ -13,7 +13,12 @@ class Handler(BaseHandler):
 
     def on_handle(self, msg, *_):
         if 'occurrence' in msg:
-            key = msg['occurrence']['name']
+            key = "{}: {}-{}".format(
+                msg['occurrence']['name'],
+                msg['occurrence']['line-beg'],
+                msg['occurrence']['col-beg'],
+            )
+
             self.acc[key] = ':exec "bd! % | edit +{} {}"<CR>'.format(
                 msg['occurrence']['line-beg'],
                 msg['occurrence']['file']
