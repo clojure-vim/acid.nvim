@@ -32,7 +32,7 @@ class BaseHandler(object):
         if handler not in self.fwd_handlers:
             self.fwd_handlers[handler] = self.context['handlers']\
                 .get(handler).do_init().configure(**self.context)
-        return sefl.fwd_handlers[handler]
+        return self.fwd_handlers[handler]
 
 
     def pass_to(self, msg, handler):
