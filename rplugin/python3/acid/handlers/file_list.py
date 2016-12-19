@@ -14,8 +14,7 @@ class Handler(BaseHandler):
     def on_handle(self, msg, *_):
         if 'occurrence' in msg:
             key = msg['occurrence']['name']
-            buf_nr = self.nvim.current.buffer.number
-            self.acc[key] = ':wincmd p | edit +{} {} | bd {}<CR>'.format(
+            self.acc[key] = ':bd! % | edit +{} {}<CR>'.format(
                 msg['occurrence']['line-beg'],
                 msg['occurrence']['file'],
                 buf_nr
