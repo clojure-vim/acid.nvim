@@ -19,7 +19,7 @@ class Handler(BaseHandler):
                 msg['occurrence']['col-beg'],
             )
 
-            self.acc[key] = ':exec "bd! % | edit +{} {}"<CR>'.format(
+            self.acc[key] = ':exec "bd! % \| edit +{} {}"<CR>'.format(
                 msg['occurrence']['line-beg'],
                 msg['occurrence']['file']
             )
