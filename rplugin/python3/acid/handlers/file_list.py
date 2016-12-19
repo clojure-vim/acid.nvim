@@ -16,8 +16,7 @@ class Handler(BaseHandler):
             key = msg['occurrence']['name']
             self.acc[key] = ':bd! % | edit +{} {}<CR>'.format(
                 msg['occurrence']['line-beg'],
-                msg['occurrence']['file'],
-                buf_nr
+                msg['occurrence']['file']
             )
 
     def after_finish(self):
