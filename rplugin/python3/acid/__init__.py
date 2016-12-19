@@ -2,7 +2,7 @@
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
 from acid.nvim import (
-    localhost, path_to_ns, get_acid_ns,
+    path_to_ns, get_acid_ns, formatted_localhost_address,
     find_file_in_path, find_extensions, import_extensions
 )
 from acid.session import send, SessionHandler
@@ -24,7 +24,7 @@ class Acid(object):
             'handlers': self.extensions['handlers'],
             'commands': self.extensions['commands'],
             'session_handler': self.sessions,
-            'url': localhost(self.nvim),
+            'url': formatted_localhost_address(self.nvim),
             'nvim': self.nvim
         }
 
@@ -69,7 +69,7 @@ class Acid(object):
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
-        url = localhost(self.nvim)
+        url = self.context()['url']
 
         if url is None:
             self.nvim.command('echom "No repl open"')

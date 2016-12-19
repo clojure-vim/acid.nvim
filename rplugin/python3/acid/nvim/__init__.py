@@ -63,8 +63,12 @@ def get_port_no(nvim):
 
 
 def localhost(nvim):
+    return ['127.0.0.1', get_port_no(nvim)]
+
+def formatted_localhost_address(nvim):
     try:
-        return ":".join(['nrepl://127.0.0.1', get_port_no(nvim)])
+        addr = localhost(nvim)
+        return "{}://{}:{}".format('nrepl', *addr)
     except:
         return None
 
