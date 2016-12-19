@@ -21,15 +21,22 @@ class BaseHandler(object):
 
     def __init__(self):
         self.matcher = {}
+        self.fwd_handlers = {}
 
     def configure(self, *args, **kwargs):
         self.nvim = kwargs['nvim']
         self.context = kwargs
         return self
 
+    def new_child_handler(self, handler):
+        if handler not in self.fwd_handlers:
+            self.fwd_handlers[handler] = self.context['handlers']\
+                .get(handler).do_init().configure(**self.context)
+        return sefl.fwd_handlers[handler]
+
+
     def pass_to(self, msg, handler):
-        handler = self.context['handlers'].get(handler)
-        handler = handler.do_init().configure(**self.context)
+        handler = self.new_child_handler(handler)
         handler.on_handle(msg)
 
     def on_init(self):
@@ -45,6 +52,12 @@ class BaseHandler(object):
         pass
 
     def after_finish(self, *_):
+        for h in self.fwd_handlers.items():
+            h.after_finish(*_)
+
+        self.on_after_finish(*_)
+
+    def on_after_finish(self, *_):
         pass
 
     def gen_handler(self, stop_handler):
@@ -59,7 +72,7 @@ class BaseHandler(object):
             finally:
                 if finalizer(msg, wc, key):
                     stop_handler(wc, key)
-                    nvim.async_call(lambda: after_finish())
+                    nvim.async_call(after_finish)
 
         return handler
 
