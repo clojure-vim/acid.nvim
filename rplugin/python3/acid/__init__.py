@@ -102,6 +102,8 @@ class Acid(object):
 
         if config is not None:
             handler = handler.configure(config, **self.context)
+        else:
+            handler = handler.configure(**self.context)
 
         self.command(payload, [handler])
 
