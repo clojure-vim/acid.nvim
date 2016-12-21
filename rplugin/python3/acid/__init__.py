@@ -100,10 +100,12 @@ class Acid(object):
             self.nvim.command('echom "Handler not found"')
             return
 
+        context = self.context()
+
         if config is not None:
-            handler = handler.configure(config, **self.context)
+            handler = handler.configure(config, **context)
         else:
-            handler = handler.configure(**self.context)
+            handler = handler.configure(**context)
 
         self.command(payload, [handler])
 
