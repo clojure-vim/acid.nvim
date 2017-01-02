@@ -36,6 +36,10 @@ class Handler(SingletonHandler):
     def on_init(self):
         self.buf_nr = None
 
+    def insert_text(self, text):
+        self.nvim.buffers[self.buf_nr].append(text)
+        self.nvim.command('normal! G')
+
     def on_pre_handle(self, *_):
 
         no_shared_buffer = self.buf_nr is None
@@ -49,7 +53,7 @@ class Handler(SingletonHandler):
             self.buf_nr = build_window(self.nvim, close=1, commands=cmds)
 
     def on_handle(self, msg, *_):
-        [self.nvim.buffers[self.buf_nr].append(i)
+        [self.insert_text(i)
          for i
          in format_payload(msg)
          if not i.isspace()]
