@@ -28,5 +28,5 @@ class Handler(BaseHandler):
         selection_window(
             self.nvim,
             header="Select file",
-            select_options=produce_select_options(self.acc)
+            select_options=self.acc
         )
