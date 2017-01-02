@@ -38,7 +38,8 @@ class Handler(SingletonHandler):
 
     def insert_text(self, text):
         self.nvim.buffers[self.buf_nr].append(text)
-        self.nvim.command('normal! G')
+        pos = len(self.nvim.buffers[self.buf_nr])
+        self.nvim.funcs.setpos('.', [self.buf_nr, (pos - 1) , 1, 0])
 
     def on_pre_handle(self, *_):
 
