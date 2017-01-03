@@ -13,8 +13,12 @@ class Handler(BaseHandler):
 
     def on_handle(self, msg, *_):
         if 'occurrence' in msg:
-            key = "{}: {}-{}".format(
-                msg['occurrence']['name'],
+            path = msg['occurrence']['path'].split('/'),
+            fname, cpath = path[-1], "/".join(path[:-1])
+
+            key = "{}: {} @ {}-{}".format(
+                fname,
+                cpath,
                 msg['occurrence']['line-beg'],
                 msg['occurrence']['col-beg'],
             )
