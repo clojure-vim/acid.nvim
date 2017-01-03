@@ -13,12 +13,11 @@ class Handler(BaseHandler):
 
     def on_handle(self, msg, *_):
         if 'occurrence' in msg:
-            path = msg['occurrence']['file'].split('/'),
-            fname, cpath = path[-1], "/".join(path[:-1])
+            path = msg['occurrence']['file'].split('/')
 
             key = "{} {} @ {}:{}".format(
-                fname,
-                cpath,
+                path[-1],
+                "/".join(path[:-1]),
                 msg['occurrence']['line-beg'],
                 msg['occurrence']['col-beg'],
             )
