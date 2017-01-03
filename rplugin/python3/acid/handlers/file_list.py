@@ -16,7 +16,7 @@ class Handler(BaseHandler):
             path = msg['occurrence']['file'].split('/'),
             fname, cpath = path[-1], "/".join(path[:-1])
 
-            key = "{}: {} @ {}-{}".format(
+            key = "{} {} @ {}:{}".format(
                 fname,
                 cpath,
                 msg['occurrence']['line-beg'],
@@ -31,6 +31,5 @@ class Handler(BaseHandler):
     def after_finish(self):
         selection_window(
             self.nvim,
-            header="Select file",
             select_options=self.acc
         )
