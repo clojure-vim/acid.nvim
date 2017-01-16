@@ -8,7 +8,8 @@ class Handler(BaseHandler):
     def on_init(self):
         self.vim_fn = ""
 
-    def configure(self, vim_fn, *_):
+    def configure(self, vim_fn, *args, **kwargs):
+        super().configure(*args, **kargs)
         self.vim_fn = vim_fn
         return self
 

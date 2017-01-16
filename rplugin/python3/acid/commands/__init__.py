@@ -1,8 +1,10 @@
+import functools
 
 class BaseCommand(object):
 
     __instances__ = {}
     handlers = ['']
+    with_acid = False
     handlers_var = ''
 
     def __init__(self, nvim):
@@ -20,11 +22,12 @@ class BaseCommand(object):
     def prepare_payload(self, *args):
         return {}
 
-    def configure(self, handler):
+    def configure(self, context, handler):
+        handler.configure(**context)
         return handler
 
-    def start_handler(self, handler):
-        return self.configure(handler.do_init(self.nvim))
+    def start_handler(self, context, handler):
+        return self.configure(context, handler.do_init())
 
     @classmethod
     def build_interfaces(cls):
@@ -47,15 +50,18 @@ class BaseCommand(object):
         cls.__instances__[cls.name] = inst
 
     @classmethod
-    def call(cls, acid):
+    def call(cls, acid, context):
         inst = cls.__instances__[cls.name]
 
         payload = inst.prepare_payload()
-        payload.update({'op': cls.op})
 
-        get_handler = acid.extensions['handlers'].get
+        if not 'op' in payload:
+            payload.update({'op': cls.op})
+
+        get_handler = context['handlers'].get
+        start_handler = functools.partial(inst.start_handler, context)
 
         handler_classes = map(get_handler, inst.actual_handlers)
-        handlers = map(inst.start_handler, handler_classes)
+        handlers = map(start_handler, handler_classes)
 
         acid.command(payload, handlers)

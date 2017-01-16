@@ -44,6 +44,12 @@ def import_extensions(path, source, classname):
     return cls
 
 
+def current_file(nvim):
+    return nvim.funcs.expand("%:p")
+
+def current_path(nvim):
+    return nvim.funcs.getcwd()
+
 def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
     return ".".join(path.split('/')[1:]).replace("_","-")
@@ -60,6 +66,13 @@ def localhost(nvim):
     try:
         return ['127.0.0.1', get_port_no(nvim)]
     except:
+        return None
+
+def formatted_localhost_address(nvim):
+    addr = localhost(nvim)
+    if addr:
+        return "{}://{}:{}".format('nrepl', *addr)
+    else:
         return None
 
 

@@ -2,7 +2,7 @@
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
 from acid.nvim import (
-    localhost, path_to_ns, get_acid_ns,
+    path_to_ns, get_acid_ns, formatted_localhost_address,
     find_file_in_path, find_extensions, import_extensions
 )
 from acid.session import send, SessionHandler
@@ -18,6 +18,15 @@ class Acid(object):
         self.extensions = {'handlers': {},
                            'commands': {}}
         self._init = False
+
+    def context(self):
+        return {
+            'handlers': self.extensions['handlers'],
+            'commands': self.extensions['commands'],
+            'session_handler': self.sessions,
+            'url': formatted_localhost_address(self.nvim),
+            'nvim': self.nvim
+        }
 
     @neovim.command("AcidInit")
     def init(self):
@@ -53,20 +62,18 @@ class Acid(object):
                         extension.do_init(self.nvim)
 
     def get_handler(self, name):
-        return self.extensions['handlers'].get(name).do_init(self.nvim)
+        return self.extensions['handlers'].get(name).do_init()
 
     def add_log_to(self, url):
-        log = self.get_handler('Log')
+        log = self.get_handler('Log').configure(**self.context())
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
-        address = localhost(self.nvim)
+        url = self.context()['url']
 
-        if address is None:
+        if url is None:
             self.nvim.command('echom "No repl open"')
             return
-
-        url = "nrepl://{}:{}".format(*address)
 
         if self.nvim.vars['acid_log_messages']:
             self.add_log_to(url)
@@ -79,7 +86,7 @@ class Acid(object):
     @neovim.command("AcidCommand", nargs=1)
     def acid_command(self, args):
         command = self.extensions['commands'].get(args[0].strip())
-        command.call(self)
+        command.call(self, self.context())
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
@@ -93,8 +100,12 @@ class Acid(object):
             self.nvim.command('echom "Handler not found"')
             return
 
+        context = self.context()
+
         if config is not None:
-            handler = handler.configure(config)
+            handler = handler.configure(config, **context)
+        else:
+            handler = handler.configure(**context)
 
         self.command(payload, [handler])
 
