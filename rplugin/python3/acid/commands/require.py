@@ -16,6 +16,6 @@ class Command(BaseCommand):
 
     def prepare_payload(self, *args):
         ns = path_to_ns(self.nvim)
-        code = "(require '[{}] :reload)"
+        code = "(require '[{}] :reload)".format(ns)
         return {"code": code}
 
