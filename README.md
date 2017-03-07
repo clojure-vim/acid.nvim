@@ -27,6 +27,12 @@ Then, add and install acid:
 Plug 'clojure-vim/acid.nvim'
 ```
 
+Update your `~/.lein/profiles.clj` adding the following lines:
+```clj
+[refactor-nrepl "2.3.0-SNAPSHOT"]
+[cider/cider-nrepl "0.14.0"]
+```
+
 ## Running
 
 Acid requires you to have a running REPL on the current directory.
