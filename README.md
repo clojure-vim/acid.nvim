@@ -5,7 +5,7 @@ Asynchronous Clojure Interactive Development
 ## What is it for?
 
 Acid.nvim is a plugin for clojure development on neovim.
-It was initially designed within [iron.nvim](http://github.com/hkupty/iron.nvim), but evolved to be a proper clojure plugin for neovim.
+It was initially designed within [iron.nvim](http://github.com/clojure-vim/iron.nvim), but evolved to be a proper clojure plugin for neovim.
 
 ## Design and Structure
 
@@ -24,7 +24,7 @@ pip3 install --user neovim
 Then, add and install acid:
 
 ```vim
-Plug 'hkupty/acid.nvim'
+Plug 'clojure-vim/acid.nvim'
 ```
 
 ## Running
@@ -60,4 +60,4 @@ Some of the features are outlined below:
 
 ## Cool, I want more
 
-Acid is still very young and does not have much functionality implemented yet. Please take a look at the [TODO](https://github.com/hkupty/acid.nvim/blob/master/TODO.md) for the roadmap.
+Acid is still very young and does not have much functionality implemented yet. Please take a look at the [TODO](https://github.com/clojure-vim/acid.nvim/blob/master/TODO.md) for the roadmap.
