@@ -55,6 +55,9 @@ class BaseCommand(object):
 
         payload = inst.prepare_payload()
 
+        if payload is None:
+            return
+
         if not 'op' in payload:
             payload.update({'op': cls.op})
 
