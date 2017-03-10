@@ -58,8 +58,10 @@ class BaseCommand(object):
             )
 
         mapping_var = "{}_command_mapping".format(convert_case(cmd_name))
+
         mapping = getattr(cls, 'mapping', None)
         opfunc = getattr(cls, 'opfunc', False)
+
         default_mapping = mapping is not None and not opfunc
         motion_mapping = mapping is not None and opfunc
 
@@ -78,9 +80,12 @@ class BaseCommand(object):
             shorthand_mapping = "{}_shorthand_mapping".format(
                 convert_case(cmd_name)
             )
-            mapping = nvim.vars.get(
-                shorthand_mapping, "{}{}".format(mapping, mapping[-1])
+            mapping = getattr(
+                cls, 'shortand_mapping',"{}{}".format(
+                    mapping, mapping[-1]
+                ) if mapping is not None else None
             )
+            mapping = nvim.vars.get(shorthand_mapping, mapping)
             cmd.append('noremap {} :{} shorthand<CR>'.format(
                 mapping, cmd_name
             ))

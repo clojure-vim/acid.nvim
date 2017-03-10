@@ -1,7 +1,8 @@
 from acid.session import send
 
 def status_finalizer(msg, *_):
-    return 'status' in msg
+    return ('status' in msg and
+            not set(msg['status']).intersection({'eval-error'}))
 
 class BaseHandler(object):
 

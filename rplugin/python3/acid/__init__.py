@@ -85,9 +85,9 @@ class Acid(object):
 
     @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
-        self.nvim.command("echom '{}'".format(" ".join(args)))
-        command = self.extensions['commands'].get(args[0].strip())
-        command.call(self, self.context(), *args[1:])
+        cmd, *args = args
+        command = self.extensions['commands'].get(cmd.strip())
+        command.call(self, self.context(), *args)
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
