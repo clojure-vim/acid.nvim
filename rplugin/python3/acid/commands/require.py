@@ -7,7 +7,6 @@ class Command(BaseCommand):
     name = 'Require'
     cmd_name = 'AcidRequire'
     handlers = ['Ignore']
-    handlers_var = 'acid_require_command_handler'
     op = "eval"
     mapping = '<leader>ar'
 
