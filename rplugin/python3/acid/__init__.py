@@ -83,10 +83,11 @@ class Acid(object):
 
         send(self.sessions, url, handlers, data)
 
-    @neovim.command("AcidCommand", nargs=1)
+    @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
+        self.nvim.command("echom '{}'".format(" ".join(args)))
         command = self.extensions['commands'].get(args[0].strip())
-        command.call(self, self.context())
+        command.call(self, self.context(), *args[1:])
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
@@ -108,9 +109,3 @@ class Acid(object):
             handler = handler.configure(**context)
 
         self.command(payload, [handler])
-
-    @neovim.command("AcidRequire")
-    def acid_require(self):
-        data = "(require '[{} :refer :all])".format(path_to_ns(self.nvim))
-        self.eval({"code": data}, [[self.extensions['handlers']['Ignore'], {}]])
-

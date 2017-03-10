@@ -24,3 +24,16 @@ augroup acid
   au BufEnter,BufWritePost *.clj call s:require()
 augroup END
 
+function! AcidOpfunc(callback, block)
+  let s:tmp = getreg('s')
+  if a:block == 'line'
+    normal! '[V']"sy
+  elseif a:block == 'visual'
+    normal! `<v`>"sy
+  else
+    normal! `[v`]"sy
+  endif
+  let s:ret = getreg('s')
+  call setreg('s', s:tmp)
+  exec a:callback 'opfunc' s:ret
+endfunction
