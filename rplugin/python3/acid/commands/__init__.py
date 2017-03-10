@@ -49,7 +49,7 @@ class BaseCommand(object):
         if cmd_name:
             nargs = getattr(cls, 'nargs', 0)
             cmd.append(
-                'command! -nargs={} {} AcidCommand {} {}'.format(
+                'command! -buffer -nargs={} {} AcidCommand {} {}'.format(
                     nargs,
                     cmd_name,
                     cls.name,
@@ -68,13 +68,14 @@ class BaseCommand(object):
 
         if default_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
-            cmd.append('noremap {} :{}<CR>'.format(mapping, cmd_name))
+            cmd.append('noremap <buffer> {} :{}<CR>'.format(mapping, cmd_name))
         elif motion_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
             cmd.append(opfuncfw(cmd_name))
-            cmd.append('noremap {} :set opfunc={}OpfuncFw<CR>g@'.format(
-                mapping, cmd_name
-            ))
+            cmd.append(
+                'noremap <buffer> {} :set opfunc={}OpfuncFw<CR>g@'.format(
+                    mapping, cmd_name
+                ))
 
         if hasattr(cls, 'shorthand'):
             shorthand_mapping = "{}_shorthand_mapping".format(
@@ -86,17 +87,13 @@ class BaseCommand(object):
                 ) if mapping is not None else None
             )
             mapping = nvim.vars.get(shorthand_mapping, mapping)
-            cmd.append('noremap {} :{} shorthand<CR>'.format(
+            cmd.append('noremap <buffer> {} :{} shorthand<CR>'.format(
                 mapping, cmd_name
             ))
 
         if hasattr(cls, 'prompt'):
-            cmd.append(
-                'command! -nargs=0 {}Prompt AcidCommand {} prompt'.format(
-                    cmd_name,
-                    cls.name
-                )
-            )
+            prompt = 'command! -buffer -nargs=0 {}Prompt AcidCommand {} prompt'
+            cmd.append(prompt.format(cmd_name, cls.name))
 
         return cmd
 
@@ -104,7 +101,8 @@ class BaseCommand(object):
     def do_init(cls, nvim):
         inst = cls(nvim)
         inst.on_init()
-        [nvim.command(cmd) for cmd in cls.build_interfaces(nvim)]
+        aucmd = 'autocmd FileType clojure {}'
+        [nvim.command(aucmd.format(v)) for v in cls.build_interfaces(nvim)]
         cls.__instances__[cls.name] = inst
 
     @classmethod
