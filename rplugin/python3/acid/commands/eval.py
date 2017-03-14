@@ -1,4 +1,5 @@
 from acid.commands import BaseCommand
+from acid.nvim import path_to_ns
 
 
 class Command(BaseCommand):
@@ -18,11 +19,18 @@ class Command(BaseCommand):
         return ret
 
     def shorthand(self):
-        cmd = '''exec 'normal! mx$?^("sy%`x' | nohl'''
+        cmd = '''silent exec 'normal! mx$?^("sy%`x' | nohl'''
         self.nvim.command(cmd)
         return self.nvim.funcs.getreg('s')
 
     def prepare_payload(self, mode, *args):
+        use_curr_ns = self.nvim.current.buffer.vars.get('acid_use_curr_ns')
+
+        if use_curr_ns is not None:
+            data = {'ns': path_to_ns(self.nvim)}
+        else:
+            data = {}
+
         if mode == 'shorthand':
             ret = self.shorthand()
         elif mode == 'prompt':
@@ -32,4 +40,5 @@ class Command(BaseCommand):
         else:
             ret = " ".join([mode, *args])
 
-        return {"code": ret}
+        data.update({"code": ret})
+        return data
