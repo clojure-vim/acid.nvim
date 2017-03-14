@@ -19,5 +19,5 @@ class Handler(SingletonHandler):
         self.logger.setLevel(logging.DEBUG)
 
     def on_handle(self, msg, *_):
-        if not 'sate' in msg.get('status', []):
+        if not 'state' in msg.get('status', []):
             self.logger.info(msg)
