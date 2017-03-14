@@ -87,7 +87,7 @@ class BaseCommand(object):
                 ) if mapping is not None else None
             )
             mapping = nvim.vars.get(shorthand_mapping, mapping)
-            cmd.append('noremap <buffer> {} :{} shorthand<CR>'.format(
+            cmd.append('noremap <buffer> <silent> {} :{} shorthand<CR>'.format(
                 mapping, cmd_name
             ))
 
