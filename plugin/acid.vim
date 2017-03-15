@@ -19,4 +19,11 @@ function! s:init()
   AcidInit
 endfunction
 
+function! s:require_on_save()
+  if expand("%r") !~ ".*test.*"
+    AcidRequire
+  endif
+endfunction
+
 autocmd FileType clojure call s:init()
+autocmd BufWritePost,BufNewFile *.clj call s:require_on_save()

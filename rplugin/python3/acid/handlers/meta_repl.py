@@ -48,7 +48,10 @@ class Handler(SingletonHandler):
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
         if (no_shared_buffer or has_no_window):
-            cmds = ["setlocal nolist"]
+            cmds = [
+                "setlocal nolist nobuflisted buftype=nofile",
+                "file meta-repl"
+            ]
             if self.nvim.funcs.exists(':AnsiEsc'):
                 cmds.append('AnsiEsc')
 
