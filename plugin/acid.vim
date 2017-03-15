@@ -12,18 +12,11 @@ function! AcidOpfunc(callback, block)
   exec a:callback 'opfunc' s:ret
 endfunction
 
-function! s:init()
-  if exists('g:acid_init')
-    return 1
-  endif
-  AcidInit
-endfunction
-
 function! s:require_on_save()
   if expand("%r") !~ ".*test.*"
     AcidRequire
   endif
 endfunction
 
-autocmd FileType clojure call s:init()
+autocmd Vimenter AcidInit
 autocmd BufWritePost,BufNewFile *.clj call s:require_on_save()
