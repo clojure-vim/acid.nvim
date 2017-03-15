@@ -81,7 +81,10 @@ class SessionHandler(object):
 
         patched_handler = handler.gen_handler(finalize_watch)
 
+        # Avoid side-effects
+        matches = matches.copy()
         matches.update({"id": msg_id})
+
         conn.watch(watcher_key, matches, patched_handler)
         try:
             handler.pre_handle(msg_id, url)
@@ -107,6 +110,7 @@ def send(session, url, handlers, data):
     msg_id = data.get('id', uuid.uuid4().hex)
     data.update({"id": msg_id})
 
+    logger.info("handlers = {}".format(handlers))
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, handler.matcher)
 
