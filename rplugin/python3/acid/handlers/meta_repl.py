@@ -59,7 +59,7 @@ class Handler(SingletonHandler):
                 }, 'MetaRepl')<CR>""".splitlines()
 
             send = "map <buffer> <silent> <localleader><CR> {}".format(
-                "".join(map(str.strip, send.splitlines()))
+                "".join(map(str.strip, send))
             )
             self.cmd_buf_nr = build_window(
                 self.nvim,
