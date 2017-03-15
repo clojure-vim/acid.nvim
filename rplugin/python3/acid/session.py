@@ -110,6 +110,8 @@ def send(session, url, handlers, data):
     msg_id = data.get('id', uuid.uuid4().hex)
     data.update({"id": msg_id})
 
+    handlers = list(handlers)
+
     logger.info("handlers = {}".format(handlers))
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, handler.matcher)
