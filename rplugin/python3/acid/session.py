@@ -76,6 +76,7 @@ class SessionHandler(object):
 
         logger.info('handler -> {}'.format(str(handler)))
         logger.info('connection -> {}'.format(str(url)))
+        logger.info('matchers -> {}'.format(str(matches)))
         logger.info('key -> {}'.format(str(watcher_key)))
 
         patched_handler = handler.gen_handler(finalize_watch)
