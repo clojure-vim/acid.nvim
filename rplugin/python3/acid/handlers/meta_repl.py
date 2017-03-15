@@ -11,7 +11,7 @@ def format_payload(payload):
         msg_id = payload.get('id', '****')
         for k, v in payload.items():
             key = k.lower()
-            if key not in {'ns', 'session', 'id'}:
+            if key not in {'ns', 'session', 'id', 'op'}:
                 if '\n' in v:
                     header, *trailer = v.split('\n')
                 else:
