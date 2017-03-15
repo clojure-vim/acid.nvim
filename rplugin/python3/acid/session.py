@@ -91,7 +91,9 @@ class SessionHandler(object):
         conn = self.get_or_create(url)
         logger.info('sending data -> {}'.format(str(data)))
 
-        [handler.pre_send(data) for handler in handlers]
+        for handler in handlers:
+            logger.info('passing data to handler {}'.format(str(handler)))
+            handler.pre_send(data)
 
         try:
             conn.send(data)
