@@ -18,5 +18,5 @@ function! s:require_on_save()
   endif
 endfunction
 
-autocmd VimEnter AcidInit
+autocmd VimEnter * AcidInit
 autocmd BufWritePost,BufNewFile *.clj call s:require_on_save()
