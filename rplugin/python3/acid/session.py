@@ -87,9 +87,11 @@ class SessionHandler(object):
         except Exception as e:
             logger.error('Err: could not pre-handler -> {}'.format(str(e)))
 
-    def send(self, url, data):
+    def send(self, url, data, handlers):
         conn = self.get_or_create(url)
         logger.info('sending data -> {}'.format(str(data)))
+
+        [handler.pre_send(data) for handler in handlers]
 
         try:
             conn.send(data)
@@ -105,4 +107,4 @@ def send(session, url, handlers, data):
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, handler.matcher)
 
-    session.send(url, data)
+    session.send(url, data, handlers)

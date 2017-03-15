@@ -8,7 +8,7 @@ def format_payload(payload):
 
     ls = []
     try:
-        session = payload.get('session', '****')
+        msg_id = payload.get('id', '****')
         for k, v in payload.items():
             key = k.lower()
             if key not in {'ns', 'session', 'id'}:
@@ -21,7 +21,7 @@ def format_payload(payload):
                     header, trailer = trailer[0], trailer[1:]
 
                 ls.append("[{}][{: <9}] => {}".format(
-                    str(session)[-4:], key.upper(), str(header)
+                    str(msg_id)[-4:], key.upper(), str(header)
                 ).strip())
 
                 for i in trailer:
@@ -70,8 +70,8 @@ class Handler(SingletonHandler):
                 ]
                 )
 
+    def on_pre_send(self, msg, *_):
+        [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
+
     def on_handle(self, msg, *_):
-        [self.insert_text(i)
-         for i
-         in format_payload(msg)
-         if not i.isspace()]
+        [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]

@@ -43,6 +43,12 @@ class BaseHandler(object):
     def on_init(self):
         pass
 
+    def on_pre_send(self, *_):
+        pass
+
+    def pre_send(self, *args):
+        self.on_pre_send(*args)
+
     def on_pre_handle(self, *_):
         pass
 
