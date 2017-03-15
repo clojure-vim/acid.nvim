@@ -56,7 +56,7 @@ class Handler(SingletonHandler):
 
         no_cmd = self.cmd_buf_nr is None
 
-        if cmd_buf_nr is None:
+        if no_cmd is None:
             send = """:call AcidSendNrepl({
                 'op': 'eval', 'code': join(getline(1, '$'), '\\n')
                 }, 'MetaRepl')<CR>""".splitlines()
