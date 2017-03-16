@@ -37,6 +37,8 @@ def format_payload(payload):
     except e:
         logger.error("Couldn't finish producing output: {}".format(str(e)))
     finally:
+        if len(ls) == 0:
+            logger.warn("Empty output for ls: {}".format(str(payload)))
         return ls
 
 class Handler(SingletonHandler):
