@@ -78,7 +78,16 @@ def formatted_localhost_address(nvim):
 
 
 def get_acid_ns(nvim):
-    return nvim.vars.get('acid_namespace', 'user')
+    stategy = nvim.current.buffer.vars.get(
+        'acid_ns_strategy', nvim.vars.get('acid_ns_strategy', 'global')
+    )
+    if strategy == 'buffer':
+        return path_to_ns
+    elif strategy == 'global':
+        return 'user'
+    elif 'ns:' in strategy:
+        return strategy.split(':')[-1]
+
 
 
 def with_async(nvim):

@@ -2,7 +2,7 @@
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
 from acid.nvim import (
-    path_to_ns, get_acid_ns, formatted_localhost_address,
+    path_to_ns, formatted_localhost_address,
     find_file_in_path, find_extensions, import_extensions
 )
 from acid.session import send, SessionHandler
