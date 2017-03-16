@@ -59,7 +59,7 @@ class Handler(SingletonHandler):
 
         no_cmd = self.cmd_buf_nr is None
 
-        if no_cmd is None:
+        if no_cmd:
             send = """:call AcidSendNrepl({
                 'op': 'eval', 'code': join(getline(1, '$'), '\\n')
                 }, 'MetaRepl')<CR>""".splitlines()
@@ -70,9 +70,8 @@ class Handler(SingletonHandler):
             self.cmd_buf_nr = build_window(
                 self.nvim,
                 orientation="rightbelow 20",
-                commands=["set ft=clojure"]
+                commands=["set ft=clojure", send]
             )
-            raise Exception("Just to check if this is working, ffs")
 
     def on_pre_send(self, msg, *_):
         [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
