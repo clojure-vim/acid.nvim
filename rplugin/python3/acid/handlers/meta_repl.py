@@ -20,8 +20,12 @@ def format_payload(payload):
         for k, v in payload.items():
             key = k.lower()
             if key not in {'ns', 'session', 'id', 'op'}:
+                logger.debug('Adding {} with val {}'.format(key, str(v)))
                 if '\n' in v:
                     header, *trailer = v.split('\n')
+                elif type(v) == list:
+                    header, trailer = v[0], v[1:]
+
                 else:
                     header,  trailer = v, []
 
