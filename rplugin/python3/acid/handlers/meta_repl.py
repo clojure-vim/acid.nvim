@@ -1,6 +1,13 @@
 from acid.handlers import SingletonHandler
 from acid.zen.ui import build_window
 
+logger = logging.getLogger(__name__)
+fh = logging.FileHandler('/tmp/acid-log-handler.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+logger.setLevel(logging.DEBUG)
 
 def format_payload(payload):
     if type(payload) == str:
@@ -26,6 +33,8 @@ def format_payload(payload):
 
                 for i in trailer:
                     ls.append("{: <14} {}".format("", str(i)))
+    except e:
+        logger.error("Couldn't finish producing output: {}".format(str(e)))
     finally:
         return ls
 
