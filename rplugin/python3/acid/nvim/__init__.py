@@ -63,8 +63,9 @@ def get_port_no(nvim):
 
 
 def localhost(nvim):
+    host = nvim.vars.get('acid_lein_host', '127.0.0.1')
     try:
-        return ['127.0.0.1', get_port_no(nvim)]
+        return [host, get_port_no(nvim)]
     except:
         return None
 
