@@ -35,4 +35,4 @@ class Command(BaseCommand):
         else:
             ret = " ".join([mode, *args])
 
-     return {"code": ret, "ns": ns}
+        return {"code": ret, "ns": ns}
