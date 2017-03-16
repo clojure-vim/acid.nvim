@@ -69,8 +69,9 @@ class Handler(SingletonHandler):
             )
             self.cmd_buf_nr = build_window(
                 self.nvim,
-                orientation="rightbelow 20",
-                commands=["set ft=clojure"]
+                close=1,
+                orientation="rightbelow 20 split",
+                commands=["set ft=clojure", send]
             )
 
     def on_pre_send(self, msg, *_):
