@@ -87,7 +87,7 @@ class Handler(SingletonHandler):
                 close=1,
                 throwaway=1,
                 orientation="rightbelow 20 split",
-                commands=["set ft=clojure", send]
+                commands=['file scratchpad', "set ft=clojure", send]
             )
 
     def on_pre_send(self, msg, *_):
