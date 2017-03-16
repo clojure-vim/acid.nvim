@@ -64,14 +64,13 @@ class Handler(SingletonHandler):
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
         if (no_shared_buffer or has_no_window):
-            cmds = [
-                'setlocal nolist nobuflisted buftype=nofile bufhidden=wipe',
-                'file meta-repl',
-            ]
+            cmds = ['file meta-repl']
             if self.nvim.funcs.exists(':AnsiEsc'):
                 cmds.append('AnsiEsc')
 
-            self.buf_nr = build_window(self.nvim, close=1, commands=cmds)
+            self.buf_nr = build_window(
+                self.nvim, close=1, commands=cmds, throwaway=1
+            )
 
         no_cmd = self.cmd_buf_nr is None
 
@@ -86,6 +85,7 @@ class Handler(SingletonHandler):
             self.cmd_buf_nr = build_window(
                 self.nvim,
                 close=1,
+                throwaway=1,
                 orientation="rightbelow 20 split",
                 commands=["set ft=clojure", send]
             )
