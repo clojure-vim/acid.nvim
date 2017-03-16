@@ -7,6 +7,7 @@ endfunction
 """
 
 opfuncfw = lambda k: opfunc_forwarder.format(k, k)
+silent_map = lambda *s: "noremap <silent> <buffer> {} {}".format(*s)
 
 def convert_case(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -68,14 +69,13 @@ class BaseCommand(object):
 
         if default_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
-            cmd.append('noremap <buffer> {} :{}<CR>'.format(mapping, cmd_name))
+            cmd.append(silent_map(mapping, ':{}<CR>'.format(cmd_name)))
         elif motion_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
             cmd.append(opfuncfw(cmd_name))
-            cmd.append(
-                'noremap <buffer> {} :set opfunc={}OpfuncFw<CR>g@'.format(
-                    mapping, cmd_name
-                ))
+            cmd.append(silent_map(
+                mapping, ':set opfunc={}OpfuncFw<CR>g@'.format(cmd_name)
+            ))
 
         if hasattr(cls, 'shorthand'):
             shorthand_mapping = "{}_shorthand_mapping".format(
@@ -87,8 +87,8 @@ class BaseCommand(object):
                 ) if mapping is not None else None
             )
             mapping = nvim.vars.get(shorthand_mapping, mapping)
-            cmd.append('noremap <buffer> <silent> {} :{} shorthand<CR>'.format(
-                mapping, cmd_name
+            cmd.append(silent_map(
+                mapping, ':{} shorthand<CR>'.format(cmd_name)
             ))
 
         if hasattr(cls, 'prompt'):
