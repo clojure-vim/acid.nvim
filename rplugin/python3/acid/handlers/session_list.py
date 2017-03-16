@@ -7,4 +7,4 @@ class Handler(SingletonHandler):
 
     def on_handle(self, msg, *_):
         sessions = self.nvim.vars.get('acid_sessions', [])
-        self.nvim.vars.set('acid_sessions', [msg['new-session'], *sessions])
+        self.nvim.vars['acid_sessions'] = [msg['new-session'], *sessions]
