@@ -1,5 +1,6 @@
 from acid.handlers import SingletonHandler
 from acid.zen.ui import build_window
+import logging
 
 logger = logging.getLogger(__name__)
 fh = logging.FileHandler('/tmp/acid-log-handler.log')
