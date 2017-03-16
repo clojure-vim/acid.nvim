@@ -71,7 +71,7 @@ class Acid(object):
 
     def command(self, data, handlers):
         url = self.context()['url']
-        acid_session = bool(self.nvim.vars.get('acid_current_session'))
+        acid_session = self.nvim.vars.get('acid_current_session')
 
         if url is None:
             self.nvim.command('echom "No repl open"')
@@ -91,7 +91,7 @@ class Acid(object):
 
     @neovim.command("AcidUnsetSession")
     def acid_unset_session(self):
-        self.nvim.vars['acid_current_session'] = False
+        del self.nvim.vars['acid_current_session']
 
     @neovim.command("AcidUseLastSession")
     def acid_unset_session(self):
