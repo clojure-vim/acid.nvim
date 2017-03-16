@@ -37,7 +37,7 @@ def format_payload(payload):
                 ).strip())
 
                 for i in trailer:
-                    ls.append("{: <21} {}".format("", str(i)))
+                    ls.append("{: <20} {}".format("", str(i)))
     except e:
         logger.error("Couldn't finish producing output: {}".format(str(e)))
     finally:
