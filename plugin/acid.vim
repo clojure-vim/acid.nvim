@@ -13,7 +13,7 @@ function! AcidOpfunc(callback, block)
 endfunction
 
 function! s:require()
-  if expand("%r") !~ ".*test.*"
+  if exists(':AcidRequire') and expand("%r") !~ ".*test.*"
     AcidRequire
   endif
 endfunction
