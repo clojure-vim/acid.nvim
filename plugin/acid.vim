@@ -12,11 +12,11 @@ function! AcidOpfunc(callback, block)
   exec a:callback 'opfunc' s:ret
 endfunction
 
-function! s:require_on_save()
+function! s:require()
   if expand("%r") !~ ".*test.*"
     AcidRequire
   endif
 endfunction
 
 autocmd VimEnter * AcidInit
-autocmd BufWritePost,BufNewFile *.clj call s:require_on_save()
+autocmd BufWritePost,BufRead *.clj call s:require()
