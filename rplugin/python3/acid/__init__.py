@@ -45,6 +45,7 @@ class Acid(object):
              ('acid_log_messages', 0),
              ('acid_auto_require', 1),
              ('acid_auto_start_repl', 0),
+             ('acid_sessions', []),
              ('acid_namespace', 'user'),
              ('acid_start_repl_fn', 'jobstart'),
              ('acid_start_repl_args', ['lein repl'])]]
@@ -70,6 +71,7 @@ class Acid(object):
 
     def command(self, data, handlers):
         url = self.context()['url']
+        acid_session = bool(self.nvim.vars.get('acid_current_session'))
 
         if url is None:
             self.nvim.command('echom "No repl open"')
@@ -81,7 +83,20 @@ class Acid(object):
         if not 'op' in data:
             data.update({'op': 'eval'})
 
+        if acid_session:
+            data.update({'session': acid_session})
+
         send(self.sessions, url, handlers, data)
+
+
+    @neovim.command("AcidUnsetSession")
+    def acid_unset_session(self):
+        self.nvim.vars['acid_current_session'] = False
+
+    @neovim.command("AcidUseLastSession")
+    def acid_unset_session(self):
+        self.nvim.vars[
+            'acid_current_session'] = self.nvim.vars['acid_sessions'][-1]
 
     @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
