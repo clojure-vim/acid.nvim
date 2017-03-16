@@ -82,7 +82,7 @@ def get_acid_ns(nvim):
         'acid_ns_strategy', nvim.vars.get('acid_ns_strategy', 'global')
     )
     if strategy == 'buffer':
-        return path_to_ns
+        return path_to_ns(nvim)
     elif strategy == 'global':
         return 'user'
     elif 'ns:' in strategy:

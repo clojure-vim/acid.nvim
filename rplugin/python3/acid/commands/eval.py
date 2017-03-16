@@ -1,5 +1,5 @@
 from acid.commands import BaseCommand
-from acid.nvim import path_to_ns
+from acid.nvim import get_acid_ns
 
 
 class Command(BaseCommand):
@@ -24,12 +24,7 @@ class Command(BaseCommand):
         return self.nvim.funcs.getreg('s')
 
     def prepare_payload(self, mode, *args):
-        use_curr_ns = self.nvim.current.buffer.vars.get('acid_use_curr_ns')
-
-        if use_curr_ns is not None:
-            data = {'ns': path_to_ns(self.nvim)}
-        else:
-            data = {}
+        ns = get_acid_ns(self.nvim)
 
         if mode == 'shorthand':
             ret = self.shorthand()
@@ -40,5 +35,4 @@ class Command(BaseCommand):
         else:
             ret = " ".join([mode, *args])
 
-        data.update({"code": ret})
-        return data
+     return {"code": ret, "ns": ns}
