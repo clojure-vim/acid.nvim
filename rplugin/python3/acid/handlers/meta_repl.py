@@ -72,6 +72,7 @@ class Handler(SingletonHandler):
                 orientation="rightbelow 20",
                 commands=["set ft=clojure"]
             )
+            raise Exception("Just to check if this is working, ffs")
 
     def on_pre_send(self, msg, *_):
         [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
