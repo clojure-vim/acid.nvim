@@ -60,9 +60,8 @@ class Handler(SingletonHandler):
         no_cmd = self.cmd_buf_nr is None
 
         if no_cmd:
-            send = """:exec 'normal! mx$?^("sy%`x' | nohl |
-                call AcidSendNrepl({
-                    'op': 'eval', 'code': getreg("s")
+            send = """:call AcidSendNrepl({
+                'op': 'eval', 'code': join(getline(1, '$'), '\\n')
                 }, 'MetaRepl')<CR>""".splitlines()
 
             send = "map <buffer> <silent> <localleader><CR> {}".format(
