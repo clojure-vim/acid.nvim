@@ -19,4 +19,4 @@ function! s:require()
 endfunction
 
 autocmd VimEnter * AcidInit
-autocmd BufWritePost,BufRead *.clj call s:require()
+autocmd BufWritePost,BufReadPost *.clj call s:require()

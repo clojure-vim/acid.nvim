@@ -53,8 +53,15 @@ def current_file(nvim):
 def current_path(nvim):
     return nvim.funcs.getcwd()
 
-def path_to_ns(nvim):
+def path_to_ns(nvim, child=True):
     path = nvim.funcs.expand("%:r")
+    if child:
+        root = current_path(nvim)
+        full = os.path.join(root, path)
+        check = os.path.relpath(full, start=root)
+        if check.startswith('..'):
+            return None
+
     return ".".join(path.split('/')[1:]).replace("_","-")
 
 
