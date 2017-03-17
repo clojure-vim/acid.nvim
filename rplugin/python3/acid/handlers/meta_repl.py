@@ -73,8 +73,11 @@ class Handler(SingletonHandler):
 
         no_cmd = self.cmd_buf_nr is None
         has_no_cmd_window = self.nvim.funcs.bufwinnr(self.cmd_buf_nr) == -1
+        use_cmd_win = bool(self.nvim.vars.get(
+            'acid_meta_repl_use_cmd_window', False
+        ))
 
-        if (no_cmd or has_no_cmd_window):
+        if use_cmd_win and (no_cmd or has_no_cmd_window):
             send = """:call AcidSendNrepl({
                 'op': 'eval', 'code': join(getline(1, '$'), '\\n')
                 }, 'MetaRepl')<CR>""".splitlines()
