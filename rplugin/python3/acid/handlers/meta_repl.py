@@ -1,14 +1,39 @@
+# -*- coding: utf-8 -*-
 from acid.handlers import SingletonHandler
 from acid.zen.ui import build_window
 import logging
 
 logger = logging.getLogger(__name__)
-fh = logging.FileHandler('/tmp/acid-log-handler.log')
+fh = logging.FileHandler('/tmp/acid-log-handler.log', encoding='utf-8')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 logger.setLevel(logging.DEBUG)
+
+def format_dict(d):
+    lines = []
+    for k, v in d.items():
+        if type(v) == dict:
+            data = format_dict(v)
+        elif type(v) == list:
+            data = v
+        else:
+            data = [v]
+
+        logger.debug("Pre-parsed data: {}".format(str(data)))
+
+        if not data:
+            lines.append("{: <10} → []".format(k))
+        else:
+            i, *j = data
+            lines.append("{: <10} → {}".format(k, str(i).replace('\n','')))
+            [lines.append("{: <12} {}".format("", str(l).replace('\n','')))
+             for l in j]
+            logger.debug("Produced {} lines".format(len(lines)))
+
+    return lines
+
 
 def format_payload(payload):
     if type(payload) == str:
@@ -20,13 +45,24 @@ def format_payload(payload):
         for k, v in payload.items():
             key = k.lower()
             if key not in {'ns', 'session', 'id', 'op'}:
-                logger.debug('Adding {} with val {}'.format(key, str(v)))
-                if '\n' in v:
-                    header, *trailer = v.split('\n')
-                elif type(v) == list:
+                if type(v) == list:
+                    logger.debug('v is a list')
                     header, trailer = v[0], v[1:]
+                elif type(v) == dict:
+                    logger.debug('v is a dict')
+                    formatted = format_dict(v)
+                    logger.debug('Got {}'.format(str(formatted)))
+                    if len(formatted) > 0:
+                        header, *trailer = formatted
+                    else:
+                        header = []
+                elif '\n' in v:
+                    header, *trailer = v.split('\n')
                 else:
-                    header,  trailer = v, []
+                    header, trailer = v, []
+
+                if not header:
+                    next
 
                 if header.isspace() or header is "":
                     header, trailer = trailer[0], trailer[1:]
