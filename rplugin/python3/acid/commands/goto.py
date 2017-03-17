@@ -12,10 +12,11 @@ class Command(BaseCommand):
     shorthand_mapping = '<leader>f'
 
     def shorthand(self):
-        pre = self.nvim.funcs.getreg('s')
-        self.nvim.command('normal! "syiw')
-        data = self.nvim.funcs.getreg('s')
-        self.nvim.funcs.setreg('s', pre)
+        iskw = self.nvim.current.buffer.options['iskeyword']
+        self.nvim.current.buffer.options['iskeyword'] = \
+            ','.join(set(iskw.split(',')) | {"/"})
+        data = self.nvim.funcs.expand('<cword>')
+        self.nvim.current.buffer.options['iskeyword'] = iskw
         return data
 
     def prepare_payload(self, mode, *args):

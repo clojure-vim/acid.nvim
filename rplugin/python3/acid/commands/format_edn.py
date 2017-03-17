@@ -26,4 +26,4 @@ class Command(BaseCommand):
         else:
             ret = " ".join([mode, *args])
 
-        return {"edn": ret}
+        return {'edn': ret, 'pprint-fn': 'clojure.pprint/pprint'}
