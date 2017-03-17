@@ -25,7 +25,6 @@ def format_payload(payload):
                     header, *trailer = v.split('\n')
                 elif type(v) == list:
                     header, trailer = v[0], v[1:]
-
                 else:
                     header,  trailer = v, []
 
