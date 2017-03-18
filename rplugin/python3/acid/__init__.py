@@ -110,7 +110,7 @@ class Acid(object):
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
         payload = data[0]
-        handler = len(data) > 1 and data[1] or 'Proto'
+        handler = len(data) > 1 and data[1] or 'MetaRepl'
         config = len(data) > 2 and data[2] or None
 
         handler = self.get_handler(handler)

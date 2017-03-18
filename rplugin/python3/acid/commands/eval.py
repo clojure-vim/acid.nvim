@@ -7,7 +7,7 @@ class Command(BaseCommand):
     name = 'Eval'
     priority = 0
     cmd_name = 'AcidEval'
-    handlers = ['Proto']
+    handlers = ['MetaRepl']
     mapping = 'cp'
     opfunc = True
     nargs='*'
