@@ -62,7 +62,7 @@ class Acid(object):
                         self.extensions[ext_type][name].priority < priority):
                     self.extensions[ext_type][name] = extension
 
-        for command in self.extensions['commands']:
+        for command in self.extensions['commands'].values():
             command.do_init(self.nvim)
 
     def get_handler(self, name):
