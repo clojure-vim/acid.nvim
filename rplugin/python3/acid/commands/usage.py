@@ -12,7 +12,6 @@ class Command(BaseCommand):
     op = "info"
 
     def prepare_payload(self, *args):
-        self.nvim.command('normal! "syiw')
-        data = self.nvim.funcs.getreg('s')
+        data = self.nvim.funcs.expand('<cword>')
         ns = path_to_ns(self.nvim)
         return {"symbol": data, "ns": ns}
