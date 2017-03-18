@@ -5,6 +5,7 @@ from acid.nvim import path_to_ns
 class Command(BaseCommand):
 
     name = 'Require'
+    priority = 0
     cmd_name = 'AcidRequire'
     handlers = ['Ignore']
     op = "eval"

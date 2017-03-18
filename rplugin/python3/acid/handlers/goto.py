@@ -5,6 +5,7 @@ from acid.nvim import find_file_in_path
 class Handler(BaseHandler):
 
     name = "Goto"
+    priority = 0
 
     def on_handle(self, msg, *_):
         if 'file' in msg:

@@ -56,11 +56,14 @@ class Acid(object):
 
             if extension:
                 name = extension.name
+                priority = extension.priority
 
-                if name not in self.extensions[ext_type]:
+                if (name not in self.extensions[ext_type] or
+                        self.extensions[ext_type][name].priority < priority):
                     self.extensions[ext_type][name] = extension
-                    if ext_type == 'commands':
-                        extension.do_init(self.nvim)
+
+        for command in self.extensions['commands']:
+            command.do_init(self.nvim)
 
     def get_handler(self, name):
         return self.extensions['handlers'].get(name).do_init()

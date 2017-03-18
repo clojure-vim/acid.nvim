@@ -4,6 +4,7 @@ from acid.nvim import current_file, current_path, path_to_ns
 class Command(BaseCommand):
 
     name = 'FindUsage'
+    priority = 0
     cmd_name = 'AcidFindUsage'
     handlers = ['Usage']
     mapping = '<leader>u'

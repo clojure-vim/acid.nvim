@@ -4,6 +4,7 @@ from acid.handlers import BaseHandler
 class Handler(BaseHandler):
 
     name = "VimFn"
+    priority = 0
 
     def on_init(self):
         self.vim_fn = ""

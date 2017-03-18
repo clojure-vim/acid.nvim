@@ -5,6 +5,7 @@ from acid.nvim import get_acid_ns
 class Command(BaseCommand):
 
     name = 'FormatEdn'
+    priority = 0
     cmd_name = 'AcidFormatEdn'
     handlers = ['MetaRepl']
     mapping = 'cf'

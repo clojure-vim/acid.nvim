@@ -83,6 +83,7 @@ def format_payload(payload):
 class Handler(SingletonHandler):
 
     name = "MetaRepl"
+    priority = 0
 
     def on_init(self):
         self.buf_nr = None

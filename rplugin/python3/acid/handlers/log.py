@@ -5,6 +5,7 @@ import logging
 class Handler(SingletonHandler):
 
     name = "Log"
+    priority = 0
     finalizer = lambda *_: False
 
     def on_init(self):

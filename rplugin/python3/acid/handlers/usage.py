@@ -4,6 +4,7 @@ from acid.nvim import current_file, current_path
 class Handler(WithFSM):
 
     name = 'Usage'
+    priority = 0
 
     def transform(self, msg):
         return {

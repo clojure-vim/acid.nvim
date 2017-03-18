@@ -5,6 +5,7 @@ from acid.nvim import path_to_ns
 class Command(BaseCommand):
 
     name = 'Goto'
+    priority = 0
     nargs = 1
     cmd_name = 'AcidGoto'
     handlers = ['Goto']

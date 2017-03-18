@@ -5,6 +5,7 @@ from acid.nvim import get_acid_ns
 class Command(BaseCommand):
 
     name = 'Eval'
+    priority = 0
     cmd_name = 'AcidEval'
     handlers = ['Proto']
     mapping = 'cp'

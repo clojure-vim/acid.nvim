@@ -7,6 +7,7 @@ from zen.ui import selection_window
 class Handler(BaseHandler):
 
     name = "FileList"
+    priority = 0
 
     def on_init(self):
         self.acc = {}
