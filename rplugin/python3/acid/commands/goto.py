@@ -10,7 +10,7 @@ class Command(BaseCommand):
     cmd_name = 'AcidGoto'
     handlers = ['Goto']
     op = "info"
-    shorthand_mapping = '<leader>f'
+    shorthand_mapping = 'gd'
 
     def shorthand(self):
         iskw = self.nvim.current.buffer.options['iskeyword']

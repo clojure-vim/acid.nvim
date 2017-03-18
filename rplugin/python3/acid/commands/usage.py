@@ -7,7 +7,7 @@ class Command(BaseCommand):
     priority = 0
     cmd_name = 'AcidFindUsage'
     handlers = ['Usage']
-    mapping = '<leader>u'
+    mapping = 'gu'
     with_acid = True
     op = "info"
 
