@@ -10,7 +10,9 @@ class Command(BaseCommand):
     cmd_name = 'AcidRequire'
     handlers = ['Ignore']
     op = "eval"
-    mapping = '<leader>ar'
+    mapping = 'caR'
+    shorthand_mapping = 'car'
+    shorthand = 'normal! \\"syi]'
 
     def on_init(self):
         self.required_cache = {}

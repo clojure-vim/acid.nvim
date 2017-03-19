@@ -1,5 +1,6 @@
 import os
 import binascii
+import itertools
 import tempfile
 import zipfile
 import glob
@@ -53,16 +54,20 @@ def current_file(nvim):
 def current_path(nvim):
     return nvim.funcs.getcwd()
 
-def path_to_ns(nvim, child=True):
+def path_to_ns(nvim, external=True):
     path = nvim.funcs.expand("%:r")
-    if child:
+    project = nvim.funcs.expand("%:h:t")
+    if external:
         root = current_path(nvim)
         full = os.path.join(root, path)
         check = os.path.relpath(full, start=root)
         if check.startswith('..'):
             return None
 
-    return ".".join(path.split('/')[1:]).replace("_","-")
+    splitted = path.split('/')
+    ns = itertools.dropwhile(lambda k: k != project, splitted)
+
+    return ".".join(ns).replace("_","-")
 
 
 def get_port_no(nvim):
