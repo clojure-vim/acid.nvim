@@ -22,3 +22,5 @@ class Handler(BaseHandler):
                 self.nvim.funcs.cursor(l, c)
             else:
                 self.nvim.command("edit +{} {}".format(l, f))
+        elif 'no-info' in msg['status']:
+            self.nvim.command('echom "Acid: No information found for symbol"')
