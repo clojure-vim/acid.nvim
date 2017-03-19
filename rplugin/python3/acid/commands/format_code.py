@@ -4,14 +4,14 @@ from acid.nvim import get_acid_ns
 
 class Command(BaseCommand):
 
-    name = 'FormatEdn'
+    name = 'FormatCode'
     priority = 0
-    cmd_name = 'AcidFormatEdn'
+    cmd_name = 'AcidFormatCode'
     handlers = ['MetaRepl']
-    mapping = 'cfe'
+    mapping = 'cfc'
     opfunc = True
     nargs='*'
-    op = "format-edn"
+    op = "format-code"
 
     def prepare_payload(self, *args):
-        return {'edn': " ".join(args), 'pprint-fn': 'clojure.pprint/pprint'}
+        return {'code': " ".join(args), }
