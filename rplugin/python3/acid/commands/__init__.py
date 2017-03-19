@@ -89,8 +89,8 @@ class BaseCommand(object):
             mapping = nvim.vars.get(shorthand_mapping, mapping)
             shorthand = cls.shorthand
             cmd.append(silent_map(
-                mapping,
-                ':call AcidShorthand("{}", "{}")<CR>'.format(cmd_name, shorthand)
+                mapping, ":call AcidShorthand(\"{}\", \"{}\")<CR>".format(
+                    cmd_name, shorthand)
             ))
 
         if hasattr(cls, 'prompt'):

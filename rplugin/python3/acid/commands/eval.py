@@ -12,7 +12,7 @@ class Command(BaseCommand):
     opfunc = True
     nargs='*'
     op = "eval"
-    shorthand = '''normal! mx$?^("sy%`x'''
+    shorthand = '''normal! mx$?^(\<lt>CR>\\"sy%`x'''
 
     def prepare_payload(self, *args):
 

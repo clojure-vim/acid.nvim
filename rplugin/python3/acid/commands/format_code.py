@@ -9,7 +9,7 @@ class Command(BaseCommand):
     cmd_name = 'AcidFormatCode'
     handlers = ['MetaRepl']
     mapping = 'cfc'
-    shorthand = '''normal! mx$?^("sy%`x'''
+    shorthand = '''normal! mx$?^(\<lt>CR>\\"sy%`x'''
     opfunc = True
     nargs='*'
     op = "format-code"

@@ -5,6 +5,7 @@ class Command(BaseCommand):
 
     name = 'FindUsage'
     priority = 0
+    nargs = 1
     cmd_name = 'AcidFindUsage'
     handlers = ['Usage']
     with_acid = True
@@ -12,5 +13,5 @@ class Command(BaseCommand):
     shorthand_mapping = 'gu'
     shorthand="call setreg('s', expand('<cword>'))"
 
-    def prepare_payload(self, *args):
-        return {"symbol": " ".join(args), "ns": path_to_ns(self.nvim)}
+    def prepare_payload(self, data):
+        return {"symbol": data, "ns": path_to_ns(self.nvim)}
