@@ -13,18 +13,5 @@ class Command(BaseCommand):
     nargs='*'
     op = "format-edn"
 
-    def prompt(self):
-        self.nvim.call("inputsave")
-        ret = self.nvim.call("input", "acid - format-edn> ")
-        self.nvim.call("inputrestore")
-        return ret
-
-    def prepare_payload(self, mode, *args):
-        if mode == 'prompt':
-            ret = self.prompt()
-        elif mode == 'opfunc':
-            ret = " ".join(args)
-        else:
-            ret = " ".join([mode, *args])
-
-        return {'edn': ret, 'pprint-fn': 'clojure.pprint/pprint'}
+    def prepare_payload(self, *args):
+        return {'edn': " ".join(args), 'pprint-fn': 'clojure.pprint/pprint'}

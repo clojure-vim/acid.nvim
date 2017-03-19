@@ -82,18 +82,20 @@ class BaseCommand(object):
                 convert_case(cmd_name)
             )
             mapping = getattr(
-                cls, 'shortand_mapping',"{}{}".format(
+                cls, 'shorthand_mapping',"{}{}".format(
                     mapping, mapping[-1]
                 ) if mapping is not None else None
             )
             mapping = nvim.vars.get(shorthand_mapping, mapping)
+            shorthand = cls.shorthand
             cmd.append(silent_map(
-                mapping, ':{} shorthand<CR>'.format(cmd_name)
+                mapping,
+                ':call AcidShorthand("{}", "{}")<CR>'.format(cmd_name, shorthand)
             ))
 
         if hasattr(cls, 'prompt'):
-            prompt = 'command! -buffer -nargs=0 {}Prompt AcidCommand {} prompt'
-            cmd.append(prompt.format(cmd_name, cls.name))
+            prompt = 'command! -buffer -nargs=0 {}Prompt call AcidPrompt("{}")'
+            cmd.append(prompt.format(cmd_name, cmd_name))
 
         return cmd
 

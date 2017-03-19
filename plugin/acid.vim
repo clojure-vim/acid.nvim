@@ -9,7 +9,25 @@ function! AcidOpfunc(callback, block)
   endif
   let s:ret = getreg('s')
   call setreg('s', s:tmp)
-  exec a:callback 'opfunc' s:ret
+  exec a:callback s:ret
+endfunction
+
+function! AcidPrompt(callback)
+  call inputsave()
+  let s:ret = input(a:callback . " → ")
+  call inputrestore()
+  exec a:callback s:ret
+endfunction
+
+function! AcidShorthand(callback, shorthand)
+  let s:tmp = getreg('s')
+  let s:iskw = &iskeyword
+  setl iskeyword+=/
+  silent exec a:shorthand
+  exec "setl iskeyword=".s:iskw
+  let s:ret = getreg('s')
+  call setreg('s', s:tmp)
+  exec a:callback s:ret
 endfunction
 
 function! s:require()
