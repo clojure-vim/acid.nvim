@@ -6,6 +6,7 @@ class Command(BaseCommand):
 
     name = 'Require'
     priority = 0
+    nargs='*'
     cmd_name = 'AcidRequire'
     handlers = ['Ignore']
     op = "eval"
@@ -15,10 +16,12 @@ class Command(BaseCommand):
         self.required_cache = {}
 
     def prepare_payload(self, *args):
-        ns = path_to_ns(self.nvim)
-        if ns is None:
-            return None
+        if len(args) == 0:
+            ns = path_to_ns(self.nvim)
+            if ns is None:
+                return None
+        else:
+            ns = " ".join(args)
 
-        code = "(require '[{}] :reload)".format(ns)
-        return {"code": code}
+        return {"code": "(require '[{}] :reload)".format(ns)}
 
