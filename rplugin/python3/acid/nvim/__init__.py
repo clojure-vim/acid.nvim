@@ -54,7 +54,7 @@ def current_file(nvim):
 def current_path(nvim):
     return nvim.funcs.getcwd()
 
-def path_to_ns(nvim, external=True):
+def path_to_ns(nvim, external=False):
     path = nvim.funcs.expand("%:r")
     project = nvim.funcs.expand("%:h:t")
     if external:
@@ -65,6 +65,7 @@ def path_to_ns(nvim, external=True):
             return None
 
     splitted = path.split('/')
+    nvim.command('echom "{}, {}"'.format(project, splitted))
     ns = itertools.dropwhile(lambda k: k != project, splitted)
 
     return ".".join(ns).replace("_","-")
