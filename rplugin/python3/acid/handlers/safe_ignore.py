@@ -6,6 +6,6 @@ class Handler(BaseHandler):
     priority = 0
 
     def on_handle(self, msg, *_):
-        if 'ex' in msg:
-            self.nvim.command('echom "Acid: Exception {}"'.format(msg['ex']))
+        if 'err' in msg:
+            self.nvim.command('echom "Acid: {}"'.format(msg['err']))
 
