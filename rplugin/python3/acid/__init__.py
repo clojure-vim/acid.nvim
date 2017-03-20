@@ -34,6 +34,7 @@ class Acid(object):
         self.init_extensions('commands', 'Command')
         self.init_vars()
         self.init_commands()
+        self.init_clj_fns()
         self._init = True
 
     def init_commands(self):
