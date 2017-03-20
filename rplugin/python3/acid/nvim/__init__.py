@@ -58,9 +58,7 @@ def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
     project = nvim.funcs.getcwd().split("/")[-1]
     splitted = path.split('/')
-    nvim.command('echom "{}, {}"'.format(project, splitted))
     ns = itertools.dropwhile(lambda k: k != project, splitted)
-
     return ".".join(ns).replace("_","-")
 
 
