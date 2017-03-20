@@ -21,6 +21,10 @@ class Command(BaseCommand):
         if len(args) == 0:
             ns = path_to_ns(self.nvim)
             if ns is None:
+                self.nvim.command(
+                    'echom "Acid: Unable to require. '
+                    'Source code outside project"'
+                )
                 return None
         else:
             ns = " ".join(args)
