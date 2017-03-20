@@ -23,5 +23,4 @@ class Command(BaseCommand):
         with open(fpath) as clj:
             content = "\n".join(clj.readlines())
 
-        return {'code': content,
-                'ns': 'clojure-vim.acid.nvim.fns'}
+        return {'code': content}

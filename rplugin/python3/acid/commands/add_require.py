@@ -19,5 +19,4 @@ class Command(BaseCommand):
         self.nvim.command('exec "normal! mxgg/require\<CR>\\"sya)`x"')
         data = "(add-req '{} '{})".format(self.nvim.funcs.getreg("s"), require)
 
-        return {'code': data,
-                'ns': 'clojure-vim.acid.nvim.fns'}
+        return {'code': data}
