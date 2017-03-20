@@ -1,4 +1,4 @@
-![acid.nvim](https://github.com/clojure-vim/acid.nvim/raw/acidnvim.png "acid.nvim")
+![acid.nvim](https://github.com/clojure-vim/acid.nvim/raw/acidnvim.png)
 
 Asynchronous Clojure Interactive Development
 
