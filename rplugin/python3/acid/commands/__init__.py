@@ -72,7 +72,7 @@ class BaseCommand(object):
             mapping = nvim.vars.get(mapping_var, mapping)
             if nargs == 0:
                 cmd.append(silent_map(mapping, ':{}<CR>'.format(cmd_name)))
-            elif hasattr(clj, 'prompt'):
+            elif hasattr(cls, 'prompt'):
                 cmd.append(silent_map(mapping, ':{}Prompt<CR>'.format(cmd_name)))
 
         elif motion_mapping:
