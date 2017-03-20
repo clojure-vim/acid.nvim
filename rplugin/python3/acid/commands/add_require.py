@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def prepare_payload(self, *args):
         require = " ".join(args)
-        self.nvim.command('exec "normal! mxgg/require\<CR>\"sa)`x"')
+        self.nvim.command('exec "normal! mxgg/require\<CR>\"sya)`x"')
         data = "(add-req '{} '{})".format(self.nvim.funcs.getreg("s"), require)
 
         return {'code': data,
