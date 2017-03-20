@@ -17,8 +17,9 @@ def find_clojure_fn(nvim, fname):
     src = os.path.join('rplugin/python3/acid/clj_fns/', fname)
 
     for path in rtp:
-        if os.path.exists(path):
-            return glob.iglob(os.path.join(path, src))
+        partial = os.path.join(path, src)
+        if os.path.exists(partial):
+            return partial
 
 def find_extensions(nvim, source):
     """Search for base.py or *.py
