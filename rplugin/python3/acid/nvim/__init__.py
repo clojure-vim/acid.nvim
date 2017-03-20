@@ -8,20 +8,17 @@ import sys
 from importlib.machinery import SourceFileLoader
 
 
-def find_clojure_fns(nvim):
-    """Search for base.py or *.py
-
-    Searches $VIMRUNTIME/*/rplugin/python3/acid/$source[s]/
-    """
+def find_clojure_fn(nvim, fname):
     rtp = nvim.options.get('runtimepath', '').split(',')
 
     if not rtp:
         return
 
-    src = os.path.join('rplugin/python3/acid/clj_fns/*.clj')
+    src = os.path.join('rplugin/python3/acid/clj_fns/', fname)
 
     for path in rtp:
-        yield from glob.iglob(os.path.join(path, src))
+        if os.path.exists(path):
+            return glob.iglob(os.path.join(path, src))
 
 def find_extensions(nvim, source):
     """Search for base.py or *.py

@@ -47,16 +47,18 @@ class BaseCommand(object):
         cmd = []
         cmd_name = getattr(cls, 'cmd_name')
 
-        if cmd_name:
-            nargs = getattr(cls, 'nargs', 0)
-            cmd.append(
-                'command! -buffer -nargs={} {} AcidCommand {} {}'.format(
-                    nargs,
-                    cmd_name,
-                    cls.name,
-                    (nargs != '0' and '<args>' or '')
-                )
+        if not cmd_name:
+            return
+
+        nargs = getattr(cls, 'nargs', 0)
+        cmd.append(
+            'command! -buffer -nargs={} {} AcidCommand {} {}'.format(
+                nargs,
+                cmd_name,
+                cls.name,
+                (nargs != '0' and '<args>' or '')
             )
+        )
 
         mapping_var = "{}_command_mapping".format(convert_case(cmd_name))
 
@@ -66,10 +68,13 @@ class BaseCommand(object):
         default_mapping = mapping is not None and not opfunc
         motion_mapping = mapping is not None and opfunc
 
-
         if default_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
-            cmd.append(silent_map(mapping, ':{}<CR>'.format(cmd_name)))
+            if nargs == 0:
+                cmd.append(silent_map(mapping, ':{}<CR>'.format(cmd_name)))
+            elif hasattr(clj, 'prompt'):
+                cmd.append(silent_map(mapping, ':{}Prompt<CR>'.format(cmd_name)))
+
         elif motion_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
             cmd.append(opfuncfw(cmd_name))

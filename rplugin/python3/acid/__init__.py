@@ -3,7 +3,7 @@
 import neovim
 from acid.nvim import (
     path_to_ns, formatted_localhost_address,
-    find_clojure_fns, find_file_in_path, find_extensions, import_extensions
+    find_file_in_path, find_extensions, import_extensions
 )
 from acid.session import send, SessionHandler
 
@@ -34,7 +34,6 @@ class Acid(object):
         self.init_extensions('commands', 'Command')
         self.init_vars()
         self.init_commands()
-        self.init_clj_fns()
         self._init = True
 
     def init_commands(self):
@@ -56,15 +55,6 @@ class Acid(object):
              ('acid_start_repl_fn', 'jobstart'),
              ('acid_start_repl_args', ['lein repl'])]]
 
-    def init_clj_fns(self):
-        for clj_fn in find_clojure_fns(self.nvim):
-            with read(clj_fn) as f:
-                content = "\n".join(f.readlines())
-
-            data = {"op": "eval",
-                    "code": content,
-                    'ns': 'clojure-vim.acid.nvim.fns'}
-            self.acd_eval([data, 'Ignore'])
 
     def init_extensions(self, ext_type, klass):
         for path in find_extensions(self.nvim, ext_type):
