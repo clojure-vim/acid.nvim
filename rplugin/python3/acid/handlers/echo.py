@@ -15,5 +15,5 @@ class Handler(BaseHandler):
             value = msg['value']
 
         if value is not None:
-            self.nvim.command('echo "{}"'.format(value))
+            self.nvim.command('echo "{}"'.format(value.replace('"', '\\"')))
 
