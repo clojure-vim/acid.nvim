@@ -1,4 +1,4 @@
-# acid.nvim
+(https://github.com/clojure-vim/acid.nvim/raw/acidnvim.png "acid.nvim")
 
 Asynchronous Clojure Interactive Development
 
