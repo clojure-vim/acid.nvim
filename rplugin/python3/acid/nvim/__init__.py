@@ -71,8 +71,9 @@ def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
     project = nvim.funcs.getcwd().split("/")[-1]
     splitted = path.split('/')
-    ns = itertools.dropwhile(lambda k: k != project, splitted)
-    return ".".join(ns).replace("_","-")
+    ns = reversed(list(
+        itertools.takewhile(lambda k: k != project, reversed(splitted))))
+    return ".".join([project, *ns]).replace("_","-")
 
 def get_port_no(nvim):
     pwd = nvim.funcs.getcwd()
