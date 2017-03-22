@@ -22,10 +22,25 @@ Deoplete completion will be maintained on
 
 - [x] Allow non-python callbacks
 - [x] Outsource window/screen management
-- [ ] Provide means to build refactoring tools
-- [ ] Provide means to deal with jars
-- [ ] Provide means to build new tools with it
+- [x] Provide means to deal with jars
+- [x] Provide means to build new tools with it
 
 # 1.0 Simple
 
-- [ ] Simplify structures, bindings and connectivity
+- [x] Simplify structures, bindings and connectivity
+
+
+# 1.1 Stabilization of new features
+
+- [ ] Logs
+  - [ ] Unify logs for all files
+  - [ ] Make logs available for all handlers and commands
+- [ ] Messages
+  - [ ] Single entry for Logs and `echom` messages
+  - [ ] Prepend `Acid: ` on all messages
+  - [ ] Expose as a function for all handlers and commands
+
+# 1.2 New features
+
+- [ ] Fire autocommands when first connecting nrepl
+- [ ] Inject code when first connecting to a nrepl
