@@ -100,7 +100,14 @@ class Handler(SingletonHandler):
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
         if (no_shared_buffer or has_no_window):
-            cmds = ['file meta-repl']
+            cmds = ['file meta-repl',
+                    'nnoremap <buffer> <localleader><CR> :e<CR>',
+                    'nnoremap <buffer> <localleader>o kdggjdG',
+                    'nnoremap <buffer> <localleader>c kdgg',
+                    'nnoremap <buffer> <localleader>C dgg',
+                    'nnoremap <buffer> <localleader>d jdG',
+                    'nnoremap <buffer> <localleader>D dG',
+                    ]
             if self.nvim.funcs.exists(':AnsiEsc'):
                 cmds.append('AnsiEsc')
 
