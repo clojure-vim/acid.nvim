@@ -119,7 +119,7 @@ class BaseCommand(object):
 
         custom = get_customization_variable(
             acid.nvim,
-            "{}_command_handler".format(convert_case(self.cmd_name)),
+            "{}_command_handler".format(convert_case(inst.cmd_name)),
             inst.handlers
         )
 
