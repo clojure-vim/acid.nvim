@@ -25,6 +25,7 @@ def find_clojure_fn(nvim, fname):
         if os.path.exists(partial):
             return partial
 
+
 def find_extensions(nvim, source):
     """Search for base.py or *.py
 
@@ -68,6 +69,7 @@ def import_extensions(path, source, classname):
 def current_file(nvim):
     return nvim.funcs.expand("%:p")
 
+
 def current_path(nvim):
     return nvim.funcs.getcwd()
 
@@ -78,6 +80,7 @@ def path_to_ns(nvim):
     ns = reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted))))
     return ".".join([project, *ns]).replace("_","-")
+
 
 def get_port_no(nvim):
     pwd = nvim.funcs.getcwd()
@@ -138,6 +141,7 @@ def format_payload(payload):
                     ls.append("{: <14} {}".format("", str(i)))
     finally:
         return ls
+
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
