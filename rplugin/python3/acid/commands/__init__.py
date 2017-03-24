@@ -125,8 +125,8 @@ class BaseCommand(object):
             context, context['handlers'].get(h)
         )
 
-        handlers = map(start_handler,get_customization_variable(
-            self.nvim, inst.handlers_var, inst.default_handlers))
-        )
+        handlers = map(start_handler, get_customization_variable(
+            self.nvim, inst.handlers_var, inst.default_handlers
+        ))
 
         acid.command(payload, handlers)
