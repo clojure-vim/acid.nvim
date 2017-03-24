@@ -17,14 +17,10 @@ def convert_case(name):
 class BaseCommand(object):
 
     __instances__ = {}
-    default_handlers = ['']
-    handlers_var = None
     with_acid = False
 
     def __init__(self, nvim):
         self.nvim = nvim
-        handlers_var = "{}_command_handler".format(convert_case(self.cmd_name))
-        default_handlers = self.handlers
 
     def on_init(self):
         pass
@@ -122,11 +118,13 @@ class BaseCommand(object):
             payload.update({'op': cls.op})
 
         custom = get_customization_variable(
-            acid.nvim, inst.handlers_var, inst.default_handlers
+            acid.nvim,
+            "{}_command_handler".format(convert_case(self.cmd_name)),
+            inst.handlers
         )
 
         acid.nvim.command('echom "{}"'.format([
-            str(custom), inst.handlers_var, str(inst.default_handlers)
+            str(custom), inst.handlers_var, str(inst.handlers)
         ]))
 
         handlers = map(lambda h: inst.start_handler(
