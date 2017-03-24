@@ -1,3 +1,4 @@
+from acid.nvim import get_customization_variable
 import functools
 import re
 
@@ -16,18 +17,14 @@ def convert_case(name):
 class BaseCommand(object):
 
     __instances__ = {}
-    handlers = ['']
+    default_handlers = ['']
+    handlers_var = None
     with_acid = False
 
     def __init__(self, nvim):
         self.nvim = nvim
         handlers_var = "{}_command_handler".format(convert_case(self.cmd_name))
-        handlers = self.handlers
-
-        if handlers_var is not '':
-            self.actual_handlers = self.nvim.vars.get(handlers_var, handlers)
-        else:
-            self.actual_handlers = handlers
+        default_handlers = self.handlers
 
     def on_init(self):
         pass
@@ -124,10 +121,12 @@ class BaseCommand(object):
         if not 'op' in payload:
             payload.update({'op': cls.op})
 
-        get_handler = context['handlers'].get
-        start_handler = functools.partial(inst.start_handler, context)
+        start_handler = lambda h: inst.start_handler(
+            context, context['handlers'].get(h)
+        )
 
-        handler_classes = map(get_handler, inst.actual_handlers)
-        handlers = map(start_handler, handler_classes)
+        handlers = map(start_handler,get_customization_variable(
+            self.nvim, inst.handlers_var, inst.default_handlers))
+        )
 
         acid.command(payload, handlers)
