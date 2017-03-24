@@ -127,7 +127,7 @@ class BaseCommand(object):
 
         acid.nvim.command('echom "{}"'.format([
             str(custom), inst.handlers_var, str(inst.default_handlers)
-        )
+        ])
 
         handlers = map(lambda h: inst.start_handler(
             context, context['handlers'].get(h)), custom
