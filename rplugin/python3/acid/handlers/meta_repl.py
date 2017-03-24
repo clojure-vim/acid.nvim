@@ -99,41 +99,54 @@ class Handler(SingletonHandler):
         no_shared_buffer = self.buf_nr is None
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
-        if (no_shared_buffer or has_no_window):
+        if no_shared_buffer:
             cmds = ['file acid://meta-repl',
                     'nnoremap <buffer> <localleader><CR> :e<CR>',
                     'nnoremap <buffer> <localleader><localleader> kdggjdG',
                     'nnoremap <buffer> <localleader>D kdgg',
-                    'nnoremap <buffer> <localleader>d jdG',
-                    ]
+                    'nnoremap <buffer> <localleader>d jdG',]
             if self.nvim.funcs.exists(':AnsiEsc'):
                 cmds.append('AnsiEsc')
 
             self.buf_nr = build_window(
                 self.nvim, close=1, commands=cmds, throwaway=1
             )
+        elif has_no_window:
+            nvim.command('topleft vertical split | b {}'.format(self.buf_nr))
 
-        no_cmd = self.cmd_buf_nr is None
-        has_no_cmd_window = self.nvim.funcs.bufwinnr(self.cmd_buf_nr) == -1
+
         use_cmd_win = bool(self.nvim.vars.get(
             'acid_meta_repl_use_cmd_window', False
         ))
 
-        if use_cmd_win and (no_cmd or has_no_cmd_window):
-            send = """:call AcidSendNrepl({
-                'op': 'eval', 'code': join(getline(1, '$'), '\\n')
-                }, 'MetaRepl')<CR>""".splitlines()
+        if use_cmd_win:
+            no_cmd = self.cmd_buf_nr is None
+            has_no_cmd_window = self.nvim.funcs.bufwinnr(self.cmd_buf_nr) == -1
 
-            send = "map <buffer> <silent> <localleader><CR> {}".format(
-                "".join(map(str.strip, send))
-            )
-            self.cmd_buf_nr = build_window(
-                self.nvim,
-                close=1,
-                throwaway=1,
-                orientation="rightbelow 20 split",
-                commands=['file scratchpad', "set ft=clojure", send]
-            )
+            if no_cmd:
+                send = """:call AcidSendNrepl({
+                    'op': 'eval', 'code': join(getline(1, '$'), '\\n')
+                    }, 'MetaRepl')<CR>""".splitlines()
+
+                send = "map <buffer> <silent> <localleader><CR> {}".format(
+                    "".join(map(str.strip, send))
+                )
+
+                self.cmd_buf_nr = build_window(
+                    self.nvim,
+                    close=1,
+                    throwaway=1,
+                    orientation="rightbelow 20 split",
+                    commands=['file scratchpad',
+                              'set ft=clojure',
+                              send,
+                              "let b:acid_ns_strategy='ns:user'"]
+                )
+            elif has_no_cmd_window:
+                meta_repl_window = self.nvim.funcs.bufwinnr(self.buf_nr)
+                nvim.command("{} wincmd w".format(meta_repl_window))
+                nvim.command('rightbelow 20 split| b {}'.format(
+                    self.cmd_buf_nr))
 
     def on_pre_send(self, msg, *_):
         [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
