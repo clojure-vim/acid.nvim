@@ -111,9 +111,6 @@ class Handler(SingletonHandler):
             self.buf_nr = build_window(
                 self.nvim, close=1, commands=cmds, throwaway=1
             )
-        elif has_no_window:
-            nvim.command('topleft vertical split | b {}'.format(self.buf_nr))
-
 
         use_cmd_win = bool(self.nvim.vars.get(
             'acid_meta_repl_use_cmd_window', False
@@ -131,22 +128,19 @@ class Handler(SingletonHandler):
                 send = "map <buffer> <silent> <localleader><CR> {}".format(
                     "".join(map(str.strip, send))
                 )
+                meta_repl_window = self.nvim.funcs.bufwinnr(self.buf_nr)
+                nvim.command("{} wincmd w".format(meta_repl_window))
 
                 self.cmd_buf_nr = build_window(
                     self.nvim,
                     close=1,
                     throwaway=1,
                     orientation="rightbelow 20 split",
-                    commands=['file scratchpad',
+                    commands=['file acid://scratchpad',
                               'set ft=clojure',
                               send,
                               "let b:acid_ns_strategy='ns:user'"]
                 )
-            elif has_no_cmd_window:
-                meta_repl_window = self.nvim.funcs.bufwinnr(self.buf_nr)
-                nvim.command("{} wincmd w".format(meta_repl_window))
-                nvim.command('rightbelow 20 split| b {}'.format(
-                    self.cmd_buf_nr))
 
     def on_pre_send(self, msg, *_):
         [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
