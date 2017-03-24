@@ -117,14 +117,14 @@ class BaseCommand(object):
         if not 'op' in payload:
             payload.update({'op': cls.op})
 
+        handlers_var = "{}_command_handler".format(convert_case(inst.cmd_name))
+
         custom = get_customization_variable(
-            acid.nvim,
-            "{}_command_handler".format(convert_case(inst.cmd_name)),
-            inst.handlers
+            acid.nvim, handlers_var, inst.handlers
         )
 
         acid.nvim.command('echom "{}"'.format([
-            str(custom), inst.handlers_var, str(inst.handlers)
+            str(custom), handlers_var, str(inst.handlers)
         ]))
 
         handlers = map(lambda h: inst.start_handler(
