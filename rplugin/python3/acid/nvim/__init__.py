@@ -8,6 +8,10 @@ import sys
 from importlib.machinery import SourceFileLoader
 
 
+def get_customization_variable(nvim, var, default=None):
+    return nvim.current.buffer.vars.get(var, nvim.vars.get(var, default))
+
+
 def find_clojure_fn(nvim, fname):
     rtp = nvim.options.get('runtimepath', '').split(',')
 
@@ -98,16 +102,11 @@ def formatted_localhost_address(nvim):
 
 
 def get_acid_ns(nvim):
-    strategy = nvim.current.buffer.vars.get(
-        'acid_ns_strategy', nvim.vars.get('acid_ns_strategy', 'global')
-    )
+    strategy = get_customization_variable(nvim, 'acid_ns_strategy', 'buffer')
     if strategy == 'buffer':
         return path_to_ns(nvim)
-    elif strategy == 'global':
-        return 'user'
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
-
 
 
 def with_async(nvim):
