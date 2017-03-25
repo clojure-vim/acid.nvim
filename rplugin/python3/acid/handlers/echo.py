@@ -5,15 +5,16 @@ class Handler(BaseHandler):
     name = "Echo"
     priority = 0
 
+    def on_init(self):
+        self.value = []
+
     def on_handle(self, msg, *_):
-        value = None
         if 'out' in msg:
-            value = msg['out']
+            self.value.append(msg['out'])
         elif 'err' in msg:
-            value = msg['err']
+            self.value.append(msg['err'])
         elif 'value' in msg:
-            value = msg['value']
+            self.value.append("\n" + msg['value'])
 
-        if value is not None:
-            self.nvim.command('echo "{}"'.format(value.replace('"', '\\"')))
-
+    def on_after_finish(self, *_):
+        self.nvim.command('echo {}'.format(self.nvim.call("string", "".join(self.value))))
