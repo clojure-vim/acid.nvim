@@ -1,14 +1,13 @@
 import logging
 import inspect
 
-fh = None
+fh = logging.FileHandler('/tmp/acid-log-handler.log')
+fh.setLevel(logging.DEBUG)
 
-if fh is None:
-    fh = logging.FileHandler('/tmp/acid-log-handler.log')
+if fh.formatter is None:
     formatter = logging.Formatter(
         '%(asctime)s - [%(name)s :%(levelname)s] - %(message)s'
     )
-    fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
 
 def _log(frame, fn):
