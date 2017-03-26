@@ -91,7 +91,7 @@ class Handler(SingletonHandler):
         no_shared_buffer = self.buf_nr is None
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
-        if no_shared_buffer:
+        if no_shared_buffer or has_no_window:
             cmds = ['file acid://meta-repl',
                     'nnoremap <buffer> <localleader><CR> :e<CR>',
                     'nnoremap <buffer> <localleader><localleader> kdggjdG',
@@ -112,7 +112,7 @@ class Handler(SingletonHandler):
             no_cmd = self.cmd_buf_nr is None
             has_no_cmd_window = self.nvim.funcs.bufwinnr(self.cmd_buf_nr) == -1
 
-            if no_cmd:
+            if no_cmd or has_no_cmd_window:
                 send = """:call AcidSendNrepl({
                     'op': 'eval', 'code': join(getline(1, '$'), '\\n')
                     }, 'MetaRepl')<CR>""".splitlines()
