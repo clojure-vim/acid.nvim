@@ -11,7 +11,7 @@ fh.setFormatter(formatter)
 def _log(frame, fn):
     name = inspect.getmodule(frame[0]).__name__
     logger = logging.getLogger(name)
-    if not logger.hasHandlers():
+    if not fh in logger.handlers:
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
     fn(logger)
