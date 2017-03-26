@@ -8,19 +8,8 @@ sys.path.insert(0, os.path.dirname(os.path.relpath(__file__)))
 import nrepl
 import uuid
 
-import logging
 from collections import defaultdict
-
-logger = logging.getLogger(__name__)
-fh = logging.FileHandler('/tmp/acid-sessions.log')
-fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-fh.setFormatter(formatter)
-logger.addHandler(fh)
-logger.setLevel(logging.DEBUG)
-
+from acid.nvim import log
 
 def finalize_watch(wc, key):
     wc.unwatch(key)
@@ -50,20 +39,20 @@ class SessionHandler(object):
         conn = self.get_or_create(url)
 
         if not watcher_key in self.persistent[url]:
-            logger.info('Adding new persisntent watcher fn: {}'.format(
+            log.log_info('Adding new persisntent watcher fn: {}'.format(
                 handler.name
             ))
 
             self.persistent[url].add(watcher_key)
 
-            logger.debug('persistent handler -> {}'.format(str(handler)))
-            logger.debug('connection -> {}'.format(str(url)))
-            logger.debug('key -> {}'.format(str(watcher_key)))
+            log.log_debug('persistent handler -> {}'.format(str(handler)))
+            log.log_debug('connection -> {}'.format(str(url)))
+            log.log_debug('key -> {}'.format(str(watcher_key)))
 
             patched_handler = handler.gen_handler(finalize_watch)
             conn.watch(watcher_key, matches, patched_handler)
         else:
-            logger.info('Persisntent watcher fn exists, skipping: {}'.format(
+            log.log_info('Persisntent watcher fn exists, skipping: {}'.format(
                 handler.name
             ))
 
@@ -74,10 +63,11 @@ class SessionHandler(object):
         watcher_key = "{}-{}-watcher".format(msg_id, handler.name)
         conn = self.get_or_create(url)
 
-        logger.info('handler -> {}'.format(str(handler)))
-        logger.info('connection -> {}'.format(str(url)))
-        logger.info('matchers -> {}'.format(str(matches)))
-        logger.info('key -> {}'.format(str(watcher_key)))
+        log.log_info(
+            'handler -> {}, connection -> {}, '
+            'matchers -> {}, key -> {}'.format(
+                str(handler), str(url), str(matches), str(watcher_key)
+            ))
 
         patched_handler = handler.gen_handler(finalize_watch)
 
@@ -89,14 +79,14 @@ class SessionHandler(object):
         try:
             handler.pre_handle(msg_id, url)
         except Exception as e:
-            logger.error('Err: could not pre-handler -> {}'.format(str(e)))
+            log.log_error('Err: could not pre-handler -> {}'.format(str(e)))
 
     def send(self, url, data, handlers):
         conn = self.get_or_create(url)
-        logger.info('sending data -> {}'.format(str(data)))
+        log.log_info('sending data -> {}'.format(str(data)))
 
         for handler in handlers:
-            logger.info('passing data to handler {}'.format(str(handler)))
+            log.log_info('passing data to handler {}'.format(str(handler)))
             handler.pre_send(data)
 
         try:
@@ -112,7 +102,6 @@ def send(session, url, handlers, data):
 
     handlers = list(handlers)
 
-    logger.info("handlers = {}".format(handlers))
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, handler.matcher)
 

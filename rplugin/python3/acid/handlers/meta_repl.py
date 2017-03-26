@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
 from acid.handlers import SingletonHandler
 from acid.zen.ui import build_window
-import logging
-
-logger = logging.getLogger(__name__)
-fh = logging.FileHandler('/tmp/acid-log-handler.log', encoding='utf-8')
-fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
-logger.setLevel(logging.DEBUG)
+from acid.nvim.log import log_debug, log_info, log_warning, log_error
 
 def format_dict(d):
     lines = []
@@ -21,7 +13,7 @@ def format_dict(d):
         else:
             data = [v]
 
-        logger.debug("Pre-parsed data: {}".format(str(data)))
+        log_debug("Pre-parsed data: {}".format(str(data)))
 
         if not data:
             lines.append("{: <10} → []".format(k))
@@ -30,7 +22,7 @@ def format_dict(d):
             lines.append("{: <10} → {}".format(k, str(i).replace('\n','')))
             [lines.append("{: <12} {}".format("", str(l).replace('\n','')))
              for l in j]
-            logger.debug("Produced {} lines".format(len(lines)))
+            log_debug("Produced {} lines".format(len(lines)))
 
     return lines
 
@@ -46,12 +38,12 @@ def format_payload(payload):
             key = k.lower()
             if key not in {'ns', 'session', 'id', 'op'}:
                 if type(v) == list:
-                    logger.debug('v is a list')
+                    log_debug('v is a list')
                     header, trailer = v[0], v[1:]
                 elif type(v) == dict:
-                    logger.debug('v is a dict')
+                    log_debug('v is a dict')
                     formatted = format_dict(v)
-                    logger.debug('Got {}'.format(str(formatted)))
+                    log_debug('Got {}'.format(str(formatted)))
                     if len(formatted) > 0:
                         header, *trailer = formatted
                     else:
@@ -74,10 +66,10 @@ def format_payload(payload):
                 for i in trailer:
                     ls.append("{: <20} {}".format("", str(i)))
     except e:
-        logger.error("Couldn't finish producing output: {}".format(str(e)))
+        log_error("Couldn't finish producing output: {}".format(str(e)))
     finally:
         if len(ls) == 0:
-            logger.warn("Empty output for ls: {}".format(str(payload)))
+            log_warn("Empty output for ls: {}".format(str(payload)))
         return ls
 
 class Handler(SingletonHandler):
