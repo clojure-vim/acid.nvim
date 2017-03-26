@@ -10,7 +10,7 @@ fh.setFormatter(formatter)
 
 
 def _log(frame, fn):
-    name = inspect.getmodule(frm[0])
+    name = inspect.getmodule(frame[0])
     logger = logging.getLogger(name)
     logger.addHandler(fh)
     logger.setLevel(logging.DEBUG)
