@@ -1,10 +1,9 @@
 # encoding:utf-8
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
-from acid.nvim import log
 from acid.nvim import (
     path_to_ns, formatted_localhost_address, get_acid_ns,
-    find_file_in_path, find_extensions, import_extensions
+    find_file_in_path, find_extensions, import_extensions, log
 )
 from acid.session import send, SessionHandler
 
@@ -108,7 +107,7 @@ class Acid(object):
     @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
         cmd, *args = args
-        log.log_info("Received args for command {}: {}".format(cmd, args))
+        log.log_info(r"Received args for command {}: {}".format(cmd, args))
         command = self.extensions['commands'].get(cmd.strip())
         command.call(self, self.context(), *args)
 
