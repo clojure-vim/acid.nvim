@@ -14,6 +14,8 @@ def _log(frame, fn):
     if not fh in logger.handlers:
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
+
+    logger.debug('handlers: {}'.format(logger.handlers))
     fn(logger)
 
 def log_debug(message, name=None):
