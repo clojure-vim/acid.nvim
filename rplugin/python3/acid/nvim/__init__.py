@@ -78,8 +78,8 @@ def path_to_ns(nvim):
     path = nvim.funcs.expand("%:r")
     project = nvim.funcs.getcwd().split("/")[-1]
     splitted = path.split('/')
-    ns = reversed(list(
-        itertools.takewhile(lambda k: k != project, reversed(splitted))))
+    ns = list(reversed(list(
+        itertools.takewhile(lambda k: k != project, reversed(splitted)))))
     log_debug("ns -> {}, project -> {}, path -> {}".format(
         ns, project, splitted))
     return ".".join([project, *ns]).replace("_","-")
