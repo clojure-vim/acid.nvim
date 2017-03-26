@@ -9,11 +9,11 @@ fh.setLevel(logging.DEBUG)
 fh.setFormatter(formatter)
 
 def _log(frame, fn):
+    name = inspect.getmodule(frame[0]).__name__
     logger = logging.getLogger(name)
     if not logger.hasHandlers():
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
-    name = inspect.getmodule(frame[0]).__name__
     fn(logger)
 
 def log_debug(message, name=None):
