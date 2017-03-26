@@ -6,6 +6,7 @@ import zipfile
 import glob
 import sys
 from importlib.machinery import SourceFileLoader
+from acid.nvim.log import log_debug
 
 
 def get_customization_variable(nvim, var, default=None):
@@ -79,6 +80,8 @@ def path_to_ns(nvim):
     splitted = path.split('/')
     ns = reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted))))
+    log_debug("ns -> {}, project -> {}, path -> {}".format(
+        ns, project, splitted))
     return ".".join([project, *ns]).replace("_","-")
 
 
