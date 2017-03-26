@@ -4,7 +4,7 @@ import inspect
 fh = None
 
 if fh is None:
-    logging.FileHandler('/tmp/acid-log-handler.log')
+    fh = logging.FileHandler('/tmp/acid-log-handler.log')
     formatter = logging.Formatter(
         '%(asctime)s - [%(name)s :%(levelname)s] - %(message)s'
     )
