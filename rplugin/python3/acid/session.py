@@ -32,7 +32,6 @@ class SessionHandler(object):
 
         return self.sessions[url]['conn']
 
-
     def add_persistent_watch(self, url, handler, matches={}):
         "Adds a callback to all messages in a connection."
         watcher_key = "{}-persistent".format(handler.name)
@@ -56,8 +55,6 @@ class SessionHandler(object):
                 handler.name
             ))
 
-
-
     def add_atomic_watch(self, url, msg_id, handler, matches={}):
         "Adds a callback to a msg_id on a connection."
         watcher_key = "{}-{}-watcher".format(msg_id, handler.name)
@@ -79,7 +76,7 @@ class SessionHandler(object):
         try:
             handler.pre_handle(msg_id, url)
         except Exception as e:
-            log.log_error('Err: could not pre-handler -> {}'.format(str(e)))
+            log.log_error('Err: could not pre-handle -> {}'.format(str(e)))
 
     def send(self, url, data, handlers):
         conn = self.get_or_create(url)
