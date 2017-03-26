@@ -75,14 +75,14 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 def path_to_ns(nvim):
-    path = nvim.funcs.expand("%:r")
-    project = nvim.funcs.getcwd().split("/")[-1]
+    path = nvim.funcs.expand("%:r").replace("_", "-")
+    project = nvim.funcs.getcwd().split("/")[-1].replace("_","-")
     splitted = path.split('/')
     ns = list(reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted)))))
     log_debug("ns -> {}, project -> {}, path -> {}".format(
         ns, project, splitted))
-    return ".".join([project, *ns]).replace("_","-")
+    return ".".join([project, *ns])
 
 
 def get_port_no(nvim):
