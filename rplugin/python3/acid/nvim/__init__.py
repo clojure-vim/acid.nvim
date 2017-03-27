@@ -82,7 +82,7 @@ def path_to_ns(nvim):
         if node == 'src':
             raw_path_list = path[ix-1:]
             break
-    project, splitted* = raw_path_list
+    project, *splitted = raw_path_list
 
     ns = list(reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted)))))
