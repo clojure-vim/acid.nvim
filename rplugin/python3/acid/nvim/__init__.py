@@ -75,9 +75,15 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 def path_to_ns(nvim):
-    path = nvim.funcs.expand("%:r").replace("_", "-")
-    project = nvim.funcs.getcwd().split("/")[-1].replace("_","-")
-    splitted = path.split('/')
+    path = nvim.funcs.expand("%:p").replace("_", "-").split('/')
+    raw_path_list = None
+
+    for ix, node in enumerate(path):
+        if node == 'src':
+            raw_path_list = path[ix-1:]
+            break
+    project, splitted* = raw_path_list
+
     ns = list(reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted)))))
     log_debug("ns -> {}, project -> {}, path -> {}".format(
