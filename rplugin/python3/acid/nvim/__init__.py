@@ -75,7 +75,7 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 def path_to_ns(nvim):
-    path = nvim.funcs.expand("%:p").replace("_", "-").split('/')
+    path = nvim.funcs.expand("%:p").replace("_", "-").split('/')[:-1]
     raw_path_list = None
 
     for ix, node in enumerate(path):
