@@ -10,7 +10,7 @@ class Handler(BaseHandler):
         self.vim_fn = ""
 
     def configure(self, vim_fn, *args, **kwargs):
-        super().configure(*args, **kargs)
+        super().configure(*args, **kwargs)
         self.vim_fn = vim_fn
         return self
 
