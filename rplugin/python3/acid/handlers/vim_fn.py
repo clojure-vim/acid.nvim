@@ -8,6 +8,7 @@ class Handler(BaseHandler):
 
     def on_init(self):
         self.vim_fn = ""
+        self.value = []
 
     def configure(self, vim_fn, *args, **kwargs):
         super().configure(*args, **kwargs)
@@ -15,5 +16,8 @@ class Handler(BaseHandler):
         return self
 
     def on_handle(self, msg, *_):
+        self.value.append(msg)
+
+    def on_after_finish(self, *_):
         if self.vim_fn:
-            self.nvim.call(self.vim_fn, msg)
+            self.nvim.call(self.vim_fn, self.value)
