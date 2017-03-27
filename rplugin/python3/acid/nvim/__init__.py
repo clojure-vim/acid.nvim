@@ -6,7 +6,7 @@ import zipfile
 import glob
 import sys
 from importlib.machinery import SourceFileLoader
-from acid.nvim.log import log_debug
+from acid.nvim.log import log_debug, log_warning
 
 
 def get_customization_variable(nvim, var, default=None):
@@ -75,19 +75,30 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 def path_to_ns(nvim):
-    path = nvim.funcs.expand("%:p:r").replace("_", "-").split('/')
+    path = nvim.funcs.expand("%:p:r").replace("_", "-").split('/')[1:]
     raw_path_list = None
 
     for ix, node in enumerate(path):
         if node == 'src':
             raw_path_list = path[ix-1:]
             break
+
+    if raw_path_list is None:
+        # Look for project.clj
+        for ix, _ in enumerate(path):
+            if os.path.exists(os.path.join(*["/", *path[:ix], "project.clj"])):
+                raw_path_list = path[ix-1:]
+                break
+
+    if raw_path_list is None:
+        log_warning("Have not found any viable path")
+    else:
+        log_debug("Found path list: {}".format(raw_path_list))
+
     project, *splitted = raw_path_list
 
     ns = list(reversed(list(
         itertools.takewhile(lambda k: k != project, reversed(splitted)))))
-    log_debug("ns -> {}, project -> {}, path -> {}".format(
-        ns, project, splitted))
     return ".".join([project, *ns])
 
 
