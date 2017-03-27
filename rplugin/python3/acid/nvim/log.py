@@ -13,11 +13,10 @@ if fh.formatter is None:
 def _log(frame, fn):
     name = inspect.getmodule(frame[0]).__name__
     logger = logging.getLogger(name)
-    if not fh in logger.handlers:
+    if not len(logger.handlers):
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
 
-    logger.debug('handlers: {}'.format(logger.handlers))
     fn(logger)
 
 def log_debug(message, name=None):
