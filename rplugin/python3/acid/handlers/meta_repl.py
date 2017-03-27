@@ -69,7 +69,7 @@ def format_payload(payload):
         log_error("Couldn't finish producing output: {}".format(str(e)))
     finally:
         if len(ls) == 0:
-            log_warn("Empty output for ls: {}".format(str(payload)))
+            log_warning("Empty output for ls: {}".format(str(payload)))
         return ls
 
 class Handler(SingletonHandler):
