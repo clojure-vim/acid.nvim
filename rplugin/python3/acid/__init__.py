@@ -3,8 +3,9 @@
 import neovim
 from acid.nvim import (
     path_to_ns, formatted_localhost_address, get_acid_ns,
-    find_file_in_path, find_extensions, import_extensions, log
+    find_file_in_path, find_extensions, import_extensions
 )
+from acid.nvim.log import log_info, echo, warning
 from acid.session import send, SessionHandler
 
 
@@ -80,7 +81,7 @@ class Acid(object):
         acid_session = self.nvim.vars.get('acid_current_session')
 
         if url is None:
-            log.echo(self.nvim, 'No repl open')
+            echo(self.nvim, 'No repl open')
             return
 
         if self.nvim.vars['acid_log_messages']:
@@ -107,7 +108,7 @@ class Acid(object):
     @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
         cmd, *args = args
-        log.log_info(r"Received args for command {}: {}", cmd, args)
+        log_info(r"Received args for command {}: {}", cmd, args)
         command = self.extensions['commands'].get(cmd.strip())
         command.call(self, self.context(), *args)
 
@@ -120,7 +121,7 @@ class Acid(object):
         handler = self.get_handler(handler)
 
         if handler is None:
-            log.warning(self.nvim, "Handler not found")
+            warning(self.nvim, "Handler not found")
             return
 
         context = self.context()
