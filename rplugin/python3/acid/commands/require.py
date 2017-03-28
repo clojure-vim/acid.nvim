@@ -8,7 +8,7 @@ class Command(BaseCommand):
     priority = 0
     nargs='*'
     cmd_name = 'AcidRequire'
-    handlers = ['Ignore']
+    handlers = {'Ignore': '', 'DoAutocmd': 'AcidRequired'}
     op = "eval"
     mapping = 'caR'
     shorthand_mapping = 'car'
