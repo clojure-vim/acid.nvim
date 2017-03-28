@@ -13,7 +13,7 @@ def format_dict(d):
         else:
             data = [v]
 
-        log_debug("Pre-parsed data: {}".format(str(data)))
+        log_debug("Pre-parsed data: {}", str(data))
 
         if not data:
             lines.append("{: <10} → []".format(k))
@@ -22,7 +22,7 @@ def format_dict(d):
             lines.append("{: <10} → {}".format(k, str(i).replace('\n','')))
             [lines.append("{: <12} {}".format("", str(l).replace('\n','')))
              for l in j]
-            log_debug("Produced {} lines".format(len(lines)))
+            log_debug("Produced {} lines", len(lines))
 
     return lines
 
@@ -43,7 +43,7 @@ def format_payload(payload):
                 elif type(v) == dict:
                     log_debug('v is a dict')
                     formatted = format_dict(v)
-                    log_debug('Got {}'.format(str(formatted)))
+                    log_debug('Got {}', str(formatted))
                     if len(formatted) > 0:
                         header, *trailer = formatted
                     else:
@@ -66,10 +66,10 @@ def format_payload(payload):
                 for i in trailer:
                     ls.append("{: <20} {}".format("", str(i)))
     except e:
-        log_error("Couldn't finish producing output: {}".format(str(e)))
+        log_error("Couldn't finish producing output: {}", str(e))
     finally:
         if len(ls) == 0:
-            log_warning("Empty output for ls: {}".format(str(payload)))
+            log_warning("Empty output for ls: {}", str(payload))
         return ls
 
 class Handler(SingletonHandler):

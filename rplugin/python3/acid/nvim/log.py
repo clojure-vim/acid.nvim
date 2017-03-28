@@ -20,16 +20,20 @@ def _log(frame):
     return logger
 
 def log_debug(message, *args):
-    _log(inspect.stack()[1]).debug(message.format(*args))
+    message = message.format(*args) if len(args) > 0 else message
+    _log(inspect.stack()[1]).debug(message)
 
 def log_info(message, *args):
-    _log(inspect.stack()[1]).info(message.format(*args))
+    message = message.format(*args) if len(args) > 0 else message
+    _log(inspect.stack()[1]).info(message)
 
 def log_warning(message, *args):
-    _log(inspect.stack()[1]).warning(message.format(*args))
+    message = message.format(*args) if len(args) > 0 else message
+    _log(inspect.stack()[1]).warning(message)
 
 def log_error(message, *args):
-    _log(inspect.stack()[1]).error(message.format(*args))
+    message = message.format(*args) if len(args) > 0 else message
+    _log(inspect.stack()[1]).error(message)
 
 def echo(nvim, message):
     nvim.command('echom "Acid: {}"'.format(nvim.funcs.string(message)))

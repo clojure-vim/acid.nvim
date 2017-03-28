@@ -94,7 +94,7 @@ def path_to_ns(nvim):
     if raw_path_list is None:
         log_warning("Have not found any viable path")
     else:
-        log_debug("Found path list: {}".format(raw_path_list))
+        log_debug("Found path list: {}", raw_path_list)
 
     project, *splitted = raw_path_list
 

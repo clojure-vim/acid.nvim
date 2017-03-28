@@ -38,22 +38,20 @@ class SessionHandler(object):
         conn = self.get_or_create(url)
 
         if not watcher_key in self.persistent[url]:
-            log.log_info('Adding new persisntent watcher fn: {}'.format(
-                handler.name
-            ))
+            log.log_info('Adding new persisntent watcher fn: {}', handler.name)
 
             self.persistent[url].add(watcher_key)
 
-            log.log_debug('persistent handler -> {}'.format(str(handler)))
-            log.log_debug('connection -> {}'.format(str(url)))
-            log.log_debug('key -> {}'.format(str(watcher_key)))
+            log.log_debug('persistent handler -> {}', str(handler))
+            log.log_debug('connection -> {}', str(url))
+            log.log_debug('key -> {}', str(watcher_key))
 
             patched_handler = handler.gen_handler(finalize_watch)
             conn.watch(watcher_key, matches, patched_handler)
         else:
-            log.log_info('Persisntent watcher fn exists, skipping: {}'.format(
-                handler.name
-            ))
+            log.log_info(
+                'Persisntent watcher fn exists, skipping: {}', handler.name
+            )
 
     def add_atomic_watch(self, url, msg_id, handler, matches={}):
         "Adds a callback to a msg_id on a connection."
@@ -75,14 +73,14 @@ class SessionHandler(object):
         try:
             handler.pre_handle(msg_id, url)
         except Exception as e:
-            log.log_error('Err: could not pre-handle -> {}'.format(str(e)))
+            log.log_error('Err: could not pre-handle -> {}', str(e))
 
     def send(self, url, data, handlers):
         conn = self.get_or_create(url)
-        log.log_info('sending data -> {}'.format(str(data)))
+        log.log_info('sending data -> {}', str(data))
 
         for handler in handlers:
-            log.log_info('passing data to handler {}'.format(str(handler)))
+            log.log_info('passing data to handler {}', str(handler))
             handler.pre_send(data)
 
         try:

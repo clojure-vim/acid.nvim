@@ -107,7 +107,7 @@ class Acid(object):
     @neovim.command("AcidCommand", nargs='*')
     def acid_command(self, args):
         cmd, *args = args
-        log.log_info(r"Received args for command {}: {}".format(cmd, args))
+        log.log_info(r"Received args for command {}: {}", cmd, args)
         command = self.extensions['commands'].get(cmd.strip())
         command.call(self, self.context(), *args)
 
