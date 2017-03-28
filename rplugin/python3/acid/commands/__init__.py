@@ -123,10 +123,6 @@ class BaseCommand(object):
             acid.nvim, handlers_var, inst.handlers
         )
 
-        log.log_debug([
-            str(custom), handlers_var, str(inst.handlers)
-        ])
-
         handlers = map(lambda h: inst.start_handler(
             context, context['handlers'].get(h)), custom
         )
