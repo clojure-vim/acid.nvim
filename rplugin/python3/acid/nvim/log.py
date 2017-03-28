@@ -17,7 +17,7 @@ def _log(frame):
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
 
-   return logger
+    return logger
 
 def log_debug(message, *args):
     _log(inspect.stack()[1]).debug(message.format(*args))
