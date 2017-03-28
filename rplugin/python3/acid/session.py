@@ -61,10 +61,9 @@ class SessionHandler(object):
         conn = self.get_or_create(url)
 
         log.log_info(
-            'handler -> {}, connection -> {}, '
-            'matchers -> {}, key -> {}'.format(
-                str(handler), str(url), str(matches), str(watcher_key)
-            ))
+            'handler -> {}, connection -> {}, matchers -> {}, key -> {}',
+            str(handler), str(url), str(matches), str(watcher_key)
+            )
 
         patched_handler = handler.gen_handler(finalize_watch)
 
