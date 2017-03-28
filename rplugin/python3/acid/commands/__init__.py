@@ -20,7 +20,7 @@ def items(col):
         return col.items()
     if t == str:
         return [col]
-    return col
+    return [[i] for i in  col]
 
 class BaseCommand(object):
 
@@ -131,10 +131,9 @@ class BaseCommand(object):
             acid.nvim, handlers_var, inst.handlers
         )
 
-        handlers = map(
-            lambda h, *args: inst.start_handler(
-                context, context['handlers'].get(h), *args
-            ), items(custom)
+        handlers = (
+            inst.start_handler(context, context['handlers'].get(h), *args)
+            for h, *args in items(custom)
         )
 
         acid.command(payload, handlers)
