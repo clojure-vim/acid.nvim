@@ -36,7 +36,7 @@ def log_error(message, *args):
     _log(inspect.stack()[1]).error(message)
 
 def echo(nvim, message):
-    nvim.command('echom "{}"'.format(nvim.funcs.string(
+    nvim.command('echom {}'.format(nvim.funcs.string(
         "Acid: {}".format(message)
     )))
 
