@@ -14,6 +14,14 @@ def convert_case(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
+def items(col):
+    t = type(col)
+    if t == dict:
+        return col.items()
+    if t == str:
+        return [col]
+    return col
+
 class BaseCommand(object):
 
     __instances__ = {}
@@ -28,12 +36,12 @@ class BaseCommand(object):
     def prepare_payload(self, *args):
         return {}
 
-    def configure(self, context, handler):
-        handler.configure(**context)
+    def configure(self, context, handler, *args):
+        handler.configure(*args, **context)
         return handler
 
-    def start_handler(self, context, handler):
-        return self.configure(context, handler.do_init())
+    def start_handler(self, context, handler, *args):
+        return self.configure(context, handler.do_init(), *args)
 
     @classmethod
     def build_interfaces(cls, nvim):
@@ -123,8 +131,10 @@ class BaseCommand(object):
             acid.nvim, handlers_var, inst.handlers
         )
 
-        handlers = map(lambda h: inst.start_handler(
-            context, context['handlers'].get(h)), custom
+        handlers = map(
+            lambda h, *args: inst.start_handler(
+                context, context['handlers'].get(h), *args
+            ), items(custom)
         )
 
         acid.command(payload, handlers)
