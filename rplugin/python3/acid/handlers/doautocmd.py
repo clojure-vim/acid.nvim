@@ -19,6 +19,6 @@ class Handler(BaseHandler):
         self.successful = self.successful and not 'err' in msg
 
     def on_after_finish(self, *_):
-        if self.successful,:
+        if self.successful:
             self.nvim.command("doautocmd User {}".format(self.cmd_group))
 
