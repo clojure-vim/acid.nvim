@@ -80,7 +80,7 @@ class Acid(object):
         acid_session = self.nvim.vars.get('acid_current_session')
 
         if url is None:
-            self.nvim.command('echom "No repl open"')
+            log.echo(self.nvim, 'No repl open')
             return
 
         if self.nvim.vars['acid_log_messages']:
@@ -120,7 +120,7 @@ class Acid(object):
         handler = self.get_handler(handler)
 
         if handler is None:
-            self.nvim.command('echom "Handler not found"')
+            log.warning(self.nvim, "Handler not found")
             return
 
         context = self.context()

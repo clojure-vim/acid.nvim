@@ -74,6 +74,7 @@ def current_file(nvim):
 def current_path(nvim):
     return nvim.funcs.getcwd()
 
+
 def path_to_ns(nvim):
     path = nvim.funcs.expand("%:p:r").replace("_", "-").split('/')[1:]
     raw_path_list = None
@@ -116,6 +117,7 @@ def localhost(nvim):
     except:
         return None
 
+
 def formatted_localhost_address(nvim):
     addr = localhost(nvim)
     if addr:
@@ -130,37 +132,6 @@ def get_acid_ns(nvim):
         return path_to_ns(nvim)
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
-
-
-def with_async(nvim):
-    def wrapper(fn):
-        def wrapped(*args, **kwargs):
-            return nvim.async_call(lambda: fn(*args, **kwargs))
-        return wrapped
-    return wrapper
-
-
-def format_payload(payload):
-    if type(payload) == str:
-        return [payload]
-
-    ls = []
-    try:
-        for k, v in payload.items():
-            key = k.lower()
-            if key not in {'ns', 'session', 'id'}:
-                if '\n' in v:
-                    header, *trailer = v.split('\n')
-                else:
-                    header,  trailer = v, []
-                ls.append("[{: <9}] => {}".format(
-                    key.upper(), str(header)
-                ).strip())
-
-                for i in trailer:
-                    ls.append("{: <14} {}".format("", str(i)))
-    finally:
-        return ls
 
 
 def find_file_in_path(nvim, msg):
