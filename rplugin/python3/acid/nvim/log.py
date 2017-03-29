@@ -13,6 +13,7 @@ if fh.formatter is None:
 def _log(frame):
     name = inspect.getmodule(frame[0]).__name__
     logger = logging.getLogger(name)
+    logger.propagate = False
 
     if not len(logger.handlers):
         logger.addHandler(fh)
