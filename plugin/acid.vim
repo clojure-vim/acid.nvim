@@ -30,32 +30,19 @@ function! AcidShorthand(callback, shorthand)
   exec a:callback s:ret
 endfunction
 
-function! s:not_in(path, pattern)
-  return a:path !~ a:pattern
-endfunction
-
-function! s:all_true(pred)
-  for i in a:pred
-    if !i
-      return 0
-    endif
-  endfor
-endfunction
-
-function! s:path_to_pattern(paths)
-  return map(a:paths, '".*" . v:val . ".*"')
-endfunction
-
 function! s:require()
-  let path = expand("%")
-
   if exists("g:acid_alt_test_paths")
     let test_paths = add(g:acid_alt_test_paths, "test")
   else
     let test_paths = ["test"]
   endif
 
-  if exists(':AcidRequire') && s:all_true(map(s:path_to_pattern(test_paths), function('s:not_in', [path])))
+  if exists(':AcidRequire')
+    for test_path in test_paths
+      if expand("%") !~ ".*".test_path.".*"
+        return
+    endfor
+
     AcidRequire
   endif
 endfunction
