@@ -43,7 +43,7 @@ function! s:all_true(pred)
 endfunction
 
 function! s:path_to_pattern(paths)
-  return map(a:paths, ".*" . v:val . ".*")
+  return map(a:paths, ".*" . a:paths[v:key] . ".*")
 endfunction
 
 function! s:require()
