@@ -39,7 +39,7 @@ function! s:require()
 
   if exists(':AcidRequire')
     for test_path in test_paths
-      if expand("%") !~ ".*".test_path.".*"
+      if expand("%") =~ ".*".test_path.".*"
         return
       endif
     endfor
