@@ -55,7 +55,7 @@ function! s:require()
     let test_paths = ["test"]
   endif
 
-  if exists(':AcidRequire') && s:all_true(s:not_in(path, s:path_to_pattern(test_paths)))
+  if exists(':AcidRequire') && s:all_true(map(s:path_to_pattern(test_paths), function('s:not_in', [path])))
     AcidRequire
   endif
 endfunction
