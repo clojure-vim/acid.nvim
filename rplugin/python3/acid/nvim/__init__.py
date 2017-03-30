@@ -144,7 +144,8 @@ def find_file_in_path(nvim, msg):
         elif 'resource' in msg:
             resource = msg['resource']
             alt_paths = nvim.vars.get('acid_alt_paths', [])
-            paths = ['src', 'test', *alt_paths]
+            alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
+            paths = ['src', 'test', *alt_paths, *alt_test_paths]
 
             for path in paths:
                 attempt = os.path.join(path, resource)
