@@ -41,6 +41,7 @@ function! s:require()
     for test_path in test_paths
       if expand("%") !~ ".*".test_path.".*"
         return
+      endif
     endfor
 
     AcidRequire
