@@ -1,6 +1,6 @@
 from acid.commands import BaseCommand
 from acid.nvim import path_to_ns
-from acid.log import warning
+from acid.nvim.log import warning
 
 
 class Command(BaseCommand):
