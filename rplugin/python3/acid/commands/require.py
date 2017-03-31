@@ -26,6 +26,8 @@ class Command(BaseCommand):
                     "Unable to require: couldn't find namespace from path."
                 )
                 return None
+        else:
+            ns = args[0]
 
         return {"code": "(require '[{}] :reload)".format(ns)}
 
