@@ -8,5 +8,5 @@ class Handler(BaseHandler):
 
     def on_handle(self, msg, *_):
         if 'err' in msg:
-            warning(msg['err'])
+            warning(self.nvim, msg['err'])
 
