@@ -1,5 +1,6 @@
 from acid.handlers import BaseHandler
 from acid.nvim import find_file_in_path
+from acid.nvim.log import log_info, error, warning
 
 
 class Handler(BaseHandler):
@@ -12,15 +13,24 @@ class Handler(BaseHandler):
             f = find_file_in_path(self.nvim, msg)
 
             if f is None:
-                self.nvim.command("echo 'File not found'")
+                warning(self.nvim, "File not found")
                 return
 
             c = msg.get('column', 1)
             l = msg.get('line', 1)
 
-            if self.nvim.funcs.expand('%').endswith(f):
-                self.nvim.funcs.cursor(l, c)
-            else:
-                self.nvim.command("edit +{} {}".format(l, f))
+            current_scrolloff = self.nvim.options['scrolloff']
+            self.nvim.options['scrolloff'] = 999
+
+            try:
+                if self.nvim.funcs.expand('%').endswith(f):
+                    self.nvim.funcs.cursor(l, c)
+                else:
+                    self.nvim.command("edit +{} {}".format(l, f))
+            except Exception as e:
+                error(self.nvim, "Error while navigating: {}".format(str(e)))
+            finally:
+                self.nvim.options['scrolloff'] = current_scrolloff
+
         elif 'no-info' in msg['status']:
-            self.nvim.command('echom "Acid: No information found for symbol"')
+            warning(self.nvim, 'No information found for symbol')
