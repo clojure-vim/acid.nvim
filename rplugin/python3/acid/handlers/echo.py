@@ -17,4 +17,5 @@ class Handler(BaseHandler):
             self.value.append("\n" + msg['value'])
 
     def on_after_finish(self, *_):
-        self.nvim.command('echo {}'.format(self.nvim.call("string", "".join(self.value))))
+        escaped_str = self.nvim.call("string", "".join(self.value))
+        self.nvim.command('echo {}'.format(escaped))

@@ -1,5 +1,5 @@
 from acid.handlers import BaseHandler
-from acid.nvim.log import war
+from acid.nvim.log import warning
 
 class Handler(BaseHandler):
 

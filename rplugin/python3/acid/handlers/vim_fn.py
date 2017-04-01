@@ -23,5 +23,5 @@ class Handler(BaseHandler):
         try:
             if self.vim_fn:
                 self.nvim.call(self.vim_fn, self.value)
-        except Exception as e
+        except Exception as e:
              error(self.nvim, str(e))
