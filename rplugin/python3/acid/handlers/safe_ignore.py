@@ -1,4 +1,5 @@
 from acid.handlers import BaseHandler
+from acid.nvim.log import war
 
 class Handler(BaseHandler):
 
@@ -7,5 +8,5 @@ class Handler(BaseHandler):
 
     def on_handle(self, msg, *_):
         if 'err' in msg:
-            self.nvim.command('echom "Acid: {}"'.format(msg['err']))
+            warning(msg['err'])
 

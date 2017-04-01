@@ -1,4 +1,5 @@
 from acid.handlers import BaseHandler
+from acid.nvim.log import error
 
 
 class Handler(BaseHandler):
@@ -19,5 +20,8 @@ class Handler(BaseHandler):
         self.value.append(msg)
 
     def on_after_finish(self, *_):
-        if self.vim_fn:
-            self.nvim.call(self.vim_fn, self.value)
+        try:
+            if self.vim_fn:
+                self.nvim.call(self.vim_fn, self.value)
+        except Exception as e
+             error(self.nvim, str(e))
