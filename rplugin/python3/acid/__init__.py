@@ -91,8 +91,10 @@ class Acid(object):
             echo(self.nvim, 'No repl open')
             return
 
-        if self.nvim.vars['acid_log_messages']:
-            self.add_log_to(url)
+        if get_customization_variable(self.nvim, 'acid_log_messages', 0):
+            handlers = (i for i in (
+                *handlers, self.get_handler('Log').configure(**self.context())
+            ))
 
         if not 'op' in data:
             data.update({'op': 'eval'})
