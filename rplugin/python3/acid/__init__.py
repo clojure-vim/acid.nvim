@@ -16,6 +16,7 @@ class Acid(object):
     def __init__(self, nvim):
         self.nvim = nvim
         self.sessions = SessionHandler()
+        self.fired_urls = set()
         self.repls = {}
         self.extensions = {'handlers': {},
                            'commands': {}}
@@ -99,8 +100,9 @@ class Acid(object):
         if acid_session:
             data.update({'session': acid_session})
 
-        if url not in self.sessions.sessions:
+        if url not in self.sessions.sessions and url not in self.fired_urls:
             self.nvim.command("doautocmd User AcidPreConnectNrepl")
+            self.fired_urls.add(url)
 
         send(self.sessions, url, handlers, data)
 
