@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 )
                 return None
         else:
-            ns = args[0]
+            ns = " ".join(args)
 
         return {"code": "(require '[{}] :reload)".format(ns)}
 
