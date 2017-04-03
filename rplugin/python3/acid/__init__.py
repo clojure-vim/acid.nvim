@@ -99,6 +99,9 @@ class Acid(object):
         if acid_session:
             data.update({'session': acid_session})
 
+        if url not in self.sessions.sessions:
+            self.nvim.command("doautocmd User AcidPreConnectNrepl")
+
         send(self.sessions, url, handlers, data)
 
 
