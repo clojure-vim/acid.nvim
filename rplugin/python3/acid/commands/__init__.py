@@ -1,4 +1,4 @@
-from acid.nvim import get_customization_variable, log
+from acid.nvim import get_customization_variable, log, convert_case
 import functools
 import re
 
@@ -10,9 +10,6 @@ endfunction
 opfuncfw = lambda k: opfunc_forwarder.format(k, k)
 silent_map = lambda *s: "noremap <silent> <buffer> {} {}".format(*s)
 
-def convert_case(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 def items(col):
     t = type(col)
@@ -21,6 +18,7 @@ def items(col):
     if t == str:
         return [col]
     return [[i] for i in  col]
+
 
 class BaseCommand(object):
 

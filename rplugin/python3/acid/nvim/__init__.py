@@ -9,6 +9,11 @@ from importlib.machinery import SourceFileLoader
 from acid.nvim.log import log_debug, log_warning
 
 
+def convert_case(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
 def get_customization_variable(nvim, var, default=None):
     return nvim.current.buffer.vars.get(var, nvim.vars.get(var, default))
 

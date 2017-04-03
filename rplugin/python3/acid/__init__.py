@@ -3,7 +3,8 @@
 import neovim
 from acid.nvim import (
     path_to_ns, formatted_localhost_address, get_acid_ns,
-    find_file_in_path, find_extensions, import_extensions
+    find_file_in_path, find_extensions, import_extensions,
+    convert_case
 )
 from acid.nvim.log import log_info, echo, warning
 from acid.session import send, SessionHandler
@@ -64,8 +65,13 @@ class Acid(object):
             if extension:
                 name = extension.name
                 priority = extension.priority
+                enabled = bool(self.nvim.vars.get(
+                    "{}_{}_enabled".format(
+                        convert_case(name), ext_type.lower()
+                    ), getattr(extension, 'enabled', 1)
+                ))
 
-                if (name not in self.extensions[ext_type] or
+                if enabled and (name not in self.extensions[ext_type] or
                         self.extensions[ext_type][name].priority < priority):
                     self.extensions[ext_type][name] = extension
 
