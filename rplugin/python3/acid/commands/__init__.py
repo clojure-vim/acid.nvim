@@ -1,6 +1,5 @@
 from acid.nvim import get_customization_variable, log, convert_case
 import functools
-import re
 
 opfunc_forwarder = """function! {}OpfuncFw(block)
     call AcidOpfunc('{}', a:block)

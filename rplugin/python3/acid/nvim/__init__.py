@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 import glob
 import sys
+import re
 from importlib.machinery import SourceFileLoader
 from acid.nvim.log import log_debug, log_warning
 
