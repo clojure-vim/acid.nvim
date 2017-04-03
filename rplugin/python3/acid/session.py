@@ -48,10 +48,6 @@ class SessionHandler(object):
 
             patched_handler = handler.gen_handler(finalize_watch)
             conn.watch(watcher_key, matches, patched_handler)
-        else:
-            log.log_info(
-                'Persisntent watcher fn exists, skipping: {}', handler.name
-            )
 
     def add_atomic_watch(self, url, msg_id, handler, matches={}):
         "Adds a callback to a msg_id on a connection."
