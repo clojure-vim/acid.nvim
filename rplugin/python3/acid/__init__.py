@@ -4,7 +4,7 @@ import neovim
 from acid.nvim import (
     path_to_ns, formatted_localhost_address, get_acid_ns,
     find_file_in_path, find_extensions, import_extensions,
-    convert_case
+    convert_case, get_customization_variable
 )
 from acid.nvim.log import log_info, echo, warning
 from acid.session import send, SessionHandler
