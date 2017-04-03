@@ -7,6 +7,7 @@ class Command(BaseCommand):
 
     name = 'AddRequire'
     priority = 0
+    enabled = 0
     cmd_name = 'AcidAddRequire'
     handlers = ['MetaRepl']
     mapping = 'cdr'
