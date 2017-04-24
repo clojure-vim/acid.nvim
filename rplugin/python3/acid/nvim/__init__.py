@@ -110,7 +110,7 @@ def path_to_ns(nvim):
 
 
 def get_port_no(nvim):
-    pwd = nvim.funcs.getcwd()
+    pwd = current_path(nvim)
 
     with open(os.path.join(pwd, ".nrepl-port")) as port:
         return port.read().strip()

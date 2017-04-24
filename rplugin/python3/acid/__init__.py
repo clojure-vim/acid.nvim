@@ -4,9 +4,9 @@ import neovim
 from acid.nvim import (
     path_to_ns, formatted_localhost_address, get_acid_ns,
     find_file_in_path, find_extensions, import_extensions,
-    convert_case, get_customization_variable
+    convert_case, get_customization_variable, current_path
 )
-from acid.nvim.log import log_info, echo, warning
+from acid.nvim.log import log_info, echo, warning, info
 from acid.session import send, SessionHandler
 
 
@@ -84,12 +84,8 @@ class Acid(object):
         self.sessions.add_persistent_watch(url, log)
 
     def command(self, data, handlers):
-        url = self.context()['url']
+        url = formatted_localhost_address(self.nvim)
         acid_session = self.nvim.vars.get('acid_current_session')
-
-        if url is None:
-            echo(self.nvim, 'No repl open')
-            return
 
         if get_customization_variable(self.nvim, 'acid_log_messages', 0):
             handlers = (i for i in (
@@ -122,6 +118,14 @@ class Acid(object):
     def acid_command(self, args):
         cmd, *args = args
         log_info(r"Received args for command {}: {}", cmd, args)
+        url = formatted_localhost_address(self.nvim)
+
+        if url is None:
+            path = current_path(self.nvim)
+            echo("No REPL open")
+            log_info(self.nvim,"No repl open on path {}".format(path))
+            return
+
         command = self.extensions['commands'].get(cmd.strip())
         command.call(self, self.context(), *args)
 
