@@ -123,8 +123,8 @@ class Acid(object):
 
         if url is None:
             path = current_path(self.nvim)
-            echo("No REPL open")
-            log_info(self.nvim,"No repl open on path {}".format(path))
+            echo(self.nvim, "No REPL open")
+            log_info("No repl open on path {}".format(path))
             return
 
         command = self.extensions['commands'].get(cmd.strip())
