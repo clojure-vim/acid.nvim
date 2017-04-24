@@ -116,7 +116,7 @@ def get_port_no(nvim):
         return port.read().strip()
 
 
-def localhost(nvim):
+def repl_host_address(nvim):
     host = nvim.vars.get('acid_lein_host', '127.0.0.1')
     try:
         return [host, get_port_no(nvim)]
@@ -124,8 +124,12 @@ def localhost(nvim):
         return None
 
 
+# Renamed the function, keeping this here to avoid breaking stuff..
+localhost = repl_host_address
+
+
 def formatted_localhost_address(nvim):
-    addr = localhost(nvim)
+    addr = repl_host_adress(nvim)
     if addr:
         return "{}://{}:{}".format('nrepl', *addr)
     else:

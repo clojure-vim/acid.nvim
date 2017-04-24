@@ -153,3 +153,7 @@ class Acid(object):
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
         return get_acid_ns(self.nvim)
+
+    @neovim.function("AcidGetUrl", sync=True)
+    def acid_get_ns(self, args):
+        return repl_host_address(self.nvim)
