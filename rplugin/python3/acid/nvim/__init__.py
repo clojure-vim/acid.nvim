@@ -129,7 +129,7 @@ localhost = repl_host_address
 
 
 def formatted_localhost_address(nvim):
-    addr = repl_host_adress(nvim)
+    addr = repl_host_address(nvim)
     if addr:
         return "{}://{}:{}".format('nrepl', *addr)
     else:
