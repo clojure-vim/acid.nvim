@@ -85,16 +85,16 @@ def path_to_ns(nvim):
     path = nvim.funcs.expand("%:p:r").replace("_", "-").split('/')[1:]
     raw_path_list = None
 
-    for ix, node in enumerate(path):
+    for ix, node in enumerate(reversed(path)):
         if node == 'src':
-            raw_path_list = path[ix-1:]
+            raw_path_list = path[ix * -1:]
             break
 
     if raw_path_list is None:
         # Look for project.clj
         for ix, _ in enumerate(path):
             if os.path.exists(os.path.join(*["/", *path[:ix], "project.clj"])):
-                raw_path_list = path[ix:]
+                raw_path_list = path[ix+1:]
                 break
 
     if raw_path_list is None:
@@ -102,11 +102,7 @@ def path_to_ns(nvim):
     else:
         log_debug("Found path list: {}", raw_path_list)
 
-    project, *splitted = raw_path_list
-
-    ns = list(reversed(list(
-        itertools.takewhile(lambda k: k != project, reversed(splitted)))))
-    return ".".join([project, *ns])
+    return ".".join(raw_path_list)
 
 
 def get_port_no(nvim):
