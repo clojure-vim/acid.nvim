@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 from acid.handlers import SingletonHandler
 from acid.zen.ui import build_window
 from acid.nvim.log import log_debug, log_info, log_warning, log_error
@@ -77,36 +78,33 @@ class Handler(SingletonHandler):
     name = "MetaRepl"
     priority = 0
 
-    def on_init(self):
-        self.buf_nr = None
-        self.cmd_buf_nr = None
-
-    def insert_text(self, text):
-        self.nvim.buffers[self.buf_nr].append(text)
-        pos = len(self.nvim.buffers[self.buf_nr])
-        self.nvim.funcs.setpos('.', [self.buf_nr, pos , 1, 0])
-
-    def on_pre_handle(self, *_):
-
+    def ensure_win_exists(self):
         no_shared_buffer = self.buf_nr is None
         has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
+        log_debug("buf_nr is {}", self.buf_nr)
+        log_debug("has window? {}", has_no_window)
+
         if no_shared_buffer or has_no_window:
-            cmds = ['file acid://meta-repl',
+            self.random = random.randint(0, 100)
+            cmds = ['file acid://meta-repl-{}'.format(self.random),
                     'nnoremap <buffer> <localleader><CR> :e<CR>',
                     'nnoremap <buffer> <localleader><localleader> kdggjdG',
                     'nnoremap <buffer> <localleader>D kdgg',
-                    'nnoremap <buffer> <localleader>d jdG',]
-            if self.nvim.funcs.exists(':AnsiEsc'):
-                cmds.append('AnsiEsc')
+                    'nnoremap <buffer> <localleader>d jdG',
+                    ]
 
             self.buf_nr = build_window(
-                self.nvim, close=1, commands=cmds, throwaway=1
+                self.nvim, close=1, commands=cmds, throwaway=1,
             )
+            log_debug("Set buf_nr to {}", self.buf_nr)
 
+    def ensure_cmd_win_exists(self):
         use_cmd_win = bool(self.nvim.vars.get(
             'acid_meta_repl_use_cmd_window', False
         ))
+
+        log_debug("use cmd win? is {}", self.use_cmd_win)
 
         if use_cmd_win:
             no_cmd = self.cmd_buf_nr is None
@@ -128,13 +126,29 @@ class Handler(SingletonHandler):
                     close=1,
                     throwaway=1,
                     orientation="rightbelow 20 split",
-                    commands=['file acid://scratchpad',
+                    commands=['file acid://meta-repl-{}/scratchpad'.format(
+                                    self.random),
                               'set ft=clojure',
                               send,
                               "let b:acid_ns_strategy='ns:user'"]
                 )
 
+
+    def on_init(self):
+        self.buf_nr = None
+        self.cmd_buf_nr = None
+
+    def insert_text(self, text):
+        self.nvim.buffers[self.buf_nr].append(text)
+        pos = len(self.nvim.buffers[self.buf_nr])
+        self.nvim.funcs.setpos('.', [self.buf_nr, pos , 1, 0])
+
+    def on_pre_handle(self, *_):
+        self.ensure_win_exists()
+        # self.ensure_cmd_win_exists()
+
     def on_pre_send(self, msg, *_):
+        self.ensure_win_exists()
         [self.insert_text(i) for i in format_payload(msg) if not i.isspace()]
 
     def on_handle(self, msg, *_):
