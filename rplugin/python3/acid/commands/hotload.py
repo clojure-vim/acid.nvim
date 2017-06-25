@@ -7,7 +7,6 @@ class Command(BaseCommand):
 
     name = 'LoadAll'
     priority = 0
-    cmd_name = 'AcidLoadAll'
     handlers = {'Ignore': '', 'DoAutocmd': 'AcidLoadedAll'}
     nargs = 0
     op = "ns-load-all"

@@ -8,15 +8,11 @@ class Command(BaseCommand):
     name = 'Require'
     priority = 0
     nargs='?'
-    cmd_name = 'AcidRequire'
     handlers = {'Ignore': '', 'DoAutocmd': 'AcidRequired'}
     op = "eval"
     mapping = 'caR'
     shorthand_mapping = 'car'
     shorthand = 'normal! \\"syi]'
-
-    def on_init(self):
-        self.required_cache = {}
 
     def prepare_payload(self, *args):
         if len(args) == 0:

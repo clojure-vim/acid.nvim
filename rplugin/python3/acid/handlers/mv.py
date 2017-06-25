@@ -1,6 +1,10 @@
 from acid.handlers import BaseHandler
 from acid.nvim.log import echo_warning
 
+
+# Not exactly correct. Must update all open buffers related to change,
+# Including the one which was moved.
+
 class Handler(BaseHandler):
 
     name = "MvSingle"

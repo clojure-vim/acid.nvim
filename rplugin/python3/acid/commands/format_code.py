@@ -6,7 +6,6 @@ class Command(BaseCommand):
 
     name = 'FormatCode'
     priority = 0
-    cmd_name = 'AcidFormatCode'
     handlers = ['MetaRepl']
     mapping = 'cfc'
     shorthand = '''normal! mx$?^(\<lt>CR>\\"sy%`x'''

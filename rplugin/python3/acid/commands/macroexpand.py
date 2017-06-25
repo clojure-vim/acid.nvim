@@ -6,7 +6,6 @@ class Command(BaseCommand):
 
     name = 'ExpandMacro'
     priority = 0
-    cmd_name = 'AcidExpandMacro'
     handlers = ['MetaRepl']
     mapping = 'cme'
     shorthand = '''normal! mx$?^(\<lt>CR>\\"sy%`x'''

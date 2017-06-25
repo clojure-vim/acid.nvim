@@ -6,7 +6,6 @@ class Command(BaseCommand):
     name = 'FindUsage'
     priority = 0
     nargs = 1
-    cmd_name = 'AcidFindUsage'
     handlers = ['Usage']
     with_acid = True
     op = "info"

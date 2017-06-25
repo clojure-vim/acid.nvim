@@ -6,7 +6,6 @@ class Command(BaseCommand):
 
     name = 'Eval'
     priority = 0
-    cmd_name = 'AcidEval'
     handlers = ['MetaRepl']
     mapping = 'cp'
     opfunc = True
