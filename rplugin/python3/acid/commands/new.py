@@ -11,8 +11,7 @@ class Command(BaseCommand):
     priority = 0
     nargs=1
     prompt=1
-    handlers = {'Ignore': '', 'DoAutocmd': 'AcidRequired'}
-    op = "eval"
+    handlers = {'Ignore': ''}
     mapping = '<leader>N'
 
     @staticmethod
@@ -30,6 +29,5 @@ class Command(BaseCommand):
 
         self.nvim.command('silent edit {}'.format(path))
 
-        return {"code": "(require '[{}])".format(ns)}
-
-
+        # Does not interact with nrepl
+        return None
