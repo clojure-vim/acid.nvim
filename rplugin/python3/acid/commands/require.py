@@ -23,6 +23,7 @@ class Command(BaseCommand):
             ns = path_to_ns(self.nvim)
             if ns is None:
                 warning(
+                    self.nvim,
                     "Unable to require: couldn't find namespace from path."
                 )
                 return None
