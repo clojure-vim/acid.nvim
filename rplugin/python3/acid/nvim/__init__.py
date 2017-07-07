@@ -99,10 +99,10 @@ def path_to_ns(nvim):
 
     if raw_path_list is None:
         log_warning("Have not found any viable path")
+        return None
     else:
         log_debug("Found path list: {}", raw_path_list)
-
-    return ".".join(raw_path_list)
+        return ".".join(raw_path_list)
 
 
 def get_port_no(nvim):
