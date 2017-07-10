@@ -2,12 +2,15 @@ import os
 from acid.nvim.log import log_debug, log_warning
 
 
-def path_to_ns(path):
+def path_to_ns(path, stop_paths=None):
+    if stop_paths is None:
+        stop_paths = ['src', 'test']
+
     path = path.replace("_", "-").split('/')[1:]
     raw_path_list = None
 
     for ix, node in enumerate(reversed(path)):
-        if node == 'src':
+        if node in stop_paths:
             raw_path_list = path[ix * -1:]
             break
 

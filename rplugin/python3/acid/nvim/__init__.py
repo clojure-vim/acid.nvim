@@ -83,7 +83,7 @@ def current_path(nvim):
 
 
 def path_to_ns(nvim):
-    return pure.path_to_ns(nvim.funcs.expand("%:p:r"))
+    return pure.path_to_ns(nvim.funcs.expand("%:p:r"), get_stop_paths(nvim))
 
 def get_port_no(nvim):
     pwd = current_path(nvim)
@@ -119,6 +119,12 @@ def get_acid_ns(nvim):
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
 
+def get_stop_paths(nvim):
+    alt_paths = nvim.vars.get('acid_alt_paths', [])
+    alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
+    return ['src', 'test', *alt_paths, *alt_test_paths]
+
+
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
@@ -129,9 +135,7 @@ def find_file_in_path(nvim, msg):
             return fpath
         elif 'resource' in msg:
             resource = msg['resource']
-            alt_paths = nvim.vars.get('acid_alt_paths', [])
-            alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
-            paths = ['src', 'test', *alt_paths, *alt_test_paths]
+            paths = get_stop_paths(nvim)
 
             for path in paths:
                 attempt = os.path.join(path, resource)
