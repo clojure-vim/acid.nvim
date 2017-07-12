@@ -10,8 +10,8 @@ class Command(BaseCommand):
     nargs='?'
     handlers = {'Ignore': '', 'DoAutocmd': 'AcidRequired'}
     op = "eval"
-    mapping = 'caR'
-    shorthand_mapping = 'car'
+    mapping = 'car'
+    shorthand_mapping = 'caR'
     shorthand = 'normal! \\"syi]'
 
     def prepare_payload(self, *args):

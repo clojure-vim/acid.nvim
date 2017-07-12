@@ -28,19 +28,17 @@ Deoplete completion will be maintained on
 # 1.0 Simple
 
 - [x] Simplify structures, bindings and connectivity
+- [x] Logs
+- [x] Messages
+- [x] Fire autocommands when first connecting nrepl
+- [x] New File (creates with namespace already)
+- [x] Rename file (renames imports as well)
+- [x] Ignore 'comment' blocks when evaluating code
 
+# 1.1 Docs and declarative stuff
 
-# 1.1 Stabilization of new features
-
-- [ ] Logs
-  - [ ] Unify logs for all files
-  - [ ] Make logs available for all handlers and commands
-- [ ] Messages
-  - [ ] Single entry for Logs and `echom` messages
-  - [ ] Prepend `Acid: ` on all messages
-  - [ ] Expose as a function for all handlers and commands
-
-# 1.2 New features
-
-- [ ] Fire autocommands when first connecting nrepl
-- [ ] Inject code when first connecting to a nrepl
+- [ ] Add docs for commands
+- [ ] Show docs for commands
+- [ ] Show current maps
+- [ ] Show current configs for commands
+- [ ] Make commands available as early as possible
