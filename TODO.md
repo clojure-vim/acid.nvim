@@ -30,12 +30,14 @@ Deoplete completion will be maintained on
 - [x] Simplify structures, bindings and connectivity
 - [x] Logs
 - [x] Messages
+
+# 1.1
 - [x] Fire autocommands when first connecting nrepl
 - [x] New File (creates with namespace already)
 - [x] Rename file (renames imports as well)
 - [x] Ignore 'comment' blocks when evaluating code
 
-# 1.1 Docs and declarative stuff
+# 1.2 Docs and declarative stuff
 
 - [ ] Add docs for commands
 - [ ] Show docs for commands
