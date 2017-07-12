@@ -6,7 +6,6 @@ class Command(BaseCommand):
 
     name = 'FormatEdn'
     priority = 0
-    cmd_name = 'AcidFormatEdn'
     handlers = ['MetaRepl']
     mapping = 'cfe'
     opfunc = True

@@ -9,14 +9,15 @@ function! AcidOpfunc(callback, block)
   endif
   let s:ret = getreg('s')
   call setreg('s', s:tmp)
-  exec a:callback s:ret
+  exec "Acid".a:callback s:ret
 endfunction
 
-function! AcidPrompt(callback)
+function! AcidPrompt(callback, has_default)
+  let s:txt = a:has_default == 1 ? AcidCommandMeta(a:callback, 'prompt_default') : ''
   call inputsave()
-  let s:ret = input(a:callback . " → ")
+  let s:ret = input("Acid " . a:callback . " → ", s:txt)
   call inputrestore()
-  exec a:callback s:ret
+  exec "Acid".a:callback s:ret
 endfunction
 
 function! AcidShorthand(callback, shorthand)
@@ -27,7 +28,7 @@ function! AcidShorthand(callback, shorthand)
   exec "setl iskeyword=".s:iskw
   let s:ret = getreg('s')
   call setreg('s', s:tmp)
-  exec a:callback s:ret
+  exec "Acid".a:callback s:ret
 endfunction
 
 function! s:require()

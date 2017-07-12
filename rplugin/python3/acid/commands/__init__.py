@@ -1,10 +1,11 @@
 from acid.nvim import get_customization_variable, log, convert_case
 import functools
 
-opfunc_forwarder = """function! {}OpfuncFw(block)
+opfunc_forwarder = """function! Acid{}OpfuncFw(block)
     call AcidOpfunc('{}', a:block)
 endfunction
 """
+prompt_fw = 'command! -buffer -nargs=0 Acid{}Prompt call AcidPrompt("{}", "{}")'
 
 opfuncfw = lambda k: opfunc_forwarder.format(k, k)
 silent_map = lambda *s: "noremap <silent> <buffer> {} {}".format(*s)
@@ -43,22 +44,22 @@ class BaseCommand(object):
     @classmethod
     def build_interfaces(cls, nvim):
         cmd = []
-        cmd_name = getattr(cls, 'cmd_name')
+        cmd_name = getattr(cls, 'name')
 
         if not cmd_name:
             return
 
         nargs = getattr(cls, 'nargs', 0)
         cmd.append(
-            'command! -buffer -nargs={} {} AcidCommand {} {}'.format(
+            'command! -buffer -nargs={} Acid{} AcidCommand {} {}'.format(
                 nargs,
                 cmd_name,
-                cls.name,
+                cmd_name,
                 (nargs != '0' and '<args>' or '')
             )
         )
 
-        mapping_var = "{}_command_mapping".format(convert_case(cmd_name))
+        mapping_var = "acid_{}_command_mapping".format(convert_case(cmd_name))
 
         mapping = getattr(cls, 'mapping', None)
         opfunc = getattr(cls, 'opfunc', False)
@@ -69,19 +70,19 @@ class BaseCommand(object):
         if default_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
             if nargs in [0, '?', '*']:
-                cmd.append(silent_map(mapping, ':{}<CR>'.format(cmd_name)))
+                cmd.append(silent_map(mapping, ':Acid{}<CR>'.format(cmd_name)))
             elif hasattr(cls, 'prompt'):
-                cmd.append(silent_map(mapping, ':{}Prompt<CR>'.format(cmd_name)))
+                cmd.append(silent_map(mapping, ':Acid{}Prompt<CR>'.format(cmd_name)))
 
         elif motion_mapping:
             mapping = nvim.vars.get(mapping_var, mapping)
             cmd.append(opfuncfw(cmd_name))
             cmd.append(silent_map(
-                mapping, ':set opfunc={}OpfuncFw<CR>g@'.format(cmd_name)
+                mapping, ':set opfunc=Acid{}OpfuncFw<CR>g@'.format(cmd_name)
             ))
 
         if hasattr(cls, 'shorthand'):
-            shorthand_mapping = "{}_shorthand_mapping".format(
+            shorthand_mapping = "acid_{}_shorthand_mapping".format(
                 convert_case(cmd_name)
             )
             mapping = getattr(
@@ -97,8 +98,8 @@ class BaseCommand(object):
             ))
 
         if hasattr(cls, 'prompt'):
-            prompt = 'command! -buffer -nargs=0 {}Prompt call AcidPrompt("{}")'
-            cmd.append(prompt.format(cmd_name, cmd_name))
+            has_default = int(hasattr(cls, 'prompt_default'))
+            cmd.append(prompt_fw.format(cmd_name, cmd_name, has_default))
 
         return cmd
 
@@ -122,7 +123,7 @@ class BaseCommand(object):
         if not 'op' in payload:
             payload.update({'op': cls.op})
 
-        handlers_var = "{}_command_handler".format(convert_case(inst.cmd_name))
+        handlers_var = "acid_{}_command_handler".format(convert_case(inst.name))
 
         custom = get_customization_variable(
             acid.nvim, handlers_var, inst.handlers

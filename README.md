@@ -35,35 +35,35 @@ Update your `~/.lein/profiles.clj` adding the following lines:
 
 ## Running
 
-Acid requires you to have a running REPL on the current directory.
+Acid has some commands for interacting with the nrepl.
 
-Some of the features are outlined below:
+Currently, there is no documentation for those commands, but a few are worth
+mentioning here:
 
-```vim
-" Evaluating code
+* `<leader>N` Creates a new file
+* `K` Shows documentation for the symbol below cursor
+* `car` Requires current file
+* `caR` Requires dependency line below cursor (i.e. `[clojure.string :as str]`)
+* `gu` Shows usage of symbol below cursor
+* `gd` Goes to definition of symbol below cursor
+* `cp<motion>` Sends the block to nrepl for evaluation
+* `cpp` Shorthand mapping for evaluating the whole block below cursor (up until the outermost)
 
-" Send output of a command to a neovim buffer
-:call AcidEval({'op': 'eval', 'code': '(some-fn "")'})
+All those are defined as Commands as well:
 
-" Symbol Navigation
+* `AcidNewFile <ns.file>` Creates a new file under supplied ns.name.
+* `AcidNewFilePrompt` Prompts for the full filename for creation.
+* `AcidLoadAll` Loads all project namespaces into the nrepl for easier navigation.
+* `AcidRequire [<require> [<options>]]` Requires a namespace.
+  * If no parameters supplied, loads current ns.
+  * Arguments supplied can be the same as a require vector, taking options:
+    * `AcidRequire clojure.string :as str`
+    * `AcidRequire clojure.string :refer [join]`
+* `AcidDoc <ns/symbol>` Shows the documentation of the supplied symbol.
 
-" With a function
-:call AcidGoTo("some-symbol")
-
-" With a command, getting the symbol under the cursor
-:AcidGoToDefinition
-
-" Or with a mapping
-
-" Requiring current file
-" With a command
-:AcidRequire
-
-" Automatically, for all files
-:let g:acid_auto_require=1
-<C-F>
-```
+There are a few more which are unstable and/or incomplete.
 
 ## Cool, I want more
 
-Acid is still very young and does not have much functionality implemented yet. Please take a look at the [TODO](https://github.com/clojure-vim/acid.nvim/blob/master/TODO.md) for the roadmap.
+Acid is growing up in both complexity and features and there is still a lot of work to be done.
+Please take a look at the [TODO](https://github.com/clojure-vim/acid.nvim/blob/master/TODO.md) for the roadmap.

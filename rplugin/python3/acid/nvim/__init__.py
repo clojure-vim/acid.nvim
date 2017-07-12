@@ -7,6 +7,7 @@ import glob
 import sys
 import re
 from importlib.machinery import SourceFileLoader
+from acid import pure
 from acid.nvim.log import log_debug, log_warning
 
 
@@ -82,28 +83,7 @@ def current_path(nvim):
 
 
 def path_to_ns(nvim):
-    path = nvim.funcs.expand("%:p:r").replace("_", "-").split('/')[1:]
-    raw_path_list = None
-
-    for ix, node in enumerate(reversed(path)):
-        if node == 'src':
-            raw_path_list = path[ix * -1:]
-            break
-
-    if raw_path_list is None:
-        # Look for project.clj
-        for ix, _ in enumerate(path):
-            if os.path.exists(os.path.join(*["/", *path[:ix], "project.clj"])):
-                raw_path_list = path[ix+1:]
-                break
-
-    if raw_path_list is None:
-        log_warning("Have not found any viable path")
-        return None
-    else:
-        log_debug("Found path list: {}", raw_path_list)
-        return ".".join(raw_path_list)
-
+    return pure.path_to_ns(nvim.funcs.expand("%:p:r"), get_stop_paths(nvim))
 
 def get_port_no(nvim):
     pwd = current_path(nvim)
@@ -139,6 +119,12 @@ def get_acid_ns(nvim):
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
 
+def get_stop_paths(nvim):
+    alt_paths = nvim.vars.get('acid_alt_paths', [])
+    alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
+    return ['src', 'test', *alt_paths, *alt_test_paths]
+
+
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
@@ -149,9 +135,7 @@ def find_file_in_path(nvim, msg):
             return fpath
         elif 'resource' in msg:
             resource = msg['resource']
-            alt_paths = nvim.vars.get('acid_alt_paths', [])
-            alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
-            paths = ['src', 'test', *alt_paths, *alt_test_paths]
+            paths = get_stop_paths(nvim)
 
             for path in paths:
                 attempt = os.path.join(path, resource)

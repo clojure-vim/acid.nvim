@@ -8,7 +8,6 @@ class Command(BaseCommand):
     name = 'InjectFn'
     priority = 0
     enabled = 0
-    cmd_name = 'AcidInjectFn'
     handlers = ['Ignore']
     nargs=1
     op = "eval"

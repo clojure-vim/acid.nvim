@@ -7,7 +7,6 @@ class Command(BaseCommand):
     name = 'Goto'
     priority = 0
     nargs = 1
-    cmd_name = 'AcidGoto'
     handlers = ['Goto']
     op = "info"
     shorthand_mapping = 'gd'

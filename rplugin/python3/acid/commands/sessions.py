@@ -6,7 +6,6 @@ class Command(BaseCommand):
 
     name = 'Session'
     priority = 0
-    cmd_name = 'AcidSession'
     op = 'clone'
     handlers = ['SessionAdd']
 

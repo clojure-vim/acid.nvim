@@ -4,14 +4,15 @@ from acid.nvim import get_acid_ns
 
 class Command(BaseCommand):
 
-    name = 'FormatCode'
+    name = 'ExpandMacro'
     priority = 0
     handlers = ['MetaRepl']
-    mapping = 'cfc'
+    mapping = 'cme'
     shorthand = '''normal! mx$?^(\<lt>CR>\\"sy%`x'''
     opfunc = True
     nargs='*'
-    op = "format-code"
+    op = "macroexpand"
 
     def prepare_payload(self, *args):
-        return {'code': " ".join(args), }
+        return {'code': "'{}".format(" ".join(args)),
+                'expander': 'macroexpand-all'}
