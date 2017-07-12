@@ -50,4 +50,5 @@ function! s:require()
 endfunction
 
 autocmd VimEnter * AcidInit
+autocmd FileType clojure AcidBootstrap
 autocmd BufWritePost,BufReadPost *.clj call s:require()
