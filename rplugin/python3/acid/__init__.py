@@ -7,6 +7,7 @@ from acid.nvim import (
     convert_case, get_customization_variable, current_path,
     repl_host_address
 )
+from collections import deque
 from acid.nvim.log import log_info, echo, warning, info
 from acid.session import send, SessionHandler
 
@@ -16,6 +17,7 @@ class Acid(object):
 
     def __init__(self, nvim):
         self.nvim = nvim
+        self.commands = []
         self.sessions = SessionHandler()
         self.fired_urls = set()
         self.repls = {}
@@ -37,12 +39,14 @@ class Acid(object):
         self.init_extensions('handlers', 'Handler')
         self.init_extensions('commands', 'Command')
         self.init_vars()
-        self.init_commands()
         self._init = True
 
     def init_commands(self):
+        cmds = deque()
         for command in self.extensions['commands'].values():
-            command.do_init(self.nvim)
+            cmds.extend(command.do_init(self.nvim))
+
+        return list(cmds)
 
     def init_vars(self):
         def init_var(var, default=0):
@@ -144,6 +148,13 @@ class Acid(object):
         ret = getattr(command, meta_key)(self.nvim, *args)
         log_info(r"Got {} as a return for {}[{}]".format(ret, cmd, meta_key))
         return ret
+
+    @neovim.command("AcidBootstrap", nargs=0, bang=True)
+    def acid_bootstrap(self, bang=False):
+        if bang or not self.commands:
+            self.commands = self.init_commands()
+
+        [self.nvim.command(cmd) for cmd in self.commands]
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):

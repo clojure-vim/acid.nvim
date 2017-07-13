@@ -107,9 +107,9 @@ class BaseCommand(object):
     def do_init(cls, nvim):
         inst = cls(nvim)
         inst.on_init()
-        aucmd = 'autocmd FileType clojure {}'
-        [nvim.command(aucmd.format(v)) for v in cls.build_interfaces(nvim)]
+        cmd_list = cls.build_interfaces(nvim)
         cls.__instances__[cls.name] = inst
+        return cmd_list
 
     @classmethod
     def call(cls, acid, context, *args):
