@@ -36,9 +36,11 @@ class Acid(object):
 
     @neovim.command("AcidInit")
     def init(self):
-        self.init_extensions('handlers', 'Handler')
-        self.init_extensions('commands', 'Command')
         self.init_vars()
+        self.init_extensions({
+            'handlers': 'Handler',
+            'commands': 'Command',
+        })
         self._init = True
 
     def init_commands(self):
@@ -64,9 +66,9 @@ class Acid(object):
              ('acid_start_repl_args', ['lein repl'])]]
 
 
-    def init_extensions(self, ext_type, klass):
-        for path in find_extensions(self.nvim, ext_type):
-            extension = import_extensions(path, ext_type, klass)
+    def init_extensions(self, ext_mapping):
+        for path in find_extensions(self.nvim, ext_mapping.keys()):
+            ext_type, extension = import_extensions(path, ext_mapping)
 
             if extension:
                 name = extension.name
@@ -153,6 +155,7 @@ class Acid(object):
     def acid_bootstrap(self, bang=False):
         if bang or not self.commands:
             self.commands = self.init_commands()
+
 
         [self.nvim.command(cmd) for cmd in self.commands]
 

@@ -34,18 +34,16 @@ def find_clojure_fn(nvim, fname):
             return partial
 
 
-def find_extensions(nvim, source):
+def find_extensions(nvim, ext):
     """Search for base.py or *.py
 
     Searches $VIMRUNTIME/*/rplugin/python3/acid/$source[s]/
     """
-    rtp = nvim.options.get('runtimepath', '').split(',')
-
-    if not rtp:
-        return
+    rtp = nvim.options.get('runtimepath').split(',')
 
     sources = (
-        os.path.join('rplugin/python3/acid', source, '*.py'),
+        os.path.join('rplugin/python3/acid', source, '*.py')
+        for source in ext
     )
 
     for src in sources:
@@ -53,25 +51,21 @@ def find_extensions(nvim, source):
             yield from glob.iglob(os.path.join(path, src))
 
 
-def import_extensions(path, source, classname):
+def import_extensions(path, mapping):
     """Import Acid plugin source class.
 
     If the class exists, add its directory to sys.path.
     """
-    name = os.path.splitext(os.path.basename(path))[0]
+    source, fname = path.split(os.path.sep)[-2:]
+    name = os.path.splitext(fname)[0]
     module_name = 'acid.%s.%s' % (source, name)
     module = SourceFileLoader(module_name, path).load_module()
-    cls = getattr(module, classname, None)
+    cls = getattr(module, mapping[source], None)
 
     if not cls:
-        return None
+        return None, None
 
-    dirname = os.path.dirname(path)
-
-    if dirname not in sys.path:
-        sys.path.insert(0, dirname)
-
-    return cls
+    return source, cls
 
 
 def current_file(nvim):
@@ -119,11 +113,14 @@ def get_acid_ns(nvim):
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
 
-def get_stop_paths(nvim):
-    alt_paths = nvim.vars.get('acid_alt_paths', [])
-    alt_test_paths = nvim.vars.get('acid_alt_test_paths', [])
-    return ['src', 'test', *alt_paths, *alt_test_paths]
+def test_paths(nvim):
+    return {'test', *nvim.vars.get('acid_alt_test_paths', [])}
 
+def src_paths(nvim):
+    return {'src', *nvim.vars.get('acid_alt_paths', [])}
+
+def get_stop_paths(nvim):
+    return set() | test_paths(nvim) | src_paths(nvim)
 
 
 def find_file_in_path(nvim, msg):
