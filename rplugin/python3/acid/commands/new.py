@@ -9,9 +9,9 @@ class Command(BaseCommand):
 
     name = 'NewFile'
     priority = 0
-    nargs=1
-    prompt=1
-    handlers = {'Ignore': ''}
+    nargs = 1
+    prompt = 1
+    handlers = []
     mapping = '<leader>N'
 
     @staticmethod
