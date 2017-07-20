@@ -19,7 +19,7 @@ class Command(BaseCommand):
         return "{}.".format(path_to_ns(path))
 
 
-    def prepare_payload(self, ns):
+    def prepare_payload(self):
         send = "map <buffer> <silent> <localleader><CR> {}".format(
             "".join(map(
                 str.strip,
@@ -36,10 +36,12 @@ class Command(BaseCommand):
                 ]
 
 
-        self.buf_nr = build_window(
+        build_window(
             self.nvim,
             close=1,
             throwaway=1,
             orientation="rightbelow 50 split",
             commands=cmds,
         )
+
+        return None
