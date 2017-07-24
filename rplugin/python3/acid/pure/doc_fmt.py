@@ -34,3 +34,4 @@ def doc_transform(definition):
                 if obj:
                     lines.append(obj)
         return lines
+    return print_doc

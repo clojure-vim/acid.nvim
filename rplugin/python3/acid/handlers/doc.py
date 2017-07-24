@@ -12,7 +12,7 @@ class Handler(BaseHandler):
         self.doc_buf_nr = None
 
     def on_configure(self, transform, *args, **kwargs):
-        log_debug('Got {} as transform fn')
+        log_debug('Got {} as transform fn', transform)
         self.transform = transform
 
     def on_handle(self, msg, *_):
