@@ -1,5 +1,5 @@
 from acid.commands import BaseCommand
-from acid.nvim import list_clj_files, current_path
+from acid.nvim import list_clj_files, current_path, log
 from acid.pure import ns_to_path
 import os
 
@@ -15,6 +15,7 @@ class Command(BaseCommand):
 
     def prepare_payload(self, ns):
         files = list_clj_files(self.nvim)
+        log.log_debug('Found the following clojure files: {}', files)
         path = '{}.clj'.format(ns_to_path(ns))
 
         match = list(filter(lambda k: k.endswith(path), files))
@@ -29,3 +30,5 @@ class Command(BaseCommand):
                 'file-path': fpath,
                 'file-name': os.path.basename(fpath)
             }
+        else:
+            log.warning('no file found!')
