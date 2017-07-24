@@ -11,7 +11,7 @@ class Handler(BaseHandler):
     def on_init(self, *_):
         self.doc_buf_nr = None
 
-    def on_configure(self, transform):
+    def on_configure(self, transform, *args, **kwargs):
         self.transform = transform
 
     def on_handle(self, msg, *_):

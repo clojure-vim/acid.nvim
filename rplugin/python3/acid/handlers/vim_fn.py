@@ -11,7 +11,7 @@ class Handler(BaseHandler):
         self.vim_fn = ""
         self.value = []
 
-    def on_configure(self, vim_fn):
+    def on_configure(self, vim_fn, *args, **kwargs):
         self.vim_fn = vim_fn
 
     def on_handle(self, msg, *_):
