@@ -23,7 +23,7 @@ class Command(BaseCommand):
         match = list(filter(lambda k: k.endswith(path), files))
         if any(match):
             fpath, *_ = match
-            fpath = os.path.relpath(fpath, start=current_path(nvim))
+            fpath = os.path.relpath(fpath, start=current_path(self.nvim))
             with open(fpath, 'r') as source:
                 data = '\n'.join(source.readlines())
 
