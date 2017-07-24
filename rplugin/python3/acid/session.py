@@ -67,7 +67,6 @@ class SessionHandler(object):
         log.log_info('sending data -> {}', str(data))
 
         for handler in handlers:
-            log.log_info('passing data to handler {}', str(handler))
             handler.pre_send(data)
 
         try:
