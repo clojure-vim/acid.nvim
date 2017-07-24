@@ -38,7 +38,6 @@ class Handler(BaseHandler):
                     buf_win_nr, doc_len
             ))
 
-        info(self.nvim, "Documentation for {}/{}".format(ns, name))
         log_debug(lines)
         exec_cmd = "bd {} | au! AcidDoc".format(self.doc_buf_nr)
 

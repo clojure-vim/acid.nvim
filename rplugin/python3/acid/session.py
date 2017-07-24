@@ -42,10 +42,6 @@ class SessionHandler(object):
 
             self.persistent[url].add(watcher_key)
 
-            log.log_debug('persistent handler -> {}', str(handler))
-            log.log_debug('connection -> {}', str(url))
-            log.log_debug('key -> {}', str(watcher_key))
-
             patched_handler = handler.gen_handler(finalize_watch)
             conn.watch(watcher_key, matches, patched_handler)
 
@@ -53,11 +49,6 @@ class SessionHandler(object):
         "Adds a callback to a msg_id on a connection."
         watcher_key = "{}-{}-watcher".format(msg_id, handler.name)
         conn = self.get_or_create(url)
-
-        log.log_info(
-            'handler -> {}, connection -> {}, matchers -> {}, key -> {}',
-            str(handler), str(url), str(matches), str(watcher_key)
-            )
 
         patched_handler = handler.gen_handler(finalize_watch)
 
