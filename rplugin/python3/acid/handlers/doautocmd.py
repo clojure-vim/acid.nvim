@@ -10,10 +10,8 @@ class Handler(BaseHandler):
         self.cmd_group = ""
         self.successful = True
 
-    def configure(self, cmd_group, *args, **kwargs):
-        super().configure(*args, **kwargs)
+    def on_configure(self, cmd_group, *args, **kwargs):
         self.cmd_group = cmd_group
-        return self
 
     def on_handle(self, msg, *_):
         self.successful = self.successful and not 'err' in msg
