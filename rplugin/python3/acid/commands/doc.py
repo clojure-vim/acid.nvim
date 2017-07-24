@@ -16,14 +16,14 @@ definition = {
                 for i in t[2:-2].split('] [')
             ])
         }],
-        ['doc', {'default': ''}],
+        ['doc', {'default': '', 'transform': '\n'.split}],
         ['javadoc', {'default': ''}],
         ['added', {'default': '', 'transform': 'Since version: {}'.format}],
         ['super', {'default': '', 'transform': 'Extends: {}'.format}],
-        ['modifiers', {'default': [], 'transform': '\n'.join}],
+        ['modifiers', {'default': []}],
         ['see-also', {
             'default': [],
-            'transform': lambda k: 'See Also: {}'.format('\n'.join(['', *k]))
+            'prepend': 'See Also:',
         }],
         ['interfaces', {
             'default': [],

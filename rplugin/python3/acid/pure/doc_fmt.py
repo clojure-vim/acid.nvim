@@ -17,20 +17,21 @@ def doc_transform(definition):
                 obj = msg.get(key, value['default'])
             else:
                 obj = msg[key]
+
             if obj:
+                if 'prepend' in value:
+                    prepend = value['prepend']
+                    if type(obj) == list:
+                        obj = [prepend, *obj]
+                    else:
+                        obj = '{} {}'.format(prepend, obj)
+
                 if 'transform' in value:
                     this, *other = transform_meta(value['transform'])
                     obj = value['transform'](obj, *[outcome[i] for i in other])
 
                 if 'rename' in value:
                     key = value['rename']
-
-                if type(obj) != str:
-                    log_warning(
-                        'Obj {} of key {} is not of type string. forcing',
-                        obj, key
-                    )
-                    obj = str(obj)
                 outcome[key] = obj
 
         for key in definition['format']:
@@ -38,7 +39,13 @@ def doc_transform(definition):
                 lines.append('')
             elif key in outcome:
                 obj = outcome[key]
-                if obj:
-                    lines.append(obj)
+                if (obj):
+                    obj_type = type(obj)
+                    if obj_type == str:
+                        lines.append(obj)
+                    elif obj_type == list:
+                        lines.append(*obj)
+                    else:
+                        log_warning('Unknown obj type, skipping.')
         return lines
     return print_doc
