@@ -22,13 +22,13 @@ definition = {
         ['super', {'default': '', 'transform': 'Extends: {}'.format}],
         ['modifiers', {'default': []}],
         ['see-also', {
-            'default': []],
+            'default': [],
             'transform': lambda k: 'See Also: {}'.format('\n'.join(['', *k]))
-        },
+        }],
         ['interfaces', {
-            'default': []],
+            'default': [],
             'transform': lambda k: 'Implements: {}'.format(', '.join(k))
-        }
+        }]
     ]),
     'format': [
         'fn_calls',
