@@ -1,4 +1,4 @@
-rom acid.commands import BaseCommand
+from acid.commands import BaseCommand
 from acid.nvim import get_acid_ns, find_clojure_fn
 import os
 
