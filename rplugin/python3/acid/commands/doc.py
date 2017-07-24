@@ -16,11 +16,11 @@ definition = {
                 for i in t[2:-2].split('] [')
             ])
         }],
-        ['doc', {'default': '', 'transform': lambda k: k.split('\n')}],
+        ['doc', {'default': ''}],
         ['javadoc', {'default': ''}],
         ['added', {'default': '', 'transform': 'Since version: {}'.format}],
         ['super', {'default': '', 'transform': 'Extends: {}'.format}],
-        ['modifiers', {'default': []}],
+        ['modifiers', {'default': [], 'transform': '\n'.join}],
         ['see-also', {
             'default': [],
             'transform': lambda k: 'See Also: {}'.format('\n'.join(['', *k]))

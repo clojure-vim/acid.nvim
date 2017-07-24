@@ -17,21 +17,21 @@ def doc_transform(definition):
                 obj = msg.get(key, value['default'])
             else:
                 obj = msg[key]
+            if obj:
+                if 'transform' in value:
+                    this, *other = transform_meta(value['transform'])
+                    obj = value['transform'](obj, *[outcome[i] for i in other])
 
-            if 'transform' in value:
-                this, *other = transform_meta(value['transform'])
-                obj = value['transform'](obj, *[outcome[i] for i in other])
+                if 'rename' in value:
+                    key = value['rename']
 
-            if 'rename' in value:
-                key = value['rename']
-
-            if type(obj) != str:
-                log_warning(
-                    'Obj {} of key {} is not of type string. forcing',
-                    obj, key
-                )
-                obj = str(obj)
-            outcome[key] = obj
+                if type(obj) != str:
+                    log_warning(
+                        'Obj {} of key {} is not of type string. forcing',
+                        obj, key
+                    )
+                    obj = str(obj)
+                outcome[key] = obj
 
         for key in definition['format']:
             if type(key) == list and lines[-1] != '':
