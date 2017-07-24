@@ -1,4 +1,5 @@
 import types
+from acid.nvim.log import log_warning
 
 def transform_meta(transform):
     if isinstance(transform, types.FunctionType):
@@ -24,6 +25,12 @@ def doc_transform(definition):
             if 'rename' in value:
                 key = value['rename']
 
+            if type(obj) != str:
+                log_warning(
+                    'Obj {} is not of type string. forcing',
+                    obj
+                )
+                obj = str(obj)
             outcome[key] = obj
 
         for key in definition['format']:
