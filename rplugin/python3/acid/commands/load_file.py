@@ -16,6 +16,7 @@ class Command(BaseCommand):
     def prepare_payload(self, ns):
         files = list(list_clj_files(self.nvim))
         path = '{}.clj'.format(ns_to_path(ns))
+
         log.log_debug('Found all this clojure files: {}', files)
         log.log_debug('Attempting to match against {}', path)
 

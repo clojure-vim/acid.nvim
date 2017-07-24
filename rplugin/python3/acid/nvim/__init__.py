@@ -24,7 +24,10 @@ def list_clj_files(nvim):
     rtp = nvim.options.get('runtimepath').split(',')
 
     for path in rtp:
-        yield from glob.iglob(os.path.join(path, '/clj/acid/**/*.clj'))
+        match = os.path.join(path, 'clj/acid/**/*.clj')
+        log_debug('Attempting path: {}', match)
+
+        yield from glob.iglob(match)
 
 def find_clojure_fn(nvim, fname):
     rtp = nvim.options.get('runtimepath', '').split(',')
