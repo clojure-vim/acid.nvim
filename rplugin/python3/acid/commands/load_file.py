@@ -14,9 +14,10 @@ class Command(BaseCommand):
     op = "load-file"
 
     def prepare_payload(self, ns):
-        files = list_clj_files(self.nvim)
-        log.log_debug('Found the following clojure files: {}', files)
+        files = list(list_clj_files(self.nvim))
         path = '{}.clj'.format(ns_to_path(ns))
+        log.log_debug('Found all this clojure files: {}', files)
+        log.log_debug('Attempting to match against {}', path)
 
         match = list(filter(lambda k: k.endswith(path), files))
         if any(match):
