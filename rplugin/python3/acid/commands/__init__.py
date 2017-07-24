@@ -38,7 +38,7 @@ class BaseCommand(object):
         return {}
 
     def configure(self, context, handler, *args):
-        data = [self.on_configure(*args, **context), *args]
+        data = [*self.on_configure(*args, **context), *args]
         handler.configure(*data, **context)
         return handler
 
