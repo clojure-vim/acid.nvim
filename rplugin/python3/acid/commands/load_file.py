@@ -8,7 +8,6 @@ class Command(BaseCommand):
 
     name = 'LoadFile'
     priority = 0
-    enabled = 0
     handlers = ['Ignore']
     nargs = 1
     prompt = 1
