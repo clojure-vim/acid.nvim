@@ -37,7 +37,7 @@ definition = {
         'modifiers',
         [],
         'javadoc',
-        'doc'
+        'doc',
         [],
         'added',
         'interfaces',
