@@ -29,7 +29,7 @@ class Command(BaseCommand):
             ))
         )
 
-        cmds = ['file acid://scratch-buffer-()'.format(random.randint(0, 100)),
+        cmds = ['file acid://scratch-buffer-{}'.format(random.randint(0, 100)),
                 'set ft=clojure',
                 'let b:acid_ns_strategy="ns:user"',
                 'nmap <buffer> <silent> q :bd! %<CR>',
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         build_window(
             self.nvim,
             throwaway=1,
-            orientation="rightbelow 50 split",
+            orientation="rightbelow 20 split",
             commands=cmds,
         )
 
