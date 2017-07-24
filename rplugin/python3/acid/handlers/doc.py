@@ -1,4 +1,4 @@
-from acid.handlers import SingletonHandler
+from acid.handlers import BaseHandler
 from acid.nvim.log import info, log_debug, warning
 from acid.zen.ui import build_window
 
