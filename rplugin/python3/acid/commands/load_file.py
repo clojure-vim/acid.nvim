@@ -31,4 +31,4 @@ class Command(BaseCommand):
                 'file-name': os.path.basename(fpath)
             }
         else:
-            log.warning('no file found!')
+            log.warning(self.nvim, 'no file found!')
