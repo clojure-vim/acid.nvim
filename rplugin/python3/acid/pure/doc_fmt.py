@@ -27,8 +27,8 @@ def doc_transform(definition):
 
             if type(obj) != str:
                 log_warning(
-                    'Obj {} is not of type string. forcing',
-                    obj
+                    'Obj {} of key {} is not of type string. forcing',
+                    obj, key
                 )
                 obj = str(obj)
             outcome[key] = obj
