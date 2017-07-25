@@ -27,6 +27,10 @@ definition = {
         ['see-also', {
             'default': [],
             'prepend': 'See Also:',
+            'transform': lambda k: [
+                'https://clojuredocs.org/{}'.format(i)
+                for i in k
+            ]
         }],
         ['interfaces', {
             'default': [],
