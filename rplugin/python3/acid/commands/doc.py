@@ -16,7 +16,10 @@ definition = {
                 for i in t[2:-2].split('] [')
             ])
         }],
-        ['doc', {'default': '', 'transform': lambda k: k.split('\n')}],
+        ['doc', {
+            'default': '',
+            'transform': lambda k: k.split('\n').strip()
+        }],
         ['javadoc', {'default': ''}],
         ['added', {'default': '', 'transform': 'Since version: {}'.format}],
         ['super', {'default': '', 'transform': 'Extends: {}'.format}],
