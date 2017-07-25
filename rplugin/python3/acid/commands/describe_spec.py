@@ -1,6 +1,6 @@
 from acid.commands import BaseCommand
 from acid.pure.doc_fmt import doc_transform
-from acid.nvim import path_to_ns
+from acid.nvim import path_to_ns, log
 
 def tf(f):
     if type(f) == list:
