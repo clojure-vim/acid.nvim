@@ -1,5 +1,5 @@
 import types
-from acid.nvim.log import log_warning
+from acid.nvim.log import log_warning, log_debug
 
 def transform_meta(transform):
     if isinstance(transform, types.FunctionType):
@@ -33,6 +33,8 @@ def doc_transform(definition):
                 if 'rename' in value:
                     key = value['rename']
                 outcome[key] = obj
+
+        log_debug("current data: {}", outcome)
 
         for key in definition['format']:
             if type(key) == list and lines[-1] != '':
