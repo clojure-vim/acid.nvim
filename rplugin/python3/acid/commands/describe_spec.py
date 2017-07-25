@@ -19,7 +19,6 @@ class Command(BaseCommand):
 
     name = 'DescribeSpec'
     priority = 0
-    enabled = 0
     nargs = 1
     handlers = ['Doc']
     op = "spec-form"
