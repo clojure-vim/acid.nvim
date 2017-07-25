@@ -13,6 +13,7 @@ def doc_transform(definition):
         outcome = {}
         lines = []
         for key, value in definition['data'].items():
+            log_debug("Working with key {}", key)
             if 'default' in value:
                 obj = msg.get(key, value['default'])
             else:

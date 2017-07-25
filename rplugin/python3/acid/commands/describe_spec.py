@@ -35,6 +35,7 @@ class Command(BaseCommand):
     shorthand="call setreg('s', expand('<cword>'))"
 
     def on_configure(self, *_a, **_k):
+        log.log_debug('Passing spec transformation fn')
         return [doc_transform(definition)]
 
     def prepare_payload(self, data):
