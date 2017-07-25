@@ -2,10 +2,19 @@ from acid.commands import BaseCommand
 from acid.pure.doc_fmt import doc_transform
 from acid.nvim import path_to_ns
 
+def tf(f):
+    if type(f) == list:
+        return ', '.join(f)
+    return f
+
 definition = {
     'data': {
         'spec-name': {},
-        'spec-form': {},
+        'spec-form': {
+            'transform': lambda k: [
+                tf(i) for i in k
+            ]
+        },
     },
     'format': [
         'spec-name',
