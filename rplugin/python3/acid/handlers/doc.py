@@ -1,5 +1,5 @@
 from acid.handlers import BaseHandler
-from acid.nvim.log import info, log_debug, warning
+from acid.nvim.log import info, log_debug, warning, log_error
 from acid.zen.ui import build_window
 
 
@@ -20,7 +20,13 @@ class Handler(BaseHandler):
             warning(self.nvim, "No information for symbol")
             return
 
-        lines = self.transform(msg)
+        try:
+            lines = self.transform(msg)
+        except Exception as e:
+            warning(self.nvim, "Couldn't transform msg into doc.")
+            log_error(e)
+            return
+
         no_doc_buffer = self.doc_buf_nr is None
         buf_win_nr = self.nvim.funcs.bufwinnr(self.doc_buf_nr)
         doc_len = len(lines)
@@ -39,11 +45,4 @@ class Handler(BaseHandler):
             ))
 
         log_debug(lines)
-        exec_cmd = "bd {} | au! AcidDoc".format(self.doc_buf_nr)
-
         self.nvim.buffers[self.doc_buf_nr][:] = lines
-        self.nvim.command('augroup AcidDoc')
-        self.nvim.command('au!')
-        self.nvim.command(
-            'au CursorMoved * exec "{}"'.format(exec_cmd))
-        self.nvim.command('augroup END')
