@@ -39,12 +39,12 @@ def doc_transform(definition):
                 lines.append('')
             elif key in outcome:
                 obj = outcome[key]
-                if (obj):
+                if obj:
                     obj_type = type(obj)
                     if obj_type == str:
                         lines.append(obj)
                     elif obj_type == list:
-                        lines.append(*obj)
+                        lines = [*lines, *obj]
                     else:
                         log_warning('Unknown obj type, skipping.')
         return lines
