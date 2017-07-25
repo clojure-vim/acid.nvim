@@ -18,7 +18,7 @@ definition = {
         }],
         ['doc', {
             'default': '',
-            'transform': lambda k: k.split('\n').strip()
+            'transform': lambda k: [i.strip() for i in k.split('\n')]
         }],
         ['javadoc', {'default': ''}],
         ['added', {'default': '', 'transform': 'Since version: {}'.format}],
