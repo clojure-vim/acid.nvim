@@ -19,16 +19,16 @@ def doc_transform(definition):
                 obj = msg[key]
 
             if obj:
+                if 'transform' in value:
+                    this, *other = transform_meta(value['transform'])
+                    obj = value['transform'](obj, *[outcome[i] for i in other])
+
                 if 'prepend' in value:
                     prepend = value['prepend']
                     if type(obj) == list:
                         obj = [prepend, *obj]
                     else:
                         obj = '{} {}'.format(prepend, obj)
-
-                if 'transform' in value:
-                    this, *other = transform_meta(value['transform'])
-                    obj = value['transform'](obj, *[outcome[i] for i in other])
 
                 if 'rename' in value:
                     key = value['rename']
