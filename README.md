@@ -65,5 +65,9 @@ There are a few more which are unstable and/or incomplete.
 
 ## Cool, I want more
 
+
+Take a look at the [design](https://github.com/clojure-vim/acid.nvim/blob/master/DESIGN.md) page
+for a better understanding on how acid works.
+
 Acid is growing up in both complexity and features and there is still a lot of work to be done.
 Please take a look at the [TODO](https://github.com/clojure-vim/acid.nvim/blob/master/TODO.md) for the roadmap.
