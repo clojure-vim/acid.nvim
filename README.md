@@ -21,6 +21,12 @@ First, install the python dependencies:
 pip3 install --user neovim
 ```
 
+Update your `~/.lein/profiles.clj` adding the following lines:
+```clj
+[refactor-nrepl "2.3.0-SNAPSHOT"]
+[cider/cider-nrepl "0.14.0"]
+```
+
 Then, add and install acid:
 
 ```vim
@@ -30,10 +36,11 @@ Plug 'clojure-vim/acid.nvim'
 :UpdateRemotePlugins
 ```
 
-Update your `~/.lein/profiles.clj` adding the following lines:
-```clj
-[refactor-nrepl "2.3.0-SNAPSHOT"]
-[cider/cider-nrepl "0.14.0"]
+Acid is a remote plugin. This means it communicates with neovim using the rpc interface.
+For its commands to be available on neovim, one must first update neovims rpc bindings:
+
+```vim
+:UpdateRemotePlugins
 ```
 
 ## Running

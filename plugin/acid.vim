@@ -51,4 +51,6 @@ endfunction
 
 autocmd VimEnter * AcidInit
 autocmd FileType clojure AcidBootstrap
-autocmd BufWritePost,BufReadPost *.clj call s:require()
+
+autocmd User AcidBootstrapComplete call s:require()
+autocmd BufWritePost *.clj call s:require()
