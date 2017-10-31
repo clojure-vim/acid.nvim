@@ -157,6 +157,7 @@ class Acid(object):
             self.commands = self.init_commands()
 
         [self.nvim.command(cmd) for cmd in self.commands]
+        self.nvim.command("doautocmd User AcidBootstrapComplete")
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
