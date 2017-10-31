@@ -108,6 +108,7 @@ class BaseCommand(object):
         inst = cls(nvim)
         inst.on_init()
         cmd_list = cls.build_interfaces(nvim)
+        log.log_info("Defining commands {}", "\n".join(cmd_list))
         cls.__instances__[cls.name] = inst
         return cmd_list
 

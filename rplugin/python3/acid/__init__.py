@@ -156,7 +156,6 @@ class Acid(object):
         if bang or not self.commands:
             self.commands = self.init_commands()
 
-
         [self.nvim.command(cmd) for cmd in self.commands]
 
     @neovim.function("AcidSendNrepl")
