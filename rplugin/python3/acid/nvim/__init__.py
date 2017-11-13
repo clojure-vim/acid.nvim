@@ -113,6 +113,12 @@ def get_acid_ns(nvim):
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
 
+def test_paths(nvim):
+    return {'test', *nvim.vars.get('acid_alt_test_paths', [])}
+
+def src_paths(nvim):
+    return {'src', *nvim.vars.get('acid_alt_paths', [])}
+
 def get_stop_paths(nvim):
     return {'test', 'src'}
 
