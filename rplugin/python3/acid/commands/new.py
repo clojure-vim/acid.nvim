@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def prepare_payload(self, ns):
         fname = "{}.clj".format(ns_to_path(ns))
         base = 'test' if ns.endswith('-test') else 'src'
-        open_with = nvim.vars.get('acid_open_new_file_with', 'edit')
+        open_with = self.nvim.vars.get('acid_open_new_file_with', 'edit')
         path = os.path.join(current_path(self.nvim), base, fname)
 
         with open(path, 'w') as fpath:
