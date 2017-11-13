@@ -42,7 +42,7 @@ class Command(BaseCommand):
         rel_path = os.path.relpath(path, start=root_path).split('/')
         open_with = self.nvim.vars.get(
             'acid_open_alternate_file_with',
-            nvim.vars.get('acid_open_new_file_with', 'edit')
+            self.nvim.vars.get('acid_open_new_file_with', 'edit')
         )
 
         if rel_path[0] in src:
