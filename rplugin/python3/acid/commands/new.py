@@ -25,6 +25,9 @@ class Command(BaseCommand):
         base = 'test' if ns.endswith('-test') else 'src'
         open_with = self.nvim.vars.get('acid_open_new_file_with', 'edit')
         path = os.path.join(current_path(self.nvim), base, fname)
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
         with open(path, 'w') as fpath:
             fpath.write('(ns {})'.format(ns))
