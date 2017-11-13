@@ -40,6 +40,10 @@ class Command(BaseCommand):
         path = current_file(self.nvim)
         root_path = current_path(self.nvim)
         rel_path = os.path.relpath(path, start=root_path).split('/')
+        open_with = self.nvim.vars.get(
+            'acid_open_alternate_file_with',
+            nvim.vars.get('acid_open_new_file_with', 'edit')
+        )
 
         if rel_path[0] in src:
             log_debug("Current file is a 'src', changing to 'test'")
@@ -57,7 +61,7 @@ class Command(BaseCommand):
             )
 
         if os.path.exists(alt_path):
-            self.nvim.command('edit {}'.format(alt_path))
+            self.nvim.command('silent {} {}'.format(open_with, alt_path))
         else:
             ns = path_to_ns(alt_path, test | src)
             self.nvim.command('AcidNewFile {}'.format(ns))
