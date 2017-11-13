@@ -113,15 +113,8 @@ def get_acid_ns(nvim):
     elif 'ns:' in strategy:
         return strategy.split(':')[-1]
 
-def test_paths(nvim):
-    return {'test', *nvim.vars.get('acid_alt_test_paths', [])}
-
-def src_paths(nvim):
-    return {'src', *nvim.vars.get('acid_alt_paths', [])}
-
 def get_stop_paths(nvim):
-    return set() | test_paths(nvim) | src_paths(nvim)
-
+    return {'test', 'src'}
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
