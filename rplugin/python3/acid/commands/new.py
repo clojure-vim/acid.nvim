@@ -23,12 +23,13 @@ class Command(BaseCommand):
     def prepare_payload(self, ns):
         fname = "{}.clj".format(ns_to_path(ns))
         base = 'test' if ns.endswith('-test') else 'src'
+        open_with = nvim.vars.get('acid_open_new_file_with', 'edit')
         path = os.path.join(current_path(self.nvim), base, fname)
 
         with open(path, 'w') as fpath:
             fpath.write('(ns {})'.format(ns))
 
-        self.nvim.command('silent edit {}'.format(path))
+        self.nvim.command('silent {} {}'.format(open_with, path))
 
         # Does not interact with nrepl
         return None
