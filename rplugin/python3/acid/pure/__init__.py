@@ -21,7 +21,7 @@ def path_to_ns(path, stop_paths=None):
         # Look for project.clj
         for ix, _ in enumerate(path):
             if os.path.exists(os.path.join(*["/", *path[:ix], "project.clj"])):
-                raw_path_list = path[ix:]
+                raw_path_list = path[ix+1:]
                 break
 
     if raw_path_list is None:
