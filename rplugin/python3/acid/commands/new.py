@@ -9,9 +9,9 @@ class Command(BaseCommand):
 
     name = 'NewFile'
     priority = 0
-    nargs = 1
-    prompt = 1
-    handlers = []
+    nargs=1
+    prompt=1
+    handlers = {'Ignore': ''}
     mapping = '<leader>N'
 
     @staticmethod
@@ -26,6 +26,7 @@ class Command(BaseCommand):
         open_with = self.nvim.vars.get('acid_open_new_file_with', 'edit')
         path = os.path.join(current_path(self.nvim), base, fname)
         directory = os.path.dirname(path)
+
         if not os.path.exists(directory):
             os.makedirs(directory)
 
