@@ -1,4 +1,5 @@
 import os
+import re
 from acid.nvim.log import log_debug, log_warning
 
 
@@ -6,19 +7,23 @@ def path_to_ns(path, stop_paths=None):
     if stop_paths is None:
         stop_paths = ['src', 'test']
 
-    path = path.replace("_", "-").split('/')[1:]
-    path[-1] = path[-1].split('.')[0]
+    stop_paths = sorted(stop_paths, key=lambda x: x.count('/'))
+
     raw_path_list = None
 
-    for ix, node in enumerate(reversed(path)):
-        if node in stop_paths:
-            raw_path_list = path[ix * -1:]
+    for stop_path in reversed(stop_paths):
+        m = re.search(stop_path, path)
+        if m:
+            raw_path_list = path[m.start():].replace("_", "-").split('/')[stop_path.count('/') + 1:]
+            raw_path_list[-1] = raw_path_list[-1].split('.')[0]
             break
 
     if raw_path_list is None:
         log_debug("Previous check did not work. Attempting project.clj")
 
         # Look for project.clj
+        path = path.replace("_", "-").split('/')[1:]
+        path[-1] = path[-1].split('.')[0]
         for ix, _ in enumerate(path):
             if os.path.exists(os.path.join(*["/", *path[:ix], "project.clj"])):
                 raw_path_list = path[ix+1:]
