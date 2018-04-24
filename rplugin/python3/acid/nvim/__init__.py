@@ -126,7 +126,7 @@ def src_paths(nvim):
     return {'src', *nvim.vars.get('acid_alt_paths', [])}
 
 def get_stop_paths(nvim):
-    return {'test', 'src'}
+    return {'test', 'src', *test_paths(nvim), *src_paths(nvim)}
 
 def find_file_in_path(nvim, msg):
     fname = msg['file']
