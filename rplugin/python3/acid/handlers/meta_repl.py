@@ -80,7 +80,7 @@ class Handler(SingletonHandler):
 
     def ensure_win_exists(self):
         no_shared_buffer = self.buf_nr is None
-        has_no_window = self.nvim.funcs.bufwinnr(self.buf_nr) == -1
+        has_no_window = no_shared_buffer or self.nvim.funcs.bufwinnr(self.buf_nr) == -1
 
         log_debug("buf_nr is {}", self.buf_nr)
         log_debug("has window? {}", has_no_window)
