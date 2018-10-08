@@ -12,9 +12,10 @@ def path_to_ns(path, stop_paths=None):
     raw_path_list = None
 
     for stop_path in reversed(stop_paths):
-        m = re.search(stop_path, path)
+        m = re.search(stop_path[::-1], path[::-1])
         if m:
-            raw_path_list = path[m.start():].replace("_", "-").split('/')[stop_path.count('/') + 1:]
+            startpos = len(path) - m.start()
+            raw_path_list = path[startpos:].replace("_", "-").split('/')[stop_path.count('/') + 1:]
             raw_path_list[-1] = raw_path_list[-1].split('.')[0]
             break
 
