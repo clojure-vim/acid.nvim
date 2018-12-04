@@ -20,13 +20,19 @@ def get_customization_variable(nvim, var, default=None):
     return nvim.current.buffer.vars.get(var, nvim.vars.get(var, default))
 
 
+def list_clj_files(nvim):
+    rtp = nvim.options.get('runtimepath').split(',')
+
+    for path in rtp:
+        match = os.path.join(path, 'clj/acid/**/*.clj')
+        log_debug('Attempting path: {}', match)
+
+        yield from glob.iglob(match)
+
 def find_clojure_fn(nvim, fname):
     rtp = nvim.options.get('runtimepath', '').split(',')
 
-    if not rtp:
-        return
-
-    src = os.path.join('rplugin/python3/acid/clj_fns/', fname)
+    src = os.path.join('clj/acid/', fname)
 
     for path in rtp:
         partial = os.path.join(path, src)

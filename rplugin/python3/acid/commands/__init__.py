@@ -31,11 +31,15 @@ class BaseCommand(object):
     def on_init(self):
         pass
 
+    def on_configure(self, *args, **kwargs):
+        return []
+
     def prepare_payload(self, *args):
         return {}
 
     def configure(self, context, handler, *args):
-        handler.configure(*args, **context)
+        data = [*self.on_configure(*args, **context), *args]
+        handler.configure(*data, **context)
         return handler
 
     def start_handler(self, context, handler, *args):

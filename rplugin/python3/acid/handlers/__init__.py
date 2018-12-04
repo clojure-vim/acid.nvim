@@ -27,6 +27,7 @@ class BaseHandler(object):
     def configure(self, *args, **kwargs):
         self.nvim = kwargs['nvim']
         self.context = kwargs
+        self.on_configure(*args, **kwargs)
         return self
 
     def new_child_handler(self, handler):
@@ -41,6 +42,9 @@ class BaseHandler(object):
         handler.on_handle(msg)
 
     def on_init(self):
+        pass
+
+    def on_configure(self, *_a, **_k):
         pass
 
     def on_pre_send(self, *_):

@@ -125,15 +125,16 @@ class Acid(object):
     def acid_command(self, args):
         cmd, *args = args
         log_info(r"Received args for command {}: {}", cmd, args)
+        command = self.extensions['commands'].get(cmd.strip())
+
         url = formatted_localhost_address(self.nvim)
 
-        if url is None:
+        if url is None and command.handlers:
             path = current_path(self.nvim)
             echo(self.nvim, "No REPL open")
             log_info("No repl open on path {}".format(path))
             return
 
-        command = self.extensions['commands'].get(cmd.strip())
         command.call(self, self.context(), *args)
 
     @neovim.function("AcidCommandMeta", sync=True)

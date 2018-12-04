@@ -11,10 +11,8 @@ class Handler(BaseHandler):
         self.vim_fn = ""
         self.value = []
 
-    def configure(self, vim_fn, *args, **kwargs):
-        super().configure(*args, **kwargs)
+    def on_configure(self, vim_fn, *args, **kwargs):
         self.vim_fn = vim_fn
-        return self
 
     def on_handle(self, msg, *_):
         self.value.append(msg)

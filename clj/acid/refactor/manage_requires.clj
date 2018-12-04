@@ -1,3 +1,5 @@
+(ns acid.refactor.manage-requires)
+
 (defn manipulate-req [reqs modify]
   (let [[[h] v] (split-at 1 reqs)]
     (conj (sort-by first (modify v)) h)))
