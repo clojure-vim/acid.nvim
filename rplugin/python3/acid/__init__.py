@@ -2,12 +2,13 @@
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
 from acid.nvim import (
-    path_to_ns, formatted_localhost_address, get_acid_ns,
+    path_to_ns, format_addr, formatted_localhost_address, get_acid_ns,
     find_file_in_path, find_extensions, import_extensions,
     convert_case, get_customization_variable, current_path,
     repl_host_address
 )
 from collections import deque
+from acid.nvim import find_file_in_path
 from acid.nvim.log import log_info, echo, warning, info
 from acid.session import send, SessionHandler
 
@@ -90,8 +91,7 @@ class Acid(object):
         log = self.get_handler('Log').configure(**self.context())
         self.sessions.add_persistent_watch(url, log)
 
-    def command(self, data, handlers):
-        url = formatted_localhost_address(self.nvim)
+    def command(self, data, handlers, url):
         acid_session = self.nvim.vars.get('acid_current_session')
 
         if get_customization_variable(self.nvim, 'acid_log_messages', 0):
@@ -165,6 +165,11 @@ class Acid(object):
         payload = data[0]
         handler = len(data) > 1 and data[1] or 'MetaRepl'
         config = len(data) > 2 and data[2] or None
+        url = len(data) > 3 and (
+            format_addr(*data[3]) or
+            formatted_localhost_address(self.nvim)
+        )
+
 
         handler = self.get_handler(handler)
 
@@ -179,7 +184,7 @@ class Acid(object):
         else:
             handler = handler.configure(**context)
 
-        self.command(payload, [handler])
+        self.command(payload, [handler], url)
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
@@ -189,7 +194,6 @@ class Acid(object):
     def acid_get_url(self, args):
         return repl_host_address(self.nvim)
 
-    @neovim.command("AcidDescribeAll", nargs=0)
-    def acid_describe_all(self):
-        pass
-
+    @neovim.function("Acid_FindFileInPath", sync=True)
+    def acid_get_url(self, args):
+        return find_file_in_path(nvim, args[0])

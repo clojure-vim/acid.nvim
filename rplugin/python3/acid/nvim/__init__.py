@@ -103,11 +103,13 @@ def repl_host_address(nvim):
 # Renamed the function, keeping this here to avoid breaking stuff..
 localhost = repl_host_address
 
+def format_addr(*addr):
+    return "{}://{}:{}".format('nrepl', *addr)
 
 def formatted_localhost_address(nvim):
     addr = repl_host_address(nvim)
     if addr:
-        return "{}://{}:{}".format('nrepl', *addr)
+        return format_addr(*addr)
     else:
         return None
 
@@ -171,7 +173,6 @@ def find_file_in_path(nvim, msg):
 
         fpath = fpath if not os.path.isabs(fpath) else fpath[1:]
         full = os.path.join(tmppath, fpath)
-        nvim.command('echom "{}"'.format(str([full, fpath, tmppath, jarpath])))
         if os.path.exists(full):
             return full
 
