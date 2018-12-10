@@ -1,6 +1,6 @@
 local utils = require("acid.utils")
-local composable = function(map)
 
+local composable = function(map)
   map.update_payload = function(this, fn)
     local old_payload_fn = this.payload
 
@@ -23,13 +23,10 @@ local composable = function(map)
   map.build = function(this)
     return this.payload(), this.handler
   end
-
-  return setmetatable(map, {
-      __call = function(this)
-        return this:build()
-      end
-    })
+  return map
 end
+
+local nop = function(_) return end
 
 local new = function(op)
   return composable{}:with_payload{op = op}
@@ -37,7 +34,9 @@ end
 
 local for_op = function(op)
   return function(map)
-    return new(op):update_payload(function(orig) return utils.merge(orig, map) end)
+    return new(op)
+    :with_handler(nop)
+    :update_payload(function(orig) return utils.merge(orig, map) end)
   end
 end
 
@@ -50,7 +49,8 @@ local setup = function(...)
   return commands
 end
 
-return setup(
+return {
+  ops = setup(
   "eval",
   "spec-form",
   "info",
@@ -62,4 +62,7 @@ return setup(
   "load-file",
   "macroexpand",
   "rename-file-or-dir"
-)
+),
+  raw = composable,
+  custom = for_op
+}
