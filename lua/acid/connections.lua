@@ -10,11 +10,23 @@ connections.add = function(this, addr)
   return #this.store
 end
 
+connections.remove = function(this, addr)
+  local ix
+  for i, v in ipairs(this.store) do
+    if v == addr then
+      ix = i
+      break
+    end
+  end
+  table.remove(connections.store, ix)
+end
+
 connections.select = function(this, pwd, ix)
   this.current[pwd] = ix
 end
 
 connections.unselect = function(this, pwd)
+  -- TODO Potentially wrong.
   this.current[pwd] = nil
 end
 

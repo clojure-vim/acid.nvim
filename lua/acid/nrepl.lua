@@ -56,9 +56,23 @@ local nrepl = {}
 
 nrepl.cache = {}
 
+local cache = setmetatable({}, {
+    __index = function(_, k)
+      return nrepl.cache[k]
+    end,
+  __newindex = function(_, k, v)
+    if nrepl.cache[k] ~= nil then
+      nrepl.stop{pwd = k}
+    end
+    nrepl.cache[k] = v
+  end
+})
+
+nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl'}
+
 -- Starts a tools.deps version
 nrepl.start = function(obj)
-  local selected = obj.middlewares or {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl'}
+  local selected = obj.middlewares or nrepl.default_middlewares
 
   obj.port = tostring(obj.port or math.random(1024, 65534))
 
@@ -71,27 +85,22 @@ nrepl.start = function(obj)
      })
 
    if ret < 0 then
-     -- log, inform..
+     -- TODO log, inform..
      return
    end
 
-   nrepl.cache[obj.pwd] = ret
+   cache[obj.pwd] = math.floor(ret)
 
   local ix = connections:add{"127.0.0.1", obj.port}
+  connections:select(obj.pwd, ix)
 
-  if obj.pwd then
-    connections:select(obj.pwd, ix)
-  end
-
-  return obj.id
+  return true
 end
 
 nrepl.stop = function(obj)
-  nvim.nvim_call_function("jobstop", {nrepl.cache[obj.id]})
-
-  if obj.pwd then
-    connections:unselect(obj.pwd)
-  end
+  nvim.nvim_call_function("jobstop", {cache[obj.pwd]})
+  connections:remove(cache[obj.pwd])
+  connections:unselect(obj.pwd)
 end
 
 nrepl.handle = {

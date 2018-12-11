@@ -1,12 +1,8 @@
 -- luacheck: globals table
-local commands = require("acid.commands")
-local handlers = require("acid.handlers")
 local core = require("acid.core")
+local features = require("acid.features")
 
-local acid = {
-  commands = commands,
-  handlers = handlers
-}
+local acid = {}
 
 acid.run = function(cmd, conn)
   return core.send(conn, cmd:build())
