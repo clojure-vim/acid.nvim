@@ -139,4 +139,6 @@ class BaseCommand(object):
             for h, *args in items(custom)
         )
 
-        acid.command(payload, handlers)
+        url = formatted_localhost_address(self.nvim)
+
+        acid.command(payload, handlers, url)
