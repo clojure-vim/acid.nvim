@@ -1,4 +1,6 @@
-from acid.nvim import get_customization_variable, log, convert_case
+from acid.nvim import (
+    formatted_localhost_address, get_customization_variable, log, convert_case
+)
 import functools
 
 opfunc_forwarder = """function! Acid{}OpfuncFw(block)
