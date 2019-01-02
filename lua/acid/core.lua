@@ -10,10 +10,12 @@ core.send = function(conn, obj, handler)
 
   conn = conn or connections:get(nvim.nvim_call_function("getcwd", {}))
 
-  core.indirection[session] = handler
+  core.indirection[session] = {
+    fn = handler,
+    conn = conn
+  }
 
-  nvim.nvim_call_function("AcidSendNrepl", {
-      obj,
+  nvim.nvim_call_function("AcidSendNrepl", tap{obj,
       "require('acid').callback(" .. session .. ", _A)",
       conn,
       "lua"

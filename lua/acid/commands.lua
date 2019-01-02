@@ -1,6 +1,8 @@
 local utils = require("acid.utils")
 
 local composable = function(map)
+  map.type = "command"
+
   map.update_payload = function(this, fn)
     local old_payload_fn = this.payload
 

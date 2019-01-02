@@ -1,5 +1,6 @@
 -- luacheck: globals vim
 local nvim = vim.api
+local utils = require("acid.utils")
 local connections = {
   store = {},
   current = {},
@@ -22,6 +23,10 @@ connections.remove = function(this, addr)
 end
 
 connections.select = function(this, pwd, ix)
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
   this.current[pwd] = ix
 end
 
@@ -31,10 +36,14 @@ connections.unselect = function(this, pwd)
 end
 
 connections.get = function(this, pwd)
-  local ix = this.current[pwd]
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
+  local ix = tonumber(this.current[pwd])
 
   if ix == nil then
-    local port_file = pwd .. '/.nrepl-port'
+    local port_file = pwd .. '.nrepl-port'
     if nvim.nvim_call_function('filereadable', {port_file}) then
       local port = nvim.nvim_call_function('readfile', {port_file})
       ix = this:add({'127.0.0.1', port[1]})
