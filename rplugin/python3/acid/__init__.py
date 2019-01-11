@@ -165,10 +165,8 @@ class Acid(object):
         payload = data[0]
         handler = len(data) > 1 and data[1] or 'MetaRepl'
         config = len(data) > 2 and data[2] or None
-        url = len(data) > 3 and (
-            format_addr(*data[3]) or
-            formatted_localhost_address(self.nvim)
-        )
+        url = (format_addr(*data[3]) if len(data) > 3
+               else formatted_localhost_address(self.nvim))
 
 
         handler = self.get_handler(handler)
