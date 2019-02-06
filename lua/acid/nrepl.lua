@@ -73,15 +73,15 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- Starts a tools.deps version
 nrepl.start = function(obj)
   local selected = obj.middlewares or nrepl.default_middlewares
-
-  obj.port = tostring(obj.port or math.random(1024, 65534))
+  local port = tostring(obj.port or math.random(1024, 65534))
+  local cmd = obj.cmd or build_cmd(selected, port)
 
    local ret = nvim.nvim_call_function('jobstart', {
-       build_cmd(selected, obj.port), {
+       cmd , {
          on_stdout = "AcidJobHandler",
          on_stderr = "AcidJobHandler",
          cwd = obj.pwd
-     }
+       }
      })
 
    if ret < 0 then

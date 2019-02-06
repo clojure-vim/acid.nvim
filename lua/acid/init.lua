@@ -1,6 +1,5 @@
 -- luacheck: globals table
 local core = require("acid.core")
-local features = require("acid.features")
 
 local acid = {}
 
