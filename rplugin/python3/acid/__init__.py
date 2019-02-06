@@ -33,8 +33,6 @@ def should_finalize(msg):
 
 def new_handler(nvim, handler_impl, finalizer):
     def handler(msg, wc, key):
-        log_info(msg)
-
         try:
             nvim.async_call(lambda: handler_impl(msg, wc, key))
         finally:

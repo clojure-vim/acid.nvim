@@ -8,11 +8,9 @@ features.go_to = function(symbol, ns)
   return commands.info{symbol = symbol, ns = ns}:with_handler(handlers.go_to)
 end
 
-features.list_usage = function(callback, symbol, ns)
-  local handle = function(data)
-    local pwd = nvim.nvim_call_function('getcwd', {})
-    local fname = nvim.nvim_call_function('expand' ,{"%:p"})
+features.list_usage = function(callback, symbol, ns, pwd, fname)
 
+  local handle = function(data)
     return commands['find-symbol']{
         path = pwd,
         file = fname,

@@ -44,7 +44,7 @@ end
 
 local setup = function(...)
   local commands = {}
-  for _, v in ipairs(table.pack(...)) do
+  for _, v in ipairs(utils.pack(...)) do
     commands[v] = for_op(v)
   end
 

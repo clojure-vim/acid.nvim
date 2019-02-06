@@ -1,6 +1,10 @@
 -- luacheck: globals table
 local utils = {}
 
+utils.pack = function (...)
+  return {n=select('#',...); ...}
+end
+
 utils.interleave_first = function(tbl, itn)
   local new = {}
   for _, v in ipairs(tbl) do
@@ -54,7 +58,7 @@ end
 utils.merge = function(...)
   local _new = {}
 
-  for _, tbl in ipairs(table.pack(...)) do
+  for _, tbl in ipairs(utils.pack(...)) do
     for k, v in pairs(tbl) do
       _new[k] = v
     end
@@ -66,7 +70,7 @@ end
 utils.join = function(...)
   local _new = {}
 
-  for _, tbl in ipairs(table.pack(...)) do
+  for _, tbl in ipairs(utils.pack(...)) do
     for _, v in ipairs(tbl) do
        table.insert(_new, v)
     end

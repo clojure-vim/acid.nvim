@@ -44,7 +44,7 @@ local build_cmd = function(selected, portno)
     "--middleware",
     "[" ..
       table.concat(utils.join(
-        table.unpack(utils.map(selected, function(dep) return middlewares[dep] end))
+        unpack(utils.map(selected, function(dep) return middlewares[dep] end))
       ), " ") ..
       "]"
 
@@ -91,7 +91,7 @@ nrepl.start = function(obj)
 
    cache[obj.pwd] = math.floor(ret)
 
-  local ix = connections:add{"127.0.0.1", obj.port}
+  local ix = connections:add{"127.0.0.1", port}
   connections:select(obj.pwd, ix)
 
   return true

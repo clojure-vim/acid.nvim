@@ -15,7 +15,7 @@ core.send = function(conn, obj, handler)
     conn = conn
   }
 
-  nvim.nvim_call_function("AcidSendNrepl", tap{obj,
+  nvim.nvim_call_function("AcidSendNrepl", { obj,
       "require('acid').callback(" .. session .. ", _A)",
       conn,
       "lua"
