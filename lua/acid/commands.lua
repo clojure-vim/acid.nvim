@@ -66,5 +66,6 @@ return {
   "rename-file-or-dir"
 ),
   raw = composable,
-  custom = for_op
+  custom = for_op,
+  nop = nop
 }

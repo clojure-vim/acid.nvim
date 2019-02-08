@@ -1,17 +1,18 @@
-local nvim = vim.api
-local commands = require("acid.commands").ops
+local commands = require("acid.commands")
+local ops = commands.ops
 local handlers = require("acid.handlers")
+local middlewares = require("acid.middlewares")
 
 local features = {}
 
 features.go_to = function(symbol, ns)
-  return commands.info{symbol = symbol, ns = ns}:with_handler(handlers.go_to)
+  return ops.info{symbol = symbol, ns = ns}:with_handler(handlers.go_to)
 end
 
 features.list_usage = function(callback, symbol, ns, pwd, fname)
 
   local handle = function(data)
-    return commands['find-symbol']{
+    return ops['find-symbol']{
         path = pwd,
         file = fname,
         ns = data.ns,
@@ -22,8 +23,21 @@ features.list_usage = function(callback, symbol, ns, pwd, fname)
       }:with_handler(callback)
   end
 
-  return commands.info{symbol = symbol, ns = ns}:with_handler(handle)
+  return ops.info{symbol = symbol, ns = ns}:with_handler(handle)
 end
 
+features.req = function(obj)
+
+  local code = "(require '[" ..
+    obj.ns ..
+    (obj.alias ~= nil and (" :as" .. obj.alias) or "") ..
+    "])"
+
+  return ops.eval{code = code}:with_handler(
+    middlewares.doautocmd{
+      autocmd = "AcidRequired",
+      handler = (obj.handler or commands.nop)
+  })
+end
 
 return features
