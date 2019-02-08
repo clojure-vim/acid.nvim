@@ -3,16 +3,18 @@ local nvim = vim.api
 local utils = require("acid.utils")
 local connections = require("acid.connections")
 
+local nrepl = {}
+
 local deps = {
-  ['nrepl/nrepl'] = '{:mvn/version "0.5.1"}',
-  ["org.clojure/clojurescript"] =  '{:mvn/version "1.10.439"}',
-  ['cider/piggieback'] = '{:mvn/version "0.3.8"}',
-  ['cider/cider-nrepl'] = '{:mvn/version "0.18.0"}',
+  ['nrepl/nrepl'] = '{:mvn/version "0.5.3"}',
+  ['org.clojure/clojurescript'] =  '{:mvn/version "1.10.439"}',
+  ['cider/piggieback'] = '{:mvn/version "0.3.10"}',
+  ['cider/cider-nrepl'] = '{:mvn/version "0.20.0"}',
   ['refactor-nrepl'] = '{:mvn/version "2.4.0"}',
   ['iced-nrepl'] = '{:mvn/version "0.2.3"}'
 }
 
-local middlewares = {
+nrepl.middlewares = {
   ['nrepl/nrepl'] = {},
   ['cider/cider-nrepl'] = {'cider.nrepl/cider-middleware'},
   ['cider/piggieback'] = {'cider.piggieback/wrap-cljs-repl'},
@@ -32,8 +34,8 @@ local get_deps = function(selected)
 
 end
 
-local build_cmd = function(selected, portno)
-  return {
+local build_cmd = function(selected, portno, bind, host, connect)
+  local opts = {
     "clojure",
     "-Sdeps",
     get_deps(selected),
@@ -44,63 +46,83 @@ local build_cmd = function(selected, portno)
     "--middleware",
     "[" ..
       table.concat(utils.join(
-        unpack(utils.map(selected, function(dep) return middlewares[dep] end))
+        unpack(utils.map(selected, function(dep) return nrepl.middlewares[dep] end))
       ), " ") ..
       "]"
+  }
 
-  }end
+  if bind ~= nil then
+    table.insert(opts,"-b")
+    table.insert(opts, bind)
+  end
 
+  if host ~= nil or connect ~= nil then
+    table.insert(opts,"-c")
+  end
 
-local nrepl = {}
+  if host ~= nil then
+    table.insert(opts,"-h")
+    table.insert(opts, host)
+  end
+
+  return opts
+end
 
 
 nrepl.cache = {}
-
-local cache = setmetatable({}, {
-    __index = function(_, k)
-      return nrepl.cache[k]
-    end,
-  __newindex = function(_, k, v)
-    if nrepl.cache[k] ~= nil then
-      nrepl.stop{pwd = k}
-    end
-    nrepl.cache[k] = v
-  end
-})
 
 nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl'}
 
 -- Starts a tools.deps version
 nrepl.start = function(obj)
+  local pwd = obj.pwd
+
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
   local selected = obj.middlewares or nrepl.default_middlewares
   local port = tostring(obj.port or math.random(1024, 65534))
-  local cmd = obj.cmd or build_cmd(selected, port)
+  local bind = obj.bind
+  local cmd = obj.cmd or build_cmd(selected, port, obj.bind, obj.host, obj.connect)
+
+  bind = bind or "127.0.0.1"
 
    local ret = nvim.nvim_call_function('jobstart', {
        cmd , {
          on_stdout = "AcidJobHandler",
          on_stderr = "AcidJobHandler",
-         cwd = obj.pwd
+         cwd = pwd
        }
      })
 
-   if ret < 0 then
+   if ret <= 0 then
      -- TODO log, inform..
      return
    end
 
-   cache[obj.pwd] = math.floor(ret)
+   nrepl.cache[pwd] = {
+     job = ret,
+     addr = {bind, port}
+   }
 
   local ix = connections:add{"127.0.0.1", port}
-  connections:select(obj.pwd, ix)
+  connections:select(pwd, ix)
 
   return true
 end
 
 nrepl.stop = function(obj)
-  nvim.nvim_call_function("jobstop", {cache[obj.pwd]})
-  connections:remove(cache[obj.pwd])
-  connections:unselect(obj.pwd)
+  local pwd = obj.pwd
+
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
+  nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
+  connections:unselect(pwd)
+  connections:remove(nrepl.cache[pwd].addr)
+  nrepl.cache[obj.pwd] = nil
 end
 
 nrepl.handle = {
