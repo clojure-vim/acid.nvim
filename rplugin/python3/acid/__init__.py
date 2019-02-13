@@ -57,7 +57,7 @@ class Acid(object):
     def __init__(self, nvim):
         log_handler = new_handler(
             nvim,
-            lambda msg, *_: log_info(msg),
+            lambda msg, *_: not "changed-namespaces" in msg and log_info(msg),
             lambda *_: False
         )
 
