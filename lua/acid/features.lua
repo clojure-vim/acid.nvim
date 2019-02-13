@@ -1,12 +1,11 @@
 local commands = require("acid.commands")
 local ops = commands.ops
-local handlers = require("acid.handlers")
 local middlewares = require("acid.middlewares")
 
 local features = {}
 
 features.go_to = function(symbol, ns)
-  return ops.info{symbol = symbol, ns = ns}:with_handler(handlers.go_to)
+  return ops.info{symbol = symbol, ns = ns}:with_handler(middlewares.go_to(middlewares.nop))
 end
 
 features.list_usage = function(callback, symbol, ns, pwd, fname)
@@ -36,8 +35,14 @@ features.req = function(obj)
   return ops.eval{code = code}:with_handler(
     middlewares.doautocmd{
       autocmd = "AcidRequired",
-      handler = (obj.handler or commands.nop)
+      handler = (obj.handler or middlewares.nop_handler)
   })
+end
+
+-- TODO add config layer
+-- So handlers could be selected by default
+features.eval = function(obj)
+  return ops.eval{code = obj.code}:with_handler(obj.handler)
 end
 
 return features
