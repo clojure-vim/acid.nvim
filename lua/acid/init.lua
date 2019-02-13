@@ -1,7 +1,19 @@
--- luacheck: globals table
+-- luacheck: globals vim
 local core = require("acid.core")
+local connections = require("acid.connections")
+local utils = require("acid.utils")
 
 local acid = {}
+
+acid.connected = function(pwd)
+  pwd = pwd or vim.api.getcwd()
+
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
+  return connections.current[pwd] ~= nil
+end
 
 acid.run = function(cmd, conn)
   return core.send(conn, cmd:build())

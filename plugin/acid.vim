@@ -1,4 +1,8 @@
 function! s:require()
+  if !luaeval("require('acid').connected()", v:null)
+    return
+  endif
+
   if exists("g:acid_alt_test_paths")
     let test_paths = add(g:acid_alt_test_paths, "test")
   else
