@@ -19,8 +19,19 @@ function! s:require()
   call luaeval("require('acid').run(require('acid.features').req(_A))", {"ns": ns})
 endfunction
 
+function! s:mute()
+endfunction
+
+function! AcidMotion(mode)
+  exec 'lua require("acid.frontend").eval_expr("'.a:mode.'")'
+endfunction
+
+map <silent> cpp <Cmd>set opfunc=AcidMotion<CR>g@
+
+
 augroup acid
   autocmd BufWritePost *.clj call s:require()
+  autocmd User AcidRequired call s:mute()
 augroup END
 
 function! AcidJobHandler(id, data, stream)
