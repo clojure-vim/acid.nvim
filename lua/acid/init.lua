@@ -6,7 +6,7 @@ local utils = require("acid.utils")
 local acid = {}
 
 acid.connected = function(pwd)
-  pwd = pwd or vim.api.getcwd()
+  pwd = pwd or vim.api.nvim_call_function("getcwd", {})
 
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"
