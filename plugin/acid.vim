@@ -26,3 +26,5 @@ augroup END
 function! AcidJobHandler(id, data, stream)
   call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
 endfunction
+
+command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
