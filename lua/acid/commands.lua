@@ -1,5 +1,6 @@
 local ops = require("acid.ops")
 
+-- TODO split into folder
 local commands = {}
 
 commands.go_to = function(obj)
@@ -29,6 +30,13 @@ commands.req = function(obj)
     obj.ns ..
     (obj.alias ~= nil and (" :as " .. obj.alias) or "") ..
     "])"
+
+  return ops.eval{code = code}:with_handler(obj.handler)
+end
+
+commands.import = function(obj)
+
+  local code = "(import '(" ..  obj.java_ns .. ' ' .. table.concat(obj.symbols, " ") "))"
 
   return ops.eval{code = code}:with_handler(obj.handler)
 end

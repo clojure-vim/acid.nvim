@@ -18,6 +18,13 @@ config.values.features = setmetatable({
     end
   },
 
+   do_import = {
+    handler = function(data)
+      local middlewares = require("acid.middlewares")
+      return middlewares.ex.noconfig.doautocmd{autocmd = "AcidImported"}(data)
+    end
+  },
+
    go_to = {
     handler = function(data)
       local middlewares = require("acid.middlewares")

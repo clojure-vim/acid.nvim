@@ -22,6 +22,12 @@ endfunction
 function! s:mute()
 endfunction
 
+function! AcidFnAddRequire(req)
+  call search("(ns")
+  exec "normal vaf\<Esc>"
+  exec 'lua require("acid.features").add_require("'.a:req.'")'
+endfunction
+
 function! AcidMotion(mode)
   exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
 endfunction
@@ -30,10 +36,10 @@ map <silent> cpp <Cmd>set opfunc=AcidMotion<CR>g@
 map <silent> <C-c>l <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
 map <silent> <C-c><C-l> <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
 
-
 augroup acid
   autocmd BufWritePost *.clj call s:require()
   autocmd User AcidRequired call s:mute()
+  autocmd User AcidImported call s:mute()
 augroup END
 
 function! AcidJobHandler(id, data, stream)
@@ -42,3 +48,4 @@ endfunction
 
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
 command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
+command! -nargs=1 AcidAddRequire call AcidFnAddRequire("[<args>]")
