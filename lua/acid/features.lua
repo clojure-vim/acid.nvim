@@ -38,8 +38,8 @@ local extract = function(mode)
 end
 
 features.eval_expr = function(mode)
-  local stuff = table.concat(extract(mode), "\n")
-  acid.run(commands.eval(config.features.eval_expr.with{code = stuff}))
+  local code = table.concat(extract(mode), "\n")
+  acid.run(commands.eval(config.features.eval_expr.with{code = code}))
 end
 
 features.do_require = function(ns, alias)
