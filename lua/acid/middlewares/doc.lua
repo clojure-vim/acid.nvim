@@ -1,11 +1,16 @@
 local utils = require("acid.utils")
+local doc = {}
 
-return function(opts)
-  return function(data)
-    if not utils.find(data.status, "no-info") then
-      return
+doc.middleware = function(config)
+  return function(middleware)
+    return function(data)
+      if not utils.find(data.status, "no-info") then
+        return
+      end
+
+      return middleware(data) -- Will need to transform first though
     end
-
-    return opts.handler(data) -- Will need to transform first though
   end
 end
+
+return doc

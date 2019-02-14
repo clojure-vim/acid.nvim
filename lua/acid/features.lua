@@ -1,6 +1,7 @@
 -- luacheck: globals vim
 local middlewares = require('acid.middlewares')
 local commands = require("acid.commands")
+local config = require("acid.config")
 local acid = require("acid")
 
 local features = {}
@@ -39,18 +40,18 @@ end
 
 features.eval_expr = function(mode)
   local stuff = table.concat(features.extract(mode), "\n")
-
-  acid.run(commands.eval{
-    code = stuff,
-    handler = middlewares.virtualtext.set(middlewares.nop)
-  })
+  acid.run(commands.eval(config.features.eval_expr.with{code = stuff}))
 end
 
 features.do_require = function(ns, alias)
   if ns == nil then
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
-  acid.run(commands.req{ns = ns, alias = alias})
+  acid.run(commands.req(config.features.do_require.with{ns = ns, alias = alias}))
+end
+
+features.go_to = function(symbol, ns)
+  acid.run(commands.go_to(config.features.go_to.with{ns = ns, symbol = symbol}))
 end
 
 return features

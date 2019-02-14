@@ -16,7 +16,7 @@ function! s:require()
   endfor
   let ns = AcidGetNs()
 
-  call luaeval("require('acid.features').do_require(_A))", ns)
+  call luaeval("require('acid.features').do_require(_A)", ns)
 endfunction
 
 function! s:mute()
@@ -27,6 +27,8 @@ function! AcidMotion(mode)
 endfunction
 
 map <silent> cpp <Cmd>set opfunc=AcidMotion<CR>g@
+map <silent> <C-c>l <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
+map <silent> <C-c><C-l> <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
 
 
 augroup acid

@@ -83,5 +83,20 @@ utils.ends_with = function(str, ending)
   return ending == "" or str:sub(-#ending) == ending
 end
 
+utils.clone = function(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[utils.clone(orig_key)] = utils.clone(orig_value)
+        end
+        setmetatable(copy, utils.clone(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 return utils
 

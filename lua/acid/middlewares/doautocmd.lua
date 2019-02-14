@@ -1,7 +1,13 @@
 -- luacheck: globals vim
-return function(opts)
-  return function(data)
-    vim.api.nvim_command("doautocmd User " .. opts.autocmd)
-    return opts.handler(data)
+local doautocmd = {}
+
+doautocmd.middleware = function(config)
+  return function(middleware)
+    return function(data)
+      vim.api.nvim_command("doautocmd User " .. config.autocmd)
+      return middleware(data)
+    end
   end
 end
+
+return doautocmd

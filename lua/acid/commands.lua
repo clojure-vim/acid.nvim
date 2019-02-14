@@ -1,10 +1,9 @@
 local ops = require("acid.ops")
-local middlewares = require("acid.middlewares")
 
 local commands = {}
 
-commands.go_to = function(symbol, ns)
-  return ops.info{symbol = symbol, ns = ns}:with_handler(middlewares.go_to(middlewares.nop))
+commands.go_to = function(obj)
+  return ops.info{symbol = obj.symbol, ns = obj.ns}:with_handler(obj.handler)
 end
 
 commands.list_usage = function(callback, symbol, ns, pwd, fname)
@@ -31,11 +30,7 @@ commands.req = function(obj)
     (obj.alias ~= nil and (" :as " .. obj.alias) or "") ..
     "])"
 
-  return ops.eval{code = code}:with_handler(
-    middlewares.doautocmd{
-      autocmd = "AcidRequired",
-      handler = (obj.handler or middlewares.nop_handler)
-  })
+  return ops.eval{code = code}:with_handler(obj.handler)
 end
 
 -- TODO add config layer
