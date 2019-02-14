@@ -1,48 +1,56 @@
+-- luacheck: globals vim
+local middlewares = require('acid.middlewares')
 local commands = require("acid.commands")
-local ops = commands.ops
-local middlewares = require("acid.middlewares")
+local acid = require("acid")
 
 local features = {}
 
-features.go_to = function(symbol, ns)
-  return ops.info{symbol = symbol, ns = ns}:with_handler(middlewares.go_to(middlewares.nop))
-end
+features.extract = function(mode)
+  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
+  local b_line, b_col, e_line, e_col, _
 
-features.list_usage = function(callback, symbol, ns, pwd, fname)
+  if mode == 'visual' then
+    _, b_line, b_col = unpack(vim.api.nvim_call_function("getpos", {"v"}))
+    _, e_line, e_col = unpack(vim.api.nvim_call_function("getpos", {"."}))
 
-  local handle = function(data)
-    return ops['find-symbol']{
-        path = pwd,
-        file = fname,
-        ns = data.ns,
-        name = data.name,
-        line = math.floor(data.line or 1),
-        column = math.floor(data.column or 1),
-        ['serialization-format'] = 'bencode'
-      }:with_handler(callback)
+    b_col = b_col - 1
+    e_col = e_col - 1
+  else
+    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '['))
+    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, ']'))
   end
 
-  return ops.info{symbol = symbol, ns = ns}:with_handler(handle)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, b_line - 1, e_line, 0)
+
+  if b_col ~= 0 then
+    lines[1] = string.sub(lines[1], b_col + 1)
+  end
+
+  if e_col ~= 0 then
+    if b_line ~= e_line then
+      lines[#lines] = string.sub(lines[#lines], 1, e_col + 1)
+    else
+      lines[#lines] = string.sub(lines[#lines], 1, e_col - b_col + 1)
+    end
+  end
+
+  return lines
 end
 
-features.req = function(obj)
+features.eval_expr = function(mode)
+  local stuff = table.concat(features.extract(mode), "\n")
 
-  local code = "(require '[" ..
-    obj.ns ..
-    (obj.alias ~= nil and (" :as" .. obj.alias) or "") ..
-    "])"
-
-  return ops.eval{code = code}:with_handler(
-    middlewares.doautocmd{
-      autocmd = "AcidRequired",
-      handler = (obj.handler or middlewares.nop_handler)
+  acid.run(commands.eval{
+    code = stuff,
+    handler = middlewares.virtualtext.set(middlewares.nop)
   })
 end
 
--- TODO add config layer
--- So handlers could be selected by default
-features.eval = function(obj)
-  return ops.eval{code = obj.code}:with_handler(obj.handler)
+features.do_require = function(ns, alias)
+  if ns == nil then
+    ns = vim.api.nvim_call_function("AcidGetNs", {})
+  end
+  acid.run(commands.req{ns = ns, alias = alias})
 end
 
 return features
