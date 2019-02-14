@@ -1,12 +1,11 @@
 -- luacheck: globals vim
-local middlewares = require('acid.middlewares')
 local commands = require("acid.commands")
 local config = require("acid.config")
 local acid = require("acid")
 
 local features = {}
 
-features.extract = function(mode)
+local extract = function(mode)
   local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
   local b_line, b_col, e_line, e_col, _
 
@@ -39,7 +38,7 @@ features.extract = function(mode)
 end
 
 features.eval_expr = function(mode)
-  local stuff = table.concat(features.extract(mode), "\n")
+  local stuff = table.concat(extract(mode), "\n")
   acid.run(commands.eval(config.features.eval_expr.with{code = stuff}))
 end
 
