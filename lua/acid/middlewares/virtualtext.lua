@@ -38,6 +38,8 @@ end
 virtualtext.clear = function(ln)
   local cb = vim.api.nvim_get_current_buf()
 
+  ln = tonumber(ln) - 1
+
   local from = ln or 0
   local to = 1 + (ln or -2)
 
