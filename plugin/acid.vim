@@ -16,14 +16,14 @@ function! s:require()
   endfor
   let ns = AcidGetNs()
 
-  call luaeval("require('acid').run(require('acid.features').req(_A))", {"ns": ns})
+  call luaeval("require('acid.features').do_require(_A))", ns)
 endfunction
 
 function! s:mute()
 endfunction
 
 function! AcidMotion(mode)
-  exec 'lua require("acid.frontend").eval_expr("'.a:mode.'")'
+  exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
 endfunction
 
 map <silent> cpp <Cmd>set opfunc=AcidMotion<CR>g@
@@ -39,3 +39,4 @@ function! AcidJobHandler(id, data, stream)
 endfunction
 
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
+command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
