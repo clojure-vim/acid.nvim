@@ -1,6 +1,7 @@
 -- luacheck: globals vim
 local nvim = vim.api
 local utils = require("acid.utils")
+
 local connections = {
   store = {},
   current = {},

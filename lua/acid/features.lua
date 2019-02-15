@@ -42,95 +42,82 @@ end
 features.eval_expr = function(mode)
   local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
   local code = table.concat(extract(bufnr, mode), "\n")
-  acid.run(commands.eval(config.features.eval_expr.with{code = code}))
+  acid.run(commands.eval(config.features.eval_expr{code = code}))
 end
 
 features.do_require = function(ns, alias)
   if ns == nil then
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
-  acid.run(commands.req(config.features.do_require.with{ns = ns, alias = alias}))
+  acid.run(commands.req(config.features.do_require{ns = ns, alias = alias}))
 end
 
 features.do_import = function(java_ns, symbols)
-  acid.run(commands.import(config.features.do_import.with{java_ns = java_ns, symbols = symbols}))
+  acid.run(commands.import(config.features.do_import{java_ns = java_ns, symbols = symbols}))
 end
 
 features.go_to = function(symbol, ns)
-  acid.run(commands.go_to(config.features.go_to.with{ns = ns, symbol = symbol}))
+  acid.run(commands.go_to(config.features.go_to{ns = ns, symbol = symbol}))
 end
 
--- TODO move relevant parts to command
+-- TODO Autohook
 features.preload = function()
-  local contents = vim.api.nvim_call_function("readfile", {"/opt/code/clojure-vim/acid.nvim/clj/acid/inject.clj"})
-  local lf = ops['load-file']{
-    file = table.concat(contents, "\n")
-  }
-  acid.run(lf)
+  for _, path in ipairs{"clj/acid/inject.clj", "clj/acid/highlight.clj"} do
+    local fpath = vim.api.nvim_call_function("findfile", {path, vim.api.nvim_get_option('rtp')})
+    local contents = vim.api.nvim_call_function("readfile", {fpath})
+    acid.run(ops['load-file']{file = table.concat(contents, "\n")})
+  end
 end
 
--- TODO Move relevant parts to command
 features.add_require = function(req)
   local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
   local lines, b, e = extract(bufnr)
   local content = table.concat(lines, "")
 
-  acid.run(ops.eval{
-    code = "(acid.inject/format-code (acid.inject/upd-ns '" ..
-    content ..
-    " :require (partial acid.inject/add-req '" ..
-    req ..
-    ")))"
-  }:with_handler(function(data)
-    if data.ex ~= nil or data.err ~= nil then
-      local msg = data.ex or data.err
-      vim.api.nvim_err_writeln("Error while processing: " .. msg)
-      return
-    end
+  local code = "(acid.inject/format-code (acid.inject/upd-ns '" ..
+    content ..  " :require (partial acid.inject/add-req '" ..  req .. ")))"
 
-    if data.value ~= nil or data.status ~= nil then
-      return
-    end
-
-    local lns = {}
-    for v in data['out']:gmatch("([^\n]+)") do
-      table.insert(lns, v)
-    end
-
-    vim.api.nvim_buf_set_lines(bufnr, b - 1, e, false, lns)
-  end))
-
+    acid.run(commands.eval(config
+        .features
+        .add_require{from = b, to = e, bufnr = bufnr, code = code}))
 end
 
--- TODO remove duplications
+features.remove_requires = function(req)
+  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
+  local lines, b, e = extract(bufnr)
+  local content = table.concat(lines, "")
+
+  local code = "(acid.inject/format-code (acid.inject/upd-ns '" ..
+    content ..  " :require (partial acid.inject/rem-req '" ..  req .. ")))"
+
+    acid.run(commands.eval(config
+        .features
+        .remove_require{from = b, to = e, bufnr = bufnr, code = code}))
+end
+
 features.sort_requires = function()
   local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
   local lines, b, e = extract(bufnr)
   local content = table.concat(lines, "")
 
-  acid.run(ops.eval{
-    code = "(acid.inject/format-code (acid.inject/upd-ns '" ..
-    content ..
-    " :require acid.inject/sort-reqs))"
-  }:with_handler(function(data)
-    if data.ex ~= nil or data.err ~= nil then
-      local msg = data.ex or data.err
-      vim.api.nvim_err_writeln("Error while processing: " .. msg)
-      return
-    end
+  local code = "(acid.inject/format-code (acid.inject/upd-ns '" ..
+    content .. " :require acid.inject/sort-reqs))"
 
-    if data.value ~= nil or data.status ~= nil then
-      return
-    end
+    acid.run(commands.eval(config
+        .features
+        .sort_requires{from = b, to = e, bufnr = bufnr, code = code}))
 
-    local lns = {}
-    for v in data['out']:gmatch("([^\n]+)") do
-      table.insert(lns, v)
-    end
+end
 
-    vim.api.nvim_buf_set_lines(bufnr, b - 1, e, false, lns)
-  end))
+features.do_hl = function(ns)
+  ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
+  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
+  local code = "(when (find-ns 'acid.highlight) (acid.hightlight/ns-syntax-command '" ..  ns .. "))"
 
+    acid.run(commands.eval(config.features.do_hl{code = code, fn = function(dt)
+      vim.api.nvim_buf_set_var(bufnr, "clojure_syntax_without_core_keywords", true)
+      vim.api.nvim_buf_set_var(bufnr, "clojure_syntax_keywords", dt)
+    end}))
 end
 
 return features

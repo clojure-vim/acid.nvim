@@ -1,5 +1,6 @@
 -- luacheck: globals unpack vim
 local connections = require("acid.connections")
+
 local core = {
   indirection = {}
 }

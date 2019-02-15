@@ -11,8 +11,8 @@
 (defn add-req [new-req reqs]
   (manipulate-req reqs #(conj % new-req)))
 
-(defn rem-req [new-req reqs]
-  (manipulate-req reqs (partial remove #(= new-req (first %)))))
+(defn rem-req [old-req reqs]
+  (manipulate-req reqs (partial remove #(= old-req (first %)))))
 
 (defn map-if [pred action col]
   (apply list (map (fn [v]

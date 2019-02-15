@@ -4,33 +4,81 @@ local config = {}
 config.values = {}
 
 config.values.features = setmetatable({
-  eval_expr = {
-    handler = function(data)
-      local middlewares = require("acid.middlewares")
-      return middlewares.virtualtext(middlewares.ex.clipboard)(data)
-    end
-  },
+  eval_expr = function(cfg)
+    return {
+        code = cfg.code,
+        handler = function(data)
+          local middlewares = require("acid.middlewares")
+          return middlewares.virtualtext(middlewares.ex.clipboard)(data)
+        end
+      }
+    end,
 
-   do_require = {
-    handler = function(data)
-      local middlewares = require("acid.middlewares")
-      return middlewares.ex.noconfig.doautocmd{autocmd = "AcidRequired"}(data)
-    end
-  },
+   do_require = function(cfg)
+     return {
+        ns = cfg.ns,
+        symbol = cfg.symbol,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidRequired"}(data)
+        end
+      }
+    end,
 
-   do_import = {
-    handler = function(data)
-      local middlewares = require("acid.middlewares")
-      return middlewares.ex.noconfig.doautocmd{autocmd = "AcidImported"}(data)
-    end
-  },
+   add_require = function(cfg)
+     return {
+        code = cfg.code,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.refactor(cfg)(data)
+        end
+      }
+    end,
 
-   go_to = {
-    handler = function(data)
-      local middlewares = require("acid.middlewares")
-      return middlewares.ex.go_to(data)
-    end
-  },
+   do_hl = function(cfg)
+     return {
+        code = cfg.code,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.exec(cfg)(data)
+        end
+      }
+    end,
+
+   remove_require = function(cfg)
+     return {
+        code = cfg.code,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.refactor(cfg)(data)
+        end
+      }
+    end,
+
+   sort_requires = function(cfg)
+     return {
+        code = cfg.code,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.refactor(cfg)(data)
+        end
+      }
+    end,
+
+   do_import = function(cfg)
+     return {
+        java_ns = cfg.java_ns,
+        symbols = cfg.symbols,
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidImported"}(data)
+        end
+      }
+    end,
+
+   go_to = function(cfg)
+     return {
+        ns = cfg.ns,
+        symbol = cfg.symbol,
+        handler = function(data)
+          return require("acid.middlewares").ex.go_to(data)
+        end
+      }
+    end,
 }, {__index = function(tbl, k)
   return rawget(tbl, k) or {}
 end}
@@ -49,17 +97,7 @@ end
 
 config.forname = function(branch)
   return setmetatable({}, {__index = function(_, key)
-    return setmetatable(utils.clone(config.values[branch][key]), {
-        __index = function(tbl, k)
-          if k == "with" then
-            return function(val)
-              return utils.merge(tbl, val)
-            end
-          else
-            return rawget(tbl, k)
-          end
-        end
-      })
+    return utils.clone(config.values[branch][key])
     end})
 end
 

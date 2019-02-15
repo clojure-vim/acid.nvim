@@ -41,8 +41,6 @@ commands.import = function(obj)
   return ops.eval{code = code}:with_handler(obj.handler)
 end
 
--- TODO add config layer
--- So handlers could be selected by default
 commands.eval = function(obj)
   return ops.eval{code = obj.code}:with_handler(obj.handler)
 end
