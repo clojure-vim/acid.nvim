@@ -93,6 +93,24 @@ def get_port_no(nvim):
 
 
 def repl_host_address(nvim):
+    path = current_path(nvim)
+
+    if path[-1] != "/":
+        path = path + "/"
+
+    ix = nvim.funcs.luaeval(
+        "require('acid.connections').current[_A]",
+        path)
+
+    if ix != None:
+        connection = nvim.funcs.luaeval(
+        "require('acid.connections').store[_A]",
+        ix)
+        log_debug("Return from lua: {}", str(connection))
+
+        return connection
+
+
     host = nvim.vars.get('acid_lein_host', '127.0.0.1')
     try:
         return [host, get_port_no(nvim)]
