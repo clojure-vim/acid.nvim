@@ -6,12 +6,12 @@ local connections = require("acid.connections")
 local nrepl = {}
 
 local deps = {
-  ['nrepl/nrepl'] = '{:mvn/version "0.5.3"}',
+  ['nrepl/nrepl'] = '{:mvn/version "0.6.0"}',
   ['org.clojure/clojurescript'] =  '{:mvn/version "1.10.439"}',
-  ['cider/piggieback'] = '{:mvn/version "0.3.10"}',
-  ['cider/cider-nrepl'] = '{:mvn/version "0.20.0"}',
+  ['cider/piggieback'] = '{:mvn/version "0.4.0"}',
+  ['cider/cider-nrepl'] = '{:mvn/version "0.21.1"}',
   ['refactor-nrepl'] = '{:mvn/version "2.4.0"}',
-  ['iced-nrepl'] = '{:mvn/version "0.2.3"}'
+  ['iced-nrepl'] = '{:mvn/version "0.4.1"}'
 }
 
 nrepl.middlewares = {
