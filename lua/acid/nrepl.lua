@@ -31,38 +31,46 @@ local get_deps = function(selected)
     , ", "
     )
   .. "}}"
-
 end
 
-local build_cmd = function(selected, portno, bind, host, connect)
+local supplied = function(fname)
+  return table.concat(vim.api.nvim_call_function("readfile", {fname}), "\n")
+end
+
+local build_cmd = function(obj)
   local opts = {
     "clojure",
     "-Sdeps",
-    get_deps(selected),
+    get_deps(obj.selected),
     "-m",
     "nrepl.cmdline",
     "-p",
-    portno,
+    obj.portno,
     "--middleware",
     "[" ..
       table.concat(utils.join(
-        unpack(utils.map(selected, function(dep) return nrepl.middlewares[dep] end))
+        unpack(utils.map(obj.selected, function(dep) return nrepl.middlewares[dep] end))
       ), " ") ..
       "]"
   }
 
-  if bind ~= nil then
-    table.insert(opts,"-b")
-    table.insert(opts, bind)
+  if obj.deps_file ~= nil then
+    table.insert(opts, 4, "-Sdeps")
+    table.insert(opts, 5, supplied(obj.deps_file))
   end
 
-  if host ~= nil or connect ~= nil then
+  if obj.bind ~= nil then
+    table.insert(opts,"-b")
+    table.insert(opts, obj.bind)
+  end
+
+  if obj.host ~= nil or obj.connect ~= nil then
     table.insert(opts,"-c")
   end
 
-  if host ~= nil then
+  if obj.host ~= nil then
     table.insert(opts,"-h")
-    table.insert(opts, host)
+    table.insert(opts, obj.host)
   end
 
   return opts
@@ -84,7 +92,14 @@ nrepl.start = function(obj)
   local selected = obj.middlewares or nrepl.default_middlewares
   local port = tostring(obj.port or math.random(1024, 65534))
   local bind = obj.bind
-  local cmd = obj.cmd or build_cmd(selected, port, obj.bind, obj.host, obj.connect)
+  local cmd = obj.cmd or build_cmd{
+    selected = selected,
+    port = port,
+    bind = obj.bind,
+    host = obj.host,
+    connect = obj.connect,
+    deps_file = obj.deps_file
+  }
 
   bind = bind or "127.0.0.1"
 
