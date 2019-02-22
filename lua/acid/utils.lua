@@ -80,7 +80,7 @@ utils.join = function(...)
 end
 
 utils.ends_with = function(str, ending)
-  return ending == "" or str:sub(-#ending) == ending
+  return ending == "" or string.sub(str, -#ending) == ending
 end
 
 utils.clone = function(orig)
