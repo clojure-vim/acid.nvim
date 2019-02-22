@@ -45,7 +45,7 @@ local build_cmd = function(obj)
     "-m",
     "nrepl.cmdline",
     "-p",
-    obj.portno,
+    obj.port,
     "--middleware",
     "[" ..
       table.concat(utils.join(
@@ -103,13 +103,14 @@ nrepl.start = function(obj)
 
   bind = bind or "127.0.0.1"
 
-   local ret = nvim.nvim_call_function('jobstart', {
-       cmd , {
-         on_stdout = "AcidJobHandler",
-         on_stderr = "AcidJobHandler",
-         cwd = pwd
-       }
-     })
+
+  local ret = nvim.nvim_call_function('jobstart', {
+      cmd , {
+        on_stdout = "AcidJobHandler",
+        on_stderr = "AcidJobHandler",
+        cwd = pwd
+      }
+    })
 
    if ret <= 0 then
      -- TODO log, inform..
