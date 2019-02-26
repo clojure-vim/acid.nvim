@@ -17,9 +17,26 @@ config.values.features = setmetatable({
    do_require = function(cfg)
      return {
         ns = cfg.ns,
-        symbol = cfg.symbol,
+        alias = cfg.alias,
         handler = function(data)
           return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidRequired"}(data)
+        end
+      }
+    end,
+
+   ns_load_all = function()
+     return {
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidLoadedAllNSs"}(data)
+        end
+      }
+    end,
+
+   preload = function()
+     return {
+        files = {"clj/acid/inject.clj"},
+        handler = function(data)
+          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidPreloadedCljFns"}(data)
         end
       }
     end,

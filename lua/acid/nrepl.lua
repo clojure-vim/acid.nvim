@@ -3,6 +3,7 @@ local nvim = vim.api
 local utils = require("acid.utils")
 local connections = require("acid.connections")
 
+local pending = {}
 local nrepl = {}
 
 local deps = {
@@ -55,8 +56,11 @@ local build_cmd = function(obj)
   }
 
   if obj.deps_file ~= nil then
-    table.insert(opts, 4, "-Sdeps")
-    table.insert(opts, 5, supplied(obj.deps_file))
+    opts[3] = supplied(obj.deps_file)
+  end
+
+  if obj.alias ~= nil then
+    table.insert(opts, 4, obj.alias)
   end
 
   if obj.bind ~= nil then
@@ -95,6 +99,7 @@ nrepl.start = function(obj)
   local cmd = obj.cmd or build_cmd{
     selected = selected,
     port = port,
+    alias = obj.alias,
     bind = obj.bind,
     host = obj.host,
     connect = obj.connect,
@@ -103,7 +108,6 @@ nrepl.start = function(obj)
 
   bind = bind or "127.0.0.1"
 
-
   local ret = nvim.nvim_call_function('jobstart', {
       cmd , {
         on_stdout = "AcidJobHandler",
@@ -111,6 +115,7 @@ nrepl.start = function(obj)
         cwd = pwd
       }
     })
+
 
    if ret <= 0 then
      -- TODO log, inform..
@@ -123,8 +128,8 @@ nrepl.start = function(obj)
    }
 
   local ix = connections:add{"127.0.0.1", port}
-  connections:select(pwd, ix)
 
+  pending[ret] = {pwd = pwd, ix = ix}
   return true
 end
 
@@ -137,7 +142,7 @@ nrepl.stop = function(obj)
 
   nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
   connections:unselect(pwd)
-  connections:remove(nrepl.cache[pwd].addr)
+  --connections:remove(nrepl.cache[pwd].addr)
   nrepl.cache[obj.pwd] = nil
 end
 
@@ -145,6 +150,18 @@ nrepl.handle = {
   _store = {},
   stdout = function(dt, ch)
     nrepl.handle._store[ch] = nrepl.handle._store[ch] or {}
+    if pending[ch] ~= nil then
+      for _, ln in ipairs(dt) do
+        if string.sub(ln, 1, 20) == "nREPL server started" then
+          local opts = pending[ch]
+          local port = connections.store[opts.ix][2]
+          connections:select(opts.pwd, opts.ix)
+          vim.api.nvim_out_write("Acid connected on port " .. tostring(port) .. "\n")
+          vim.api.nvim_command("doautocmd User AcidConnected")
+          pending[ch] = nil
+        end
+      end
+    end
     table.insert(nrepl.handle._store[ch], dt)
   end,
   stderr = function(dt, ch)

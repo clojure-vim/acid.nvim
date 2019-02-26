@@ -4,6 +4,7 @@ from acid.nvim.log import log_debug, log_warning
 
 
 def path_to_ns(path, stop_paths=None):
+    log_debug("Supplied path is {}", str(path))
     if stop_paths is None:
         stop_paths = ['src', 'test']
 

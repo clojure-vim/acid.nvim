@@ -2,7 +2,6 @@
 local commands = require("acid.commands")
 local config = require("acid.config")
 local acid = require("acid")
-local ops = require("acid.ops")
 
 -- TODO split features to folder
 local features = {}
@@ -17,12 +16,17 @@ local extract = function(bufnr, mode)
 
     b_col = b_col - 1
     e_col = e_col - 1
+  elseif mode == 'line' then
+    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '['))
+    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, ']'))
   else
     b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '<'))
     e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '>'))
   end
 
   local lines = vim.api.nvim_buf_get_lines(bufnr, b_line - 1, e_line, 0)
+
+  tap{mode, b_line, e_line, lines}
 
   if b_col ~= 0 then
     lines[1] = string.sub(lines[1], b_col + 1)
@@ -60,13 +64,14 @@ features.go_to = function(symbol, ns)
   acid.run(commands.go_to(config.features.go_to{ns = ns, symbol = symbol}))
 end
 
--- TODO Autohook
 features.preload = function()
-  for _, path in ipairs{"clj/acid/inject.clj", "clj/acid/highlight.clj"} do
-    local fpath = vim.api.nvim_call_function("findfile", {path, vim.api.nvim_get_option('rtp')})
-    local contents = vim.api.nvim_call_function("readfile", {fpath})
-    acid.run(ops['load-file']{file = table.concat(contents, "\n")})
+  for _, cmd in ipairs(commands.preload(config.features.preload())) do
+    acid.run(cmd)
   end
+end
+
+features.load_all_nss = function()
+  acid.run(commands.ns_load_all(config.features.ns_load_all()))
 end
 
 features.add_require = function(req)

@@ -56,10 +56,12 @@ class SessionHandler(object):
 
         try:
             conn.send(data)
-        except e:
+            return True, ""
+        except Exception as e:
             log.log_error(e)
             conn.close()
             del self.sessions[url]
+            return False, str(e)
 
 
 def send(session, url, handlers, data, matcher={}):
@@ -71,4 +73,4 @@ def send(session, url, handlers, data, matcher={}):
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, matcher)
 
-    session.send(url, data, handlers)
+    return session.send(url, data, handlers)

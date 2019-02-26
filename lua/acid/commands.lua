@@ -1,3 +1,4 @@
+-- luacheck: globals vim
 local ops = require("acid.ops")
 
 -- TODO split into folder
@@ -34,11 +35,24 @@ commands.req = function(obj)
   return ops.eval{code = code}:with_handler(obj.handler)
 end
 
+commands.ns_load_all = function(obj)
+  return ops['ns-load-all']{}:with_handler(obj.handler)
+end
+
+commands.preload = function(obj)
+  local cmds = {}
+  local rtp = vim.api.nvim_get_option('rtp')
+  for _, path in ipairs(obj.files) do
+    local fpath = vim.api.nvim_call_function("findfile", {path, rtp})
+    local contents = vim.api.nvim_call_function("readfile", {fpath})
+    table.insert(cmds, ops['load-file']{file = table.concat(contents, "\n")})
+  end
+  return cmds
+end
+
 commands.import = function(obj)
-
-  local code = "(import '(" ..  obj.java_ns .. ' ' .. table.concat(obj.symbols, " ") "))"
-
-  return ops.eval{code = code}:with_handler(obj.handler)
+  local code = "(import '(" ..  obj.java_ns .. ' ' .. table.concat(obj.symbols, " ") .. "))"
+ return ops.eval{code = code}:with_handler(obj.handler)
 end
 
 commands.eval = function(obj)

@@ -1,6 +1,7 @@
 # encoding:utf-8
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
+import uuid
 from acid.nvim import (
     path_to_ns, format_addr, formatted_localhost_address, get_acid_ns,
     find_file_in_path, find_extensions, import_extensions,
@@ -8,7 +9,6 @@ from acid.nvim import (
     repl_host_address
 )
 from collections import deque
-from acid.nvim import find_file_in_path
 from acid.nvim.log import log_info, echo, warning, info
 from acid.session import send, SessionHandler
 
@@ -69,14 +69,22 @@ class Acid(object):
         nvim = self.nvim
         payload = data[0]
         fn = data[1] # fn name
-        addr = get(data, 2) or repl_host_address(nvim)
+        addr = get(data, 2)
+        addr_managed_by_acid = addr != None
+        addr = addr or repl_host_address(nvim)
         url = format_addr(*addr)
         backend = get(data, 3) or "lua"
 
         handler_impl = handlers[backend](nvim, fn)
         handler = partial_handler(nvim, handler_impl)
 
-        send(self.session_handler, url, [handler], payload)
+        success, msg = send(self.session_handler, url, [handler], payload)
+
+        if not success and addr_managed_by_acid:
+            nvim.api.err_writeln(
+            "Dropping connection on {} due to error when sending: {}".format(
+                addr[1], msg))
+            nvim.funcs.luaeval("require('acid.connections'):remove(_A)", addr)
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
@@ -86,6 +94,10 @@ class Acid(object):
     def acid_get_url(self, args):
         return repl_host_address(self.nvim)
 
-    @neovim.function("Acid_FindFileInPath", sync=True)
+    @neovim.function("AcidFindFileInPath", sync=True)
     def acid_get_url(self, args):
         return find_file_in_path(nvim, args[0])
+
+    @neovim.function("AcidNewUUID", sync=True)
+    def acid_get_url(self, args):
+        return uuid.uuid4().hex

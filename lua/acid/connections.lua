@@ -15,12 +15,18 @@ end
 connections.remove = function(this, addr)
   local ix
   for i, v in ipairs(this.store) do
-    if v == addr then
+    if v[2] == addr[2] and v[1] == addr[1] then
       ix = i
       break
     end
   end
   table.remove(connections.store, ix)
+
+  for pwd, v in pairs(this.current) do
+    if v[2] == addr[2] and v[1] == addr[1] then
+      this.current[pwd] = nil
+    end
+  end
 end
 
 connections.select = function(this, pwd, ix)
@@ -32,7 +38,7 @@ connections.select = function(this, pwd, ix)
 end
 
 connections.unselect = function(this, pwd)
-  -- TODO Potentially wrong.
+  -- TODO Potentially wrong
   this.current[pwd] = nil
 end
 
