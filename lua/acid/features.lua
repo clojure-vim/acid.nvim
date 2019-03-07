@@ -26,8 +26,6 @@ local extract = function(bufnr, mode)
 
   local lines = vim.api.nvim_buf_get_lines(bufnr, b_line - 1, e_line, 0)
 
-  tap{mode, b_line, e_line, lines}
-
   if b_col ~= 0 then
     lines[1] = string.sub(lines[1], b_col + 1)
   end

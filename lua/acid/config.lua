@@ -1,44 +1,35 @@
 local utils = require("acid.utils")
 local config = {}
 
+local with_handler = function(handler)
+  return function(map)
+    map.handler = handler
+    return map
+  end
+end
+
 config.values = {}
 
 config.values.features = setmetatable({
-  eval_expr = function(cfg)
-    return {
-        code = cfg.code,
-        handler = function(data)
-          local middlewares = require("acid.middlewares")
-          return middlewares.virtualtext(middlewares.ex.clipboard)(data)
-        end
-      }
-    end,
+  eval_expr = with_handler(function(data)
+      local middlewares = require("acid.middlewares")
+      return middlewares.virtualtext(middlewares.ex.clipboard)(data)
+    end),
 
-   do_require = function(cfg)
-     return {
-        ns = cfg.ns,
-        alias = cfg.alias,
-        handler = function(data)
-          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidRequired"}(data)
-        end
-      }
-    end,
+   do_require = with_handler(function(data)
+      return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidRequired"}(data)
+    end),
 
    ns_load_all = function()
-     return {
-        handler = function(data)
-          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidLoadedAllNSs"}(data)
-        end
-      }
+     return with_handler(function(data)
+        return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidLoadedAllNSs"}(data)
+      end){}
     end,
 
    preload = function()
-     return {
-        files = {"clj/acid/inject.clj"},
-        handler = function(data)
-          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidPreloadedCljFns"}(data)
-        end
-      }
+     return with_handler(function(data)
+        return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidPreloadedCljFns"}(data)
+      end){ files = {"clj/acid/inject.clj"} }
     end,
 
    add_require = function(cfg)
@@ -77,25 +68,13 @@ config.values.features = setmetatable({
       }
     end,
 
-   do_import = function(cfg)
-     return {
-        java_ns = cfg.java_ns,
-        symbols = cfg.symbols,
-        handler = function(data)
-          return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidImported"}(data)
-        end
-      }
-    end,
+   do_import = with_handler(function(data)
+      return require("acid.middlewares").ex.noconfig.doautocmd{autocmd = "AcidImported"}(data)
+    end),
 
-   go_to = function(cfg)
-     return {
-        ns = cfg.ns,
-        symbol = cfg.symbol,
-        handler = function(data)
-          return require("acid.middlewares").ex.go_to(data)
-        end
-      }
-    end,
+   go_to = with_handler(function(data)
+      return require("acid.middlewares").ex.go_to(data)
+    end)
 }, {__index = function(tbl, k)
   return rawget(tbl, k) or {}
 end}

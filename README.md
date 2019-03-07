@@ -5,7 +5,7 @@ Asynchronous Clojure Interactive Development
 ## What is it for?
 
 Acid.nvim is a plugin for clojure development on neovim.
-It was initially designed within [iron.nvim](http://github.com/clojure-vim/iron.nvim), but evolved to be a proper clojure plugin for neovim.
+Started as the evolution of clojure-specific code that was living in [iron.nvim](https://github.com/clojure-vim/iron.nvim) and grew into a full-fledged [nREPL](https://github.com/nrepl/nrepl) client.
 
 ## Design and Structure
 
@@ -16,7 +16,7 @@ Acid provides a range of tools to deal with nREPL connectivity, messaging and so
 First, install the python dependencies:
 
 ```bash
-pip3 install --user neovim
+pip3 install --user pynvim
 ```
 
 Then, add and install acid:
@@ -25,14 +25,8 @@ Then, add and install acid:
 Plug 'clojure-vim/acid.nvim', { 'do': ':UpdateRemotePlugins' }
 ```
 
-Acid is a remote plugin. This means it communicates with neovim using the rpc interface.
-
-Most of acids functionality are available through the lua interface.
+Most of acid functionality is available through the lua interface.
 As lua doesn't provide the required asynchronous capabilities for handling
 nREPL connectivity, a python layer exists to provide them.
 
 Nonetheless, one should never require to interact with python directly.
-
-## Functionality
-
-Acid provides multiple 

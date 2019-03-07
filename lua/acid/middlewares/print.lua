@@ -4,12 +4,6 @@ local do_print = {}
 do_print.middleware = function(config)
   return function(middleware)
     return function(data)
-      if data.ex ~= nil then
-        vim.api.nvim_err_writeln(data.ex)
-      end
-      if data.err ~= nil then
-        vim.api.nvim_err_writeln(data.err)
-      end
       if data.out ~= nil then
         vim.api.nvim_out_write(data.out .. "\n")
       end
