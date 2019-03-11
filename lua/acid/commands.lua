@@ -30,7 +30,8 @@ commands.req = function(obj)
   local code = "(require '[" ..
     obj.ns ..
     (obj.alias ~= nil and (" :as " .. obj.alias) or "") ..
-    "])"
+    (#obj.refer > 0 and (" :refer [" .. table.concat(obj.refer, " ") .. "]") or "") ..
+    " :reload :all])"
 
   return ops.eval{code = code}:with_handler(obj.handler)
 end
@@ -56,7 +57,11 @@ commands.import = function(obj)
 end
 
 commands.eval = function(obj)
-  return ops.eval{code = obj.code}:with_handler(obj.handler)
+  local payload = {code = obj.code}
+  if obj.ns ~= nil then
+    payload.ns = obj.ns
+  end
+  return ops.eval(payload):with_handler(obj.handler)
 end
 
 return commands

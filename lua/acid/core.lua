@@ -20,7 +20,7 @@ core.send = function(conn, obj, handler)
     conn = conn
   }
 
-  vim.api.nvim_call_function("AcidSendNrepl", { obj,
+  vim.api.nvim_call_function("AcidSendNrepl", {obj,
       "require('acid').callback(" .. session .. ", _A)",
       conn,
       "lua"

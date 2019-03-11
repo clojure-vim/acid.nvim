@@ -41,17 +41,18 @@ local extract = function(bufnr, mode)
   return lines, b_line, e_line
 end
 
-features.eval_expr = function(mode)
+features.eval_expr = function(mode, ns)
   local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
   local code = table.concat(extract(bufnr, mode), "\n")
-  acid.run(commands.eval(config.features.eval_expr{code = code}))
+  ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
+  acid.run(commands.eval(config.features.eval_expr{code = code, ns = ns}))
 end
 
-features.do_require = function(ns, alias)
+features.do_require = function(ns, alias, ...)
   if ns == nil then
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
-  acid.run(commands.req(config.features.do_require{ns = ns, alias = alias}))
+  acid.run(commands.req(config.features.do_require{ns = ns, alias = alias, refer = {...}}))
 end
 
 features.do_import = function(java_ns, symbols)
