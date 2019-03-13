@@ -11,6 +11,8 @@ from acid import pure
 from acid.nvim.log import log_debug, log_warning
 
 
+path_ns_cache = {}
+
 def convert_case(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
@@ -82,8 +84,18 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 
-def path_to_ns(nvim):
-    return pure.path_to_ns(nvim.funcs.expand("%:p:r"), get_stop_paths(nvim))
+def path_to_ns(nvim, force=False):
+    fpath = nvim.funcs.expand("%:p:r")
+    if fpath in path_ns_cache and not force:
+        ns = path_ns_cache[fpath]
+        log_debug("Hitting cache for ns '{}'", ns)
+        return ns
+
+    stop_paths = get_stop_paths(nvim)
+    ns = pure.path_to_ns(fpath, stop_paths)
+    path_ns_cache[fpath] = ns
+    return ns
+
 
 def get_port_no(nvim):
     pwd = current_path(nvim)
@@ -133,11 +145,10 @@ def formatted_localhost_address(nvim):
 
 
 def get_acid_ns(nvim):
-    strategy = get_customization_variable(nvim, 'acid_ns_strategy', 'buffer')
-    if strategy == 'buffer':
-        return path_to_ns(nvim)
-    elif 'ns:' in strategy:
+    strategy = get_customization_variable(nvim, 'acid_ns_strategy', '')
+    if 'ns:' in strategy:
         return strategy.split(':')[-1]
+    return path_to_ns(nvim)
 
 def test_paths(nvim):
     return {'test', *nvim.vars.get('acid_alt_test_paths', [])}
