@@ -32,6 +32,14 @@ function! AcidMotion(mode)
   exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
 endfunction
 
+function! AcidInsertEval(...)
+  let ns = a:0 >= 1 ? a:1 : "user"
+  call inputsave()
+  let code = input(ns."=> ")
+  call inputrestore()
+  call luaeval("require('acid.features').eval_cmdline(_A[1], _A[2])", [code, ns])
+endfunction
+
 
 augroup acid
   autocmd BufWritePost *.clj call s:require()
@@ -44,7 +52,11 @@ augroup acid
   autocmd User AcidLoadedAllNSs call s:mute()
   autocmd User AcidImported call s:mute()
 
-  au FileType clojure map <silent> cpp <Cmd>set opfunc=AcidMotion<CR>g@
+  au FileType clojure nmap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
+  au FileType clojure imap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
+  au FileType clojure map <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
+  au FileType clojure map <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
+
   au FileType clojure map <silent> <C-c>ll <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
   au FileType clojure map <silent> <C-c>ln <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<Cr>
   au FileType clojure map <silent> <C-c>la <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
