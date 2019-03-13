@@ -1,6 +1,8 @@
 -- luacheck: globals vim
 local virtualtext = {}
 
+virtualtext.name = "virtualtext"
+
 virtualtext.cache_index = {}
 virtualtext.cache = {}
 
@@ -27,7 +29,7 @@ virtualtext.toggle = function()
 
 end
 
-virtualtext.set = function(config)
+virtualtext.middleware = function(_)
   return function(middleware)
     return function(data)
       local cb = vim.api.nvim_get_current_buf()
@@ -88,7 +90,5 @@ virtualtext.clear = function(ln)
 
   vim.api.nvim_buf_clear_namespace(cb, virtualtext.ns, from, to)
 end
-
-virtualtext.middleware = virtualtext.set
 
 return virtualtext

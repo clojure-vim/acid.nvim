@@ -5,7 +5,7 @@ local ops = require("acid.ops")
 local commands = {}
 
 commands.go_to = function(obj)
-  return ops.info{symbol = obj.symbol, ns = obj.ns}:with_handler(obj.handler)
+  return ops.info{symbol = obj.symbol, ns = obj.ns}
 end
 
 commands.list_usage = function(callback, symbol, ns, pwd, fname)
@@ -33,11 +33,11 @@ commands.req = function(obj)
     (#obj.refer > 0 and (" :refer [" .. table.concat(obj.refer, " ") .. "]") or "") ..
     " :reload :all])"
 
-  return ops.eval{code = code}:with_handler(obj.handler)
+  return ops.eval{code = code}
 end
 
-commands.ns_load_all = function(obj)
-  return ops['ns-load-all']{}:with_handler(obj.handler)
+commands.ns_load_all = function()
+  return ops['ns-load-all']{}
 end
 
 commands.preload = function(obj)
@@ -53,15 +53,7 @@ end
 
 commands.import = function(obj)
   local code = "(import '(" ..  obj.java_ns .. ' ' .. table.concat(obj.symbols, " ") .. "))"
- return ops.eval{code = code}:with_handler(obj.handler)
-end
-
-commands.eval = function(obj)
-  local payload = {code = obj.code}
-  if obj.ns ~= nil then
-    payload.ns = obj.ns
-  end
-  return ops.eval(payload):with_handler(obj.handler)
+ return ops.eval{code = code}
 end
 
 return commands

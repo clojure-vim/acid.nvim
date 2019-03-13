@@ -1,6 +1,16 @@
 -- luacheck: globals vim
 local clipboard = {}
 
+clipboard.name = "clipboard"
+
+clipboard.config = {
+  accessor = function(data)
+    return data.value
+  end,
+  register = 'c',
+  options = '"'
+}
+
 clipboard.set = function(config)
   return function(middleware)
     return function(data)

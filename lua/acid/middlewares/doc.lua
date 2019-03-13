@@ -1,7 +1,7 @@
 local utils = require("acid.utils")
 local doc = {}
 
-doc.middleware = function(config)
+doc.middleware = function(_)
   return function(middleware)
     return function(data)
       if not utils.find(data.status, "no-info") then
