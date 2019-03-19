@@ -52,9 +52,18 @@ end
 forms.form_under_cursor = function()
   local cb = vim.api.nvim_get_current_buf()
 
-  local form = forms.extract(cb)
-  return form
+  return forms.extract(cb)
 end
 
+forms.symbol_under_cursor = function()
+  local cw = vim.api.nvim_call_function("expand", {"<cword>"})
+  local from = vim.api.nvim_call_function("searchpos", {cw, "nc"})
+  local to = vim.api.nvim_call_function("searchpos", {cw, "nce"})
+
+  return cw, {
+    from = from,
+    to = to
+  }
+end
 
 return forms

@@ -98,5 +98,15 @@ utils.clone = function(orig)
     return copy
 end
 
+utils.split_lines = function(txt)
+  local result = {}
+  local regex = ("([^%s]+)"):format("\n")
+  for each in txt:gmatch(regex) do
+    table.insert(result, each)
+  end
+  return result
+end
+
+
 return utils
 

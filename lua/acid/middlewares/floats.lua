@@ -1,12 +1,40 @@
 -- luacheck: globals vim
 local forms = require("acid.forms")
+local utils = require("acid.utils")
 local floats = {}
 
-floats.cache_index = {}
 floats.cache = {}
 
+floats.config = {
+  accessor = function(_, data)
+    if data.ex ~= nil then
+      return utils.split_lines(data.ex)
+    elseif data.err ~= nil then
+      return utils.split_lines(data.err)
+    elseif data.out ~= nil then
+      return utils.split_lines(data.out)
+    elseif data.value ~= nil and data.value ~= "nil" then
+      return utils.split_lines(data.value)
+    end
+  end,
+  get_positions = function(_, lines)
+  local cwin = vim.api.nvim_call_function("win_getid", {})
+  local width = vim.api.nvim_call_function("winwidth", {cwin})
+  local height = #lines
+  local win_height = vim.api.nvim_call_function("winheight", {cwin})
+
+    return {
+      width = width,
+      height = height,
+      row = win_height - height,
+      col = 0,
+      relative = "win"
+    }
+  end
+}
+
 -- FIXME Needs to close the window
-floats.set = function(_)
+floats.middleware = function(config)
   if vim.api.nvim_open_win == nil then
     return function(middleware)
       return function(data)
@@ -17,55 +45,63 @@ floats.set = function(_)
 
   return function(middleware)
     return function(data)
-      if data.status then
-        return
-      end
+      floats.close(config.cb)
+      config.buff = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_option(config.buff, "bufhidden", "wipe")
 
-      local spl = function(txt)
-        local result = {}
-           local regex = ("([^%s]+)"):format("\n")
-           for each in txt:gmatch(regex) do
-              table.insert(result, each)
-           end
-           return result
-        end
+      local lines = config:accessor(data)
 
-      local cur_win = vim.api.nvim_get_current_win()
+      vim.api.nvim_buf_set_lines(config.buff, 0, -1, false, lines)
 
-      local buff = vim.api.nvim_create_buf(false, true)
+      local pos = config:get_positions(lines)
 
-      local lines = {}
-
-      if data.ex ~= nil then
-        lines = spl(data.ex)
-      elseif data.err ~= nil then
-        lines = spl(data.err)
-      elseif data.out ~= nil then
-        lines = spl(data.out)
-      elseif data.value ~= nil and data.value ~= "nil" then
-        lines = spl(data.value)
-        vim.api.nvim_buf_set_option(buff, "filetype", "clojure")
-      end
-
-      vim.api.nvim_buf_set_lines(buff, 0, -1, false, lines)
-
-      local _, coords = forms.form_under_cursor()
-
-      local winid = vim.api.nvim_open_win(buff, false, 40, #lines, {
-        relative = "win",
-        row = coords.to[1],
-        col = coords.to[2]
+      config.winid = vim.api.nvim_open_win(config.buff, false, pos.width, pos.height, {
+        relative = pos.relative,
+        row = pos.row,
+        col = pos.col
       })
 
-      vim.api.nvim_win_set_option(winid, "number", false)
-      vim.api.nvim_win_set_option(winid, "relativenumber", false)
+      vim.api.nvim_win_set_option(config.winid, "number", false)
+      vim.api.nvim_win_set_option(config.winid, "relativenumber", false)
 
+      floats.cache[config.cb] = config.winid
+
+      vim.api.nvim_call_function("execute", {{
+          "function! DynamicAcidSetCleaner" .. config.cb .. "(...)",
+          "lua require('acid.middlewares.floats').set_cleaner(" .. config.cb .. ")",
+          "endfunction"
+      }})
+
+    vim.api.nvim_call_function("timer_start",{
+        "50", "DynamicAcidSetCleaner" .. config.cb
+      })
 
       return middleware(data)
     end
   end
 end
 
-floats.middleware = floats.set
+floats.set_cleaner = function(buffer)
+  vim.api.nvim_command(
+    [[au CursorMoved * once call luaeval('require("acid.middlewares.floats").close(]] ..
+    buffer ..
+    ")', v:null)"
+  )
+
+  vim.api.nvim_command(
+    [[au CursorMovedI * once call luaeval('require("acid.middlewares.floats").close(]] ..
+    buffer ..
+    ")', v:null)"
+  )
+end
+
+floats.close = function(buffer)
+  local winid = floats.cache[buffer]
+
+  if winid ~= nil then
+    vim.api.nvim_win_close(winid, true)
+    floats.cache[buffer] = nil
+  end
+end
 
 return floats

@@ -52,6 +52,7 @@ augroup acid
   autocmd User AcidLoadedAllNSs call s:mute()
   autocmd User AcidImported call s:mute()
 
+  au FileType clojure nmap <silent> K <Cmd>lua require("acid.features").docs()<CR>
   au FileType clojure nmap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
   au FileType clojure imap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
   au FileType clojure map <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
