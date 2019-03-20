@@ -52,15 +52,16 @@ augroup acid
   autocmd User AcidLoadedAllNSs call s:mute()
   autocmd User AcidImported call s:mute()
 
-  au FileType clojure nmap <silent> K <Cmd>lua require("acid.features").docs()<CR>
-  au FileType clojure nmap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
-  au FileType clojure imap <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
-  au FileType clojure map <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
-  au FileType clojure map <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
+  au FileType clojure nmap <buffer> <silent> <C-]> <Cmd>lua require("acid.features").go_to()<CR>
+  au FileType clojure nmap <buffer> <silent> K <Cmd>lua require("acid.features").docs()<CR>
+  au FileType clojure nmap <buffer> <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
+  au FileType clojure imap <buffer> <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
+  au FileType clojure map <buffer> <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
+  au FileType clojure map <buffer> <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
 
-  au FileType clojure map <silent> <C-c>ll <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
-  au FileType clojure map <silent> <C-c>ln <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<Cr>
-  au FileType clojure map <silent> <C-c>la <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
+  au FileType clojure map <buffer> <silent> <C-c>ll <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
+  au FileType clojure map <buffer> <silent> <C-c>ln <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<Cr>
+  au FileType clojure map <buffer> <silent> <C-c>la <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
 augroup END
 
 function! AcidJobHandler(id, data, stream)

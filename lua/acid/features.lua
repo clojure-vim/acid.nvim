@@ -59,7 +59,19 @@ features.do_import = function(java_ns, symbols)
   ))
 end
 
-features.docs = function(ns, symbol)
+features.go_to = function(symbol, ns)
+  local sym = forms.symbol_under_cursor()
+
+  symbol = symbol or sym
+  if ns == nil then
+    ns = vim.api.nvim_call_function("AcidGetNs", {})
+  end
+
+  acid.run(ops.info{symbol = symbol, ns = ns}:with_handler(middlewares.go_to{}))
+end
+
+
+features.docs = function(symbol, ns)
   local sym, coords = forms.symbol_under_cursor()
   local cb = vim.api.nvim_get_current_buf()
 
@@ -97,11 +109,6 @@ features.docs = function(ns, symbol)
   ))
 end
 
-features.go_to = function(symbol, ns)
-  acid.run(commands.go_to{ns = ns, symbol = symbol}:with_handler(middlewares
-    .go_to{}
-  ))
-end
 
 features.preload = function()
   local preload_commands = commands.preload{files = {"clj/acid/inject.clj"}}

@@ -159,15 +159,16 @@ def src_paths(nvim):
 def get_stop_paths(nvim):
     return {'test', 'src', *test_paths(nvim), *src_paths(nvim)}
 
-def find_file_in_path(nvim, msg):
-    fname = msg['file']
+def find_file_in_path(nvim, fname, resource):
+    log_debug("finding path")
     protocol, *_, fpath = fname.split(':')
+
+    log_debug("Finding path to {}", fname )
 
     if protocol == 'file':
         if os.path.exists(fpath):
             return fpath
-        elif 'resource' in msg:
-            resource = msg['resource']
+        elif resource != None:
             paths = get_stop_paths(nvim)
 
             for path in paths:

@@ -95,8 +95,9 @@ class Acid(object):
         return repl_host_address(self.nvim)
 
     @neovim.function("AcidFindFileInPath", sync=True)
-    def acid_get_url(self, args):
-        return find_file_in_path(nvim, args[0])
+    def find_fpath(self, args):
+        log_info("Finding path")
+        return find_file_in_path(nvim, *args)
 
     @neovim.function("AcidNewUUID", sync=True)
     def acid_get_url(self, args):
