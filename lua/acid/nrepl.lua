@@ -1,4 +1,7 @@
 -- luacheck: globals vim
+
+--- nRepl connectivity
+-- @module acid.nrepl
 local nvim = vim.api
 local utils = require("acid.utils")
 local connections = require("acid.connections")
@@ -15,6 +18,8 @@ local deps = {
   ['iced-nrepl'] = '{:mvn/version "0.4.1"}'
 }
 
+--- List of supported middlewares and the wrappers to invoke when spawning a nrepl process.
+-- @table middlewares
 nrepl.middlewares = {
   ['nrepl/nrepl'] = {},
   ['cider/cider-nrepl'] = {'cider.nrepl/cider-middleware'},
@@ -83,9 +88,18 @@ end
 
 nrepl.cache = {}
 
+--- Default middlewares that will be used by the nrepl server
+-- @table default_middlewares
 nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl'}
 
--- Starts a tools.deps version
+--- Starts a tools.deps nrepl server
+-- @tparam table obj Configuration for the nrepl process to be spawn
+-- @tparam string obj.pwd Path where the nrepl process will be started
+-- @tparam[opt] table obj.middlewares List of middlewares.
+-- @tparam[opt] string obj.alias alias on the local deps.edn
+-- @tparam[opt] string obj.connect -c parameter for the nrepl process
+-- @tparam[opt] string obj.bind -b parameter for the nrepl process
+-- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
   local pwd = obj.pwd
 
@@ -133,6 +147,9 @@ nrepl.start = function(obj)
   return true
 end
 
+--- Stops a nrepl process managed by acid
+-- @tparam table obj Configuration for the nrepl process to be stopped
+-- @tparam string obj.pwd Path where the nrepl process was started
 nrepl.stop = function(obj)
   local pwd = obj.pwd
 
@@ -168,9 +185,13 @@ nrepl.handle = {
     nrepl.handle._store[ch] = nrepl.handle._store[ch] or {}
     table.insert(nrepl.handle._store[ch], dt)
   end,
+
+--- Debugs nrepl connection by returning the captured output
+-- @tparam[opt] int ch Neovim's job id of given nrepl process. When not supplied return all.
+-- @treturn table table with the captured outputs for given (or all) nrepl process(es).
   show = function(ch)
     if ch ~= nil then
-      return nrepl.handle._store[ch]
+      return {[ch] = nrepl.handle._store[ch]}
     else
       return nrepl.handle._store
     end

@@ -1,4 +1,7 @@
 -- luacheck: globals vim
+
+--- low-level connection handler
+-- @module acid.connections
 local nvim = vim.api
 local utils = require("acid.utils")
 
@@ -7,6 +10,9 @@ local connections = {
   current = {},
 }
 
+--- Stores connection for reuse later
+-- @tparam table this Connections object.
+-- @tparam {string,string} addr Address tuple with ip and port.
 connections.add = function(this, addr)
   table.insert(this.store, addr)
   return #this.store
@@ -29,6 +35,11 @@ connections.remove = function(this, addr)
   end
 end
 
+--- Elects selected connection as primary (thus default) for a certain address
+-- @tparam table this Connections object.
+-- @tparam string pwd path (usually project root).
+-- Assumed to be neovim's `pwd`.
+-- @tparam int ix index of the stored connection
 connections.select = function(this, pwd, ix)
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"
@@ -37,11 +48,22 @@ connections.select = function(this, pwd, ix)
   this.current[pwd] = ix
 end
 
+--- Dissociates the connection for the given path
+-- @tparam table this Connections object.
+-- @tparam string pwd path (usually project root).
 connections.unselect = function(this, pwd)
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+
   -- TODO Potentially wrong
   this.current[pwd] = nil
 end
 
+--- Return active connection for the given path
+-- @tparam table this Connections object.
+-- @tparam string pwd path (usually project root).
+-- @treturn {string,string} Connection tuple with ip and port.
 connections.get = function(this, pwd)
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"

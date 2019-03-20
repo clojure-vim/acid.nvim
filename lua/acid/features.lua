@@ -28,7 +28,8 @@ end
 features.eval_expr = function(mode, ns)
   local payload = {}
   if mode == nil then
-    payload.code = table.concat(forms.form_under_cursor())
+    local form = forms.form_under_cursor()
+    payload.code = table.concat(form, "\n")
   else
     local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
     payload.code = table.concat(forms.extract(bufnr, mode), "\n")

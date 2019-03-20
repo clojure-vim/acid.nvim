@@ -1,4 +1,5 @@
 -- luacheck: globals vim
+
 local ops = require("acid.ops")
 
 -- TODO split into folder
