@@ -45,11 +45,11 @@ features.eval_expr = function(mode, ns)
   ))
 end
 
-features.do_require = function(ns, alias, ...)
+features.do_require = function(ns, ...)
   if ns == nil then
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
-  acid.run(commands.req{ns = ns, alias = alias, refer = {...}}:with_handler(middlewares
+  acid.run(commands.req{ns = ns, mod = {...}}:with_handler(middlewares
     .doautocmd{autocmd = "AcidRequired"}
   ))
 end

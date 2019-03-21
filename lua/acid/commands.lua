@@ -30,8 +30,7 @@ commands.req = function(obj)
 
   local code = "(require '[" ..
     obj.ns ..
-    (obj.alias ~= nil and (" :as " .. obj.alias) or "") ..
-    (#obj.refer > 0 and (" :refer [" .. table.concat(obj.refer, " ") .. "]") or "") ..
+    (#obj.mod > 0 and (" " .. table.concat(obj.mod, " ")) or "") ..
     " :reload :all])"
 
   return ops.eval{code = code}
