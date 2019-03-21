@@ -55,4 +55,3 @@ differences:
 
 Most of the lua code is documented [here](API.md).
 Vim documents are updated on a best effort basis.
->>>>>>> dd767df... Update README.md
