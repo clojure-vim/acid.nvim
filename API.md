@@ -56,6 +56,91 @@ handler **(function)**: Handler function to deal with the response.
 
 ---
 
+# acid.features
+User-facing features and runnable commands
+
+## `eval_cmdline(code[, ns])`
+Evaluate the given code and insert the result at the cursor position
+
+code **(string)**: Clojure s-expression to be evaluated on the nrepl
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
+## `eval_expr([mode[, ns]])`
+Evaluate the current form or the given motion.
+
+*mode* **(string)**: motion mode
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
+## `do_require([ns[, ...]])`
+Sends a `(require '[...])` function to the nrepl.
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+*...*: extra arguments to the require function
+
+
+## `do_import(java_ns, symbols)`
+Sends a `(import '[...])` function to the nrepl.
+
+java_ns **(string)**: Namespace of the java symbols that are being imported.
+
+symbols **({string,...})**: List of java symbols to be imported
+
+
+## `go_to([symbol[, ns]])`
+Navigates the the definition of the given symbol.
+
+*symbol* **(string)**: Symbol to navigate to. Defaults to symbol under
+ cursor.
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
+## `docs([symbol[, ns]])`
+Shows the docstring of the given symbol.
+
+*symbol* **(string)**: Symbol which docs will be shown. Defaults to symbol under cursor.
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
+## `preload()`
+Inject some clojure files into the nrepl sesion.
+
+
+## `load_all_nss()`
+Load all namespaces in the current session.
+
+
+## `add_require(req)`
+Refactor the current file to include the given argument in the
+`(:requires ...)` section.
+
+req **(string)**: require vector, such as `[clojure.string :as str]`.
+
+
+## `remove_require(req)`
+Refactor the current file to remove the given argument from the
+`(:requires ...)` section.
+
+req **(string)**: require namespace, such as `clojure.string`.
+
+
+## `sort_requires()`
+Refactor the current file so the `(:require ...)` form is sorted.
+
+
+---
+
 # acid.forms
 Forms extraction
 
