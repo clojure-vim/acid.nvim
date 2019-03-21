@@ -5,7 +5,7 @@ import logging
 import uuid
 from acid.nvim import (
     format_addr, get_acid_ns, find_file_in_path, repl_host_address,
-    to_alt_path
+    alt_paths
 )
 
 from acid.pure import ns_to_path
@@ -91,10 +91,6 @@ class Acid(object):
     def acid_get_ns(self, args):
         return get_acid_ns(self.nvim)
 
-    @neovim.function("AcidGetUrl", sync=True)
-    def acid_get_url(self, args):
-        return repl_host_address(self.nvim)
-
     @neovim.function("AcidFindFileInPath", sync=True)
     def find_fpath(self, args):
         log_info("Finding path")
@@ -106,13 +102,13 @@ class Acid(object):
 
     @neovim.function("AcidLog", sync=False)
     def acid_log(self, args):
-        ns, level, message = *args
+        ns, level, message, *_ = args
         logger = logging.getLogger(ns)
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
         getattr(logger , level.upper())(message)
 
-    @neovim.function("AcidAlternateFile", sync=True)
+    @neovim.function("AcidAlternateFiles", sync=True)
     def alternate_file(self, args):
         src = src_paths(self.nvim)
         test = test_paths(self.nvim)
@@ -121,12 +117,12 @@ class Acid(object):
         rel_path = os.path.relpath(path, start=root_path).split('/')
 
         if rel_path[0] in src:
-            alt_paths = to_alt_path(
+            alt_paths = alt_paths(
                 rel_path, test, root_path,
                 lambda f: '{}_test'.format(f),
             )
         else:
-            alt_paths = to_alt_path(
+            alt_paths = alt_paths(
                 rel_path, src, root_path,
                 lambda f: "_".join(f.split('_')[:-1]),
                 'src'
@@ -134,7 +130,7 @@ class Acid(object):
 
         return alt_paths
 
-    @neovim.function("AcidNewFile")
+    @neovim.function("AcidNewFile", sync=True)
     def new_file(self, args):
         ns = args[0]
         has_path = len(args) > 1
@@ -145,6 +141,10 @@ class Acid(object):
         else:
             path = args[1]
 
+        if os.path.exists(path):
+            log_debug("File already exists. Aborting.")
+            return path
+
         directory = os.path.dirname(path)
 
         if not os.path.exists(directory):
@@ -153,4 +153,4 @@ class Acid(object):
         with open(path, 'w') as fpath:
             fpath.write('(ns {})'.format(ns))
 
-        return True
+        return path
