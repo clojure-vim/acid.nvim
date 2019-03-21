@@ -1,7 +1,7 @@
 # acid.connections
 low-level connection handler
 
-## `add(this, addr)`
+## `acid.connections.add(this, addr)`
 Stores connection for reuse later
 
 this **(table)**: Connections object.
@@ -9,7 +9,7 @@ this **(table)**: Connections object.
 addr **({string,string})**: Address tuple with ip and port.
 
 
-## `select(this, pwd, ix)`
+## `acid.connections.select(this, pwd, ix)`
 Elects selected connection as primary (thus default) for a certain address
 
 this **(table)**: Connections object.
@@ -20,7 +20,7 @@ pwd **(string)**: path (usually project root).
 ix **(int)**: index of the stored connection
 
 
-## `unselect(this, pwd)`
+## `acid.connections.unselect(this, pwd)`
 Dissociates the connection for the given path
 
 this **(table)**: Connections object.
@@ -28,7 +28,7 @@ this **(table)**: Connections object.
 pwd **(string)**: path (usually project root).
 
 
-## `get(this, pwd)`
+## `acid.connections.get(this, pwd)`
 Return active connection for the given path
 
 this **(table)**: Connections object.
@@ -44,7 +44,7 @@ pwd **(string)**: path (usually project root).
 # acid.core
 low-level connection handler.
 
-## `send([conn], obj, handler)`
+## `acid.core.send([conn], obj, handler)`
 Forward messages to the nrepl and registers the handler.
 
 *conn* **({string,string})**: Ip and Port tuple. Will try to get one if nil.
@@ -59,7 +59,7 @@ handler **(function)**: Handler function to deal with the response.
 # acid.features
 User-facing features and runnable commands
 
-## `eval_cmdline(code[, ns])`
+## `acid.features.eval_cmdline(code[, ns])`
 Evaluate the given code and insert the result at the cursor position
 
 code **(string)**: Clojure s-expression to be evaluated on the nrepl
@@ -68,7 +68,7 @@ code **(string)**: Clojure s-expression to be evaluated on the nrepl
  Defaults to current file's ns.
 
 
-## `eval_expr([mode[, ns]])`
+## `acid.features.eval_expr([mode[, ns]])`
 Evaluate the current form or the given motion.
 
 *mode* **(string)**: motion mode
@@ -77,7 +77,7 @@ Evaluate the current form or the given motion.
  Defaults to current file's ns.
 
 
-## `do_require([ns[, ...]])`
+## `acid.features.do_require([ns[, ...]])`
 Sends a `(require '[...])` function to the nrepl.
 
 *ns* **(string)**: Namespace to be used when evaluating the code.
@@ -86,7 +86,7 @@ Sends a `(require '[...])` function to the nrepl.
 *...*: extra arguments to the require function
 
 
-## `do_import(java_ns, symbols)`
+## `acid.features.do_import(java_ns, symbols)`
 Sends a `(import '[...])` function to the nrepl.
 
 java_ns **(string)**: Namespace of the java symbols that are being imported.
@@ -94,7 +94,7 @@ java_ns **(string)**: Namespace of the java symbols that are being imported.
 symbols **({string,...})**: List of java symbols to be imported
 
 
-## `go_to([symbol[, ns]])`
+## `acid.features.go_to([symbol[, ns]])`
 Navigates the the definition of the given symbol.
 
 *symbol* **(string)**: Symbol to navigate to. Defaults to symbol under
@@ -104,7 +104,7 @@ Navigates the the definition of the given symbol.
  Defaults to current file's ns.
 
 
-## `docs([symbol[, ns]])`
+## `acid.features.docs([symbol[, ns]])`
 Shows the docstring of the given symbol.
 
 *symbol* **(string)**: Symbol which docs will be shown. Defaults to symbol under cursor.
@@ -113,29 +113,29 @@ Shows the docstring of the given symbol.
  Defaults to current file's ns.
 
 
-## `preload()`
+## `acid.features.preload()`
 Inject some clojure files into the nrepl sesion.
 
 
-## `load_all_nss()`
+## `acid.features.load_all_nss()`
 Load all namespaces in the current session.
 
 
-## `add_require(req)`
+## `acid.features.add_require(req)`
 Refactor the current file to include the given argument in the
 `(:requires ...)` section.
 
 req **(string)**: require vector, such as `[clojure.string :as str]`.
 
 
-## `remove_require(req)`
+## `acid.features.remove_require(req)`
 Refactor the current file to remove the given argument from the
 `(:requires ...)` section.
 
 req **(string)**: require namespace, such as `clojure.string`.
 
 
-## `sort_requires()`
+## `acid.features.sort_requires()`
 Refactor the current file so the `(:require ...)` form is sorted.
 
 
@@ -144,14 +144,14 @@ Refactor the current file so the `(:require ...)` form is sorted.
 # acid.forms
 Forms extraction
 
-## `get_form_boundaries()`
+## `acid.forms.get_form_boundaries()`
 Returns the coordinates for the boundaries of the current form
 
 
 **(table)** coordinates {from = {row,col}, to = {row,col}}
 
 
-## `form_under_cursor()`
+## `acid.forms.form_under_cursor()`
 Extracts the innermost form under the cursor
 
 
@@ -160,7 +160,7 @@ Extracts the innermost form under the cursor
 **(table)** coordinates {from = {row,col}, to = {row,col}}
 
 
-## `symbol_under_cursor()`
+## `acid.forms.symbol_under_cursor()`
 Extracts the symbol under the cursor
 
 
@@ -174,7 +174,7 @@ Extracts the symbol under the cursor
 # acid
 Frontend module with most relevant functions
 
-## `connected([pwd])`
+## `acid.connected([pwd])`
 Checks whether a connection exists for supplied path or not.
 
 *pwd* **(string)**: Path bound to connection.
@@ -184,7 +184,7 @@ Checks whether a connection exists for supplied path or not.
 **(boolean)** Whether a connection exists or not.
 
 
-## `run(cmd, conn)`
+## `acid.run(cmd, conn)`
 Façade to core.send
 
 cmd: A command (op + payload + handler) to be executed.
@@ -192,7 +192,7 @@ cmd: A command (op + payload + handler) to be executed.
 conn: A connection where this command will be run.
 
 
-## `callback(session, ret)`
+## `acid.callback(session, ret)`
 Callback proxy for handling command responses
 
 session: Session ID for matching response with request
@@ -221,7 +221,7 @@ Values:
 * `cider/cider-nrepl`
 * `refactor-nrepl`
 
-## `start(obj)`
+## `acid.nrepl.start(obj)`
 Starts a tools.deps nrepl server
 
 obj **(table)**: Configuration for the nrepl process to be spawn
@@ -237,7 +237,7 @@ Parameters for table `obj` are:
 **(boolean)** Whether it was possible to spawn a nrepl process
 
 
-## `stop(obj)`
+## `acid.nrepl.stop(obj)`
 Stops a nrepl process managed by acid
 
 obj **(table)**: Configuration for the nrepl process to be stopped
@@ -246,7 +246,7 @@ Parameters for table `obj` are:
 
 * obj.pwd **(string)**: Path where the nrepl process was started
 
-## `show([ch])`
+## `acid.nrepl.show([ch])`
 Debugs nrepl connection by returning the captured output
 
 *ch* **(int)**: Neovim's job id of given nrepl process. When not supplied return all.

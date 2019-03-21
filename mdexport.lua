@@ -49,7 +49,7 @@ return {
         for _, fn in ipairs(mod.items) do
           print("")
           if fn['type'] == 'function' then
-            print("## `" .. fn.name .. fn.args .. "`")
+            print("## `" .. mod.name .. "." .. fn.name .. fn.args .. "`")
             if fn.summary ~= nil then
               print(fn.summary)
               print("")
