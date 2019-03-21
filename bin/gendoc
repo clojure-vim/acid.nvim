@@ -1,0 +1,13 @@
+#!/bin/bash
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+cd "$ROOT_DIR" && {
+  old=$(md5sum API.md | awk '{print $1}')
+  ldoc -i --filter mdexport.filter . > /tmp/acid-api.md
+  new=$(md5sum /tmp/acid-api.md | awk '{print $1}')
+
+  if [[ "${old}" != "${new}" ]]; then
+    echo "Updated API.md"
+    mv /tmp/acid-api.md API.md
+  fi
+}

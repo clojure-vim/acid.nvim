@@ -1,197 +1,156 @@
 # encoding:utf-8
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
+import logging
+import uuid
 from acid.nvim import (
-    path_to_ns, format_addr, formatted_localhost_address, get_acid_ns,
-    find_file_in_path, find_extensions, import_extensions,
-    convert_case, get_customization_variable, current_path,
-    repl_host_address
+    format_addr, get_acid_ns, find_file_in_path, repl_host_address,
+    alt_paths
 )
-from collections import deque
-from acid.nvim import find_file_in_path
-from acid.nvim.log import log_info, echo, warning, info
-from acid.session import send, SessionHandler
 
+from acid.pure import ns_to_path
+from acid.nvim.log import log_info, log_debug, fh
+from acid.session import send, SessionHandler
+import os
+
+def get(ls, ix):
+    return len(ls) > ix and ls[ix]
+
+def lua(nvim, lua_cmd):
+    def impl(msg, *_):
+        nvim.funcs.luaeval(lua_cmd, msg)
+
+    return impl
+
+def vim(nvim, vim_fn):
+    def impl(msg, *_):
+        nvim.call(vim_fn, msg)
+
+    return impl
+
+def should_finalize(msg):
+    return ('status' in msg and
+             not set(msg['status']).intersection({'eval-error', }))
+
+def new_handler(nvim, handler_impl, finalizer):
+    def handler(msg, wc, key):
+        try:
+            nvim.async_call(lambda: handler_impl(msg, wc, key))
+        finally:
+            if should_finalize(msg):
+                finalizer(msg, wc, key)
+
+    return handler
+
+handlers = {
+    "lua": lua,
+    "vim": vim
+}
+
+def partial_handler(nvim, handler):
+    def impl(finalizer):
+        return new_handler(nvim, handler, finalizer)
+    return impl
 
 @neovim.plugin
 class Acid(object):
 
     def __init__(self, nvim):
+        log_handler = new_handler(
+            nvim,
+            lambda msg, *_: not "changed-namespaces" in msg and log_info(msg),
+            lambda *_: False
+        )
+
         self.nvim = nvim
-        self.commands = []
-        self.sessions = SessionHandler()
-        self.fired_urls = set()
-        self.repls = {}
-        self.extensions = {'handlers': {},
-                           'commands': {}}
-        self._init = False
-
-    def context(self):
-        return {
-            'handlers': self.extensions['handlers'],
-            'commands': self.extensions['commands'],
-            'session_handler': self.sessions,
-            'url': formatted_localhost_address(self.nvim),
-            'nvim': self.nvim
-        }
-
-    @neovim.command("AcidInit")
-    def init(self):
-        self.init_vars()
-        self.init_extensions({
-            'handlers': 'Handler',
-            'commands': 'Command',
-        })
-        self._init = True
-
-    def init_commands(self):
-        cmds = deque()
-        for command in self.extensions['commands'].values():
-            cmds.extend(command.do_init(self.nvim))
-
-        return list(cmds)
-
-    def init_vars(self):
-        def init_var(var, default=0):
-            self.nvim.vars[var] = self.nvim.vars.get(var, default)
-
-        [init_var(i, j)
-         for i, j
-         in [('acid_loaded', 1),
-             ('acid_log_messages', 0),
-             ('acid_auto_require', 1),
-             ('acid_auto_start_repl', 0),
-             ('acid_sessions', []),
-             ('acid_namespace', 'user'),
-             ('acid_start_repl_fn', 'jobstart'),
-             ('acid_start_repl_args', ['lein repl'])]]
-
-
-    def init_extensions(self, ext_mapping):
-        for path in find_extensions(self.nvim, ext_mapping.keys()):
-            ext_type, extension = import_extensions(path, ext_mapping)
-
-            if extension:
-                name = extension.name
-                priority = extension.priority
-                enabled = bool(self.nvim.vars.get(
-                    "{}_{}_enabled".format(
-                        convert_case(name), ext_type.lower()
-                    ), getattr(extension, 'enabled', 1)
-                ))
-
-                if enabled and (name not in self.extensions[ext_type] or
-                        self.extensions[ext_type][name].priority < priority):
-                    self.extensions[ext_type][name] = extension
-
-    def get_handler(self, name):
-        return self.extensions['handlers'].get(name).do_init()
-
-    def add_log_to(self, url):
-        log = self.get_handler('Log').configure(**self.context())
-        self.sessions.add_persistent_watch(url, log)
-
-    def command(self, data, handlers, url):
-        acid_session = self.nvim.vars.get('acid_current_session')
-
-        if get_customization_variable(self.nvim, 'acid_log_messages', 0):
-            handlers = (i for i in (
-                *handlers, self.get_handler('Log').configure(**self.context())
-            ))
-
-        if not 'op' in data:
-            data.update({'op': 'eval'})
-
-        if acid_session:
-            data.update({'session': acid_session})
-
-        if url not in self.sessions.sessions and url not in self.fired_urls:
-            self.nvim.command("doautocmd User AcidPreConnectNrepl")
-            self.fired_urls.add(url)
-
-        send(self.sessions, url, handlers, data)
-
-
-    @neovim.command("AcidUnsetSession")
-    def acid_unset_session(self):
-        del self.nvim.vars['acid_current_session']
-
-    @neovim.command("AcidUseLastSession")
-    def acid_unset_session(self):
-        self.nvim.vars[
-            'acid_current_session'] = self.nvim.vars['acid_sessions'][-1]
-
-    @neovim.command("AcidCommand", nargs='*')
-    def acid_command(self, args):
-        cmd, *args = args
-        log_info(r"Received args for command {}: {}", cmd, args)
-        command = self.extensions['commands'].get(cmd.strip())
-
-        url = formatted_localhost_address(self.nvim)
-
-        if url is None and command.handlers:
-            path = current_path(self.nvim)
-            echo(self.nvim, "No REPL open")
-            log_info("No repl open on path {}".format(path))
-            return
-
-        command.call(self, self.context(), *args)
-
-    @neovim.function("AcidCommandMeta", sync=True)
-    def acid_command_meta(self, args):
-        cmd, meta_key, *args = args
-        log_info(r"Prompting metadata {} for command {} with args {}",
-                 meta_key, cmd, args)
-
-        command = self.extensions['commands'].get(cmd.strip())
-        if command is None:
-            log_warning('Command not found. Aborting!')
-            return None
-
-        ret = getattr(command, meta_key)(self.nvim, *args)
-        log_info(r"Got {} as a return for {}[{}]".format(ret, cmd, meta_key))
-        return ret
-
-    @neovim.command("AcidBootstrap", nargs=0, bang=True)
-    def acid_bootstrap(self, bang=False):
-        if bang or not self.commands:
-            self.commands = self.init_commands()
-
-        [self.nvim.command(cmd) for cmd in self.commands]
-        self.nvim.command("doautocmd User AcidBootstrapComplete")
+        self.session_handler = SessionHandler(log_handler)
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
+        nvim = self.nvim
         payload = data[0]
-        handler = len(data) > 1 and data[1] or 'MetaRepl'
-        config = len(data) > 2 and data[2] or None
-        url = (format_addr(*data[3]) if len(data) > 3
-               else formatted_localhost_address(self.nvim))
+        fn = data[1] # fn name
+        addr = get(data, 2)
+        addr_managed_by_acid = addr != None
+        addr = addr or repl_host_address(nvim)
+        url = format_addr(*addr)
+        backend = get(data, 3) or "lua"
 
+        handler_impl = handlers[backend](nvim, fn)
+        handler = partial_handler(nvim, handler_impl)
 
-        handler = self.get_handler(handler)
+        success, msg = send(self.session_handler, url, [handler], payload)
 
-        if handler is None:
-            warning(self.nvim, "Handler not found")
-            return
-
-        context = self.context()
-
-        if config is not None:
-            handler = handler.configure(config, **context)
-        else:
-            handler = handler.configure(**context)
-
-        self.command(payload, [handler], url)
+        if not success and addr_managed_by_acid:
+            nvim.api.err_writeln(
+            "Dropping connection on {} due to error when sending: {}".format(
+                addr[1], msg))
+            nvim.funcs.luaeval("require('acid.connections'):remove(_A)", addr)
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
         return get_acid_ns(self.nvim)
 
-    @neovim.function("AcidGetUrl", sync=True)
-    def acid_get_url(self, args):
-        return repl_host_address(self.nvim)
+    @neovim.function("AcidFindFileInPath", sync=True)
+    def find_fpath(self, args):
+        log_info("Finding path")
+        return find_file_in_path(nvim, *args)
 
-    @neovim.function("Acid_FindFileInPath", sync=True)
-    def acid_get_url(self, args):
-        return find_file_in_path(nvim, args[0])
+    @neovim.function("AcidNewUUID", sync=True)
+    def acid_get_uuid(self, args):
+        return uuid.uuid4().hex
+
+    @neovim.function("AcidLog", sync=False)
+    def acid_log(self, args):
+        ns, level, message, *_ = args
+        logger = logging.getLogger(ns)
+        logger.addHandler(fh)
+        logger.setLevel(logging.DEBUG)
+        getattr(logger , level.upper())(message)
+
+    @neovim.function("AcidAlternateFiles", sync=True)
+    def alternate_file(self, args):
+        src = src_paths(self.nvim)
+        test = test_paths(self.nvim)
+        path = get(args, 0, self.nvim.funcs.expand("%:p"))
+        root_path = self.nvim.funcs.getcwd()
+        rel_path = os.path.relpath(path, start=root_path).split('/')
+
+        if rel_path[0] in src:
+            alt_paths = alt_paths(
+                rel_path, test, root_path,
+                lambda f: '{}_test'.format(f),
+            )
+        else:
+            alt_paths = alt_paths(
+                rel_path, src, root_path,
+                lambda f: "_".join(f.split('_')[:-1]),
+                'src'
+            )
+
+        return alt_paths
+
+    @neovim.function("AcidNewFile", sync=True)
+    def new_file(self, args):
+        ns = args[0]
+        has_path = len(args) > 1
+        if not has_path:
+            fname = "{}.clj".format(ns_to_path(ns))
+            base = 'test' if ns.endswith('-test') else 'src'
+            path = os.path.join(current_path(self.nvim), base, fname)
+        else:
+            path = args[1]
+
+        if os.path.exists(path):
+            log_debug("File already exists. Aborting.")
+            return path
+
+        directory = os.path.dirname(path)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(path, 'w') as fpath:
+            fpath.write('(ns {})'.format(ns))
+
+        return path

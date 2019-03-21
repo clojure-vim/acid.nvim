@@ -36,30 +36,3 @@ def log_warning(message, *args):
 def log_error(message, *args):
     message = message.format(*args) if len(args) > 0 else message
     _log(inspect.stack()[1]).error(message)
-
-def echo(nvim, message):
-    nvim.command('echom {}'.format(nvim.funcs.string(
-        "Acid: {}".format(message)
-    )))
-
-def echo_error(nvim, message):
-    nvim.command('echohl ErrorMsg')
-    echo(nvim, message)
-    nvim.command('echohl None')
-
-def echo_warning(nvim, message):
-    nvim.command('echohl WarningMsg')
-    echo(nvim, message)
-    nvim.command('echohl None')
-
-def error(nvim, message):
-    echo_error(nvim, message)
-    log_error(message)
-
-def warning(nvim, message):
-    echo_warning(nvim, message)
-    log_warning(message)
-
-def info(nvim, message):
-    echo(nvim, message)
-    log_info(message)

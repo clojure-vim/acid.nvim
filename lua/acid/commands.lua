@@ -1,65 +1,59 @@
-local utils = require("acid.utils")
-local composable = function(map)
+-- luacheck: globals vim
 
-  map.update_payload = function(this, fn)
-    local old_payload_fn = this.payload
+local ops = require("acid.ops")
 
-    this.payload = function()
-      return fn(old_payload_fn())
-    end
-    return this
-  end
+-- TODO split into folder
+local commands = {}
 
-  map.with_handler = function(this, fn)
-    this.handler = fn
-    return this
-  end
-
-  map.with_payload = function(this, value)
-    this.payload = function() return value end
-    return this
-  end
-
-  map.build = function(this)
-    return this.payload(), this.handler
-  end
-
-  return setmetatable(map, {
-      __call = function(this)
-        return this:build()
-      end
-    })
+commands.go_to = function(obj)
+  return ops.info{symbol = obj.symbol, ns = obj.ns}
 end
 
-local new = function(op)
-  return composable{}:with_payload{op = op}
-end
+commands.list_usage = function(callback, symbol, ns, pwd, fname)
 
-local for_op = function(op)
-  return function(map)
-    return new(op):update_payload(function(orig) return utils.merge(orig, map) end)
-  end
-end
-
-local setup = function(...)
-  local commands = {}
-  for _, v in ipairs(table.pack(...)) do
-    commands[v] = for_op(v)
+  local handle = function(data)
+    return ops['find-symbol']{
+        path = pwd,
+        file = fname,
+        ns = data.ns,
+        name = data.name,
+        line = math.floor(data.line or 1),
+        column = math.floor(data.column or 1),
+        ['serialization-format'] = 'bencode'
+      }:with_handler(callback)
   end
 
-  return commands
+  return ops.info{symbol = symbol, ns = ns}:with_handler(handle)
 end
 
-return setup(
-  "eval",
-  "spec-form",
-  "info",
-  "find-symbol",
-  "eldoc",
-  "format-code",
-  "format-edn",
-  "ns-load-all",
-  "load-file",
-  "macroexpand",
-  "rename-file-or-dir"
-)
+commands.req = function(obj)
+
+  local code = "(require '[" ..
+    obj.ns ..
+    (#obj.mod > 0 and (" " .. table.concat(obj.mod, " ")) or "") ..
+    " :reload :all])"
+
+  return ops.eval{code = code}
+end
+
+commands.ns_load_all = function()
+  return ops['ns-load-all']{}
+end
+
+commands.preload = function(obj)
+  local cmds = {}
+  local rtp = vim.api.nvim_get_option('rtp')
+  for _, path in ipairs(obj.files) do
+    local fpath = vim.api.nvim_call_function("findfile", {path, rtp})
+    local contents = vim.api.nvim_call_function("readfile", {fpath})
+    table.insert(cmds, ops['load-file']{file = table.concat(contents, "\n")})
+  end
+  return cmds
+end
+
+commands.import = function(obj)
+  local code = "(import '(" ..  obj.java_ns .. ' ' .. table.concat(obj.symbols, " ") .. "))"
+ return ops.eval{code = code}
+end
+
+return commands

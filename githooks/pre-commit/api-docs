@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+out=$("$ROOT_DIR/bin/gendoc")
+
+if [ -n "$out" ]; then
+  echo "API.md updated. Please commit newer version"
+  return 1
+fi
