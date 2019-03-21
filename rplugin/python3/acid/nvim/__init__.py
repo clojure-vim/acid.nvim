@@ -13,71 +13,8 @@ from acid.nvim.log import log_debug, log_warning
 
 path_ns_cache = {}
 
-def convert_case(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-
 def get_customization_variable(nvim, var, default=None):
     return nvim.current.buffer.vars.get(var, nvim.vars.get(var, default))
-
-
-def list_clj_files(nvim):
-    rtp = nvim.options.get('runtimepath').split(',')
-
-    for path in rtp:
-        match = os.path.join(path, 'clj/acid/**/*.clj')
-        log_debug('Attempting path: {}', match)
-
-        yield from glob.iglob(match)
-
-def find_clojure_fn(nvim, fname):
-    rtp = nvim.options.get('runtimepath', '').split(',')
-
-    src = os.path.join('clj/acid/', fname)
-
-    for path in rtp:
-        partial = os.path.join(path, src)
-        if os.path.exists(partial):
-            return partial
-
-
-def find_extensions(nvim, ext):
-    """Search for base.py or *.py
-
-    Searches $VIMRUNTIME/*/rplugin/python3/acid/$source[s]/
-    """
-    rtp = nvim.options.get('runtimepath').split(',')
-
-    sources = (
-        os.path.join('rplugin/python3/acid', source, '*.py')
-        for source in ext
-    )
-
-    for src in sources:
-        for path in rtp:
-            yield from glob.iglob(os.path.join(path, src))
-
-
-def import_extensions(path, mapping):
-    """Import Acid plugin source class.
-
-    If the class exists, add its directory to sys.path.
-    """
-    source, fname = path.split(os.path.sep)[-2:]
-    name = os.path.splitext(fname)[0]
-    module_name = 'acid.%s.%s' % (source, name)
-    module = SourceFileLoader(module_name, path).load_module()
-    cls = getattr(module, mapping[source], None)
-
-    if not cls:
-        return None, None
-
-    return source, cls
-
-
-def current_file(nvim):
-    return nvim.funcs.expand("%:p")
 
 
 def current_path(nvim):
@@ -133,15 +70,9 @@ def repl_host_address(nvim):
 # Renamed the function, keeping this here to avoid breaking stuff..
 localhost = repl_host_address
 
+
 def format_addr(*addr):
     return "{}://{}:{}".format('nrepl', *addr)
-
-def formatted_localhost_address(nvim):
-    addr = repl_host_address(nvim)
-    if addr:
-        return format_addr(*addr)
-    else:
-        return None
 
 
 def get_acid_ns(nvim):
@@ -150,14 +81,18 @@ def get_acid_ns(nvim):
         return strategy.split(':')[-1]
     return path_to_ns(nvim)
 
+
 def test_paths(nvim):
     return {'test', *nvim.vars.get('acid_alt_test_paths', [])}
+
 
 def src_paths(nvim):
     return {'src', *nvim.vars.get('acid_alt_paths', [])}
 
+
 def get_stop_paths(nvim):
     return {'test', 'src', *test_paths(nvim), *src_paths(nvim)}
+
 
 def find_file_in_path(nvim, fname, resource):
     log_debug("finding path")
@@ -207,3 +142,21 @@ def find_file_in_path(nvim, fname, resource):
             return full
 
     return None
+
+def alt_paths(path_arr, alt_paths, root, rename_fn):
+    # clone array so we don't overwrite last element
+    path = list(path_arr)[1:]
+    path[-1] = pure.rename_file(path[-1], rename_fn)
+
+    for ap in alt_paths:
+        fname = os.path.join(root, ap, *path)
+        if os.path.exists(fname):
+            log_debug("Alternate file exists. using '{}'", fname)
+            return fname
+
+    def existing(ap):
+        alt_root = os.path.join(root, ap)
+        if os.path.exists(alt_root):
+            return os.path.join(alt_root, *path)
+
+    return filter(lambda i: i is not None, map(existing, alt_paths))

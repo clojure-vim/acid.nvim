@@ -1,16 +1,17 @@
 # encoding:utf-8
 """ Acid stands for Asynchronous Clojure Interactive Development. """
 import neovim
+import logging
 import uuid
 from acid.nvim import (
-    path_to_ns, format_addr, formatted_localhost_address, get_acid_ns,
-    find_file_in_path, find_extensions, import_extensions,
-    convert_case, get_customization_variable, current_path,
-    repl_host_address
+    format_addr, get_acid_ns, find_file_in_path, repl_host_address,
+    to_alt_path
 )
-from collections import deque
-from acid.nvim.log import log_info, echo, warning, info
+
+from acid.pure import ns_to_path
+from acid.nvim.log import log_info, log_debug, fh
 from acid.session import send, SessionHandler
+import os
 
 def get(ls, ix):
     return len(ls) > ix and ls[ix]
@@ -100,5 +101,56 @@ class Acid(object):
         return find_file_in_path(nvim, *args)
 
     @neovim.function("AcidNewUUID", sync=True)
-    def acid_get_url(self, args):
+    def acid_get_uuid(self, args):
         return uuid.uuid4().hex
+
+    @neovim.function("AcidLog", sync=False)
+    def acid_log(self, args):
+        ns, level, message = *args
+        logger = logging.getLogger(ns)
+        logger.addHandler(fh)
+        logger.setLevel(logging.DEBUG)
+        getattr(logger , level.upper())(message)
+
+    @neovim.function("AcidAlternateFile", sync=True)
+    def alternate_file(self, args):
+        src = src_paths(self.nvim)
+        test = test_paths(self.nvim)
+        path = get(args, 0, self.nvim.funcs.expand("%:p"))
+        root_path = self.nvim.funcs.getcwd()
+        rel_path = os.path.relpath(path, start=root_path).split('/')
+
+        if rel_path[0] in src:
+            alt_paths = to_alt_path(
+                rel_path, test, root_path,
+                lambda f: '{}_test'.format(f),
+            )
+        else:
+            alt_paths = to_alt_path(
+                rel_path, src, root_path,
+                lambda f: "_".join(f.split('_')[:-1]),
+                'src'
+            )
+
+        return alt_paths
+
+    @neovim.function("AcidNewFile")
+    def new_file(self, args):
+        ns = args[0]
+        has_path = len(args) > 1
+        if not has_path:
+            fname = "{}.clj".format(ns_to_path(ns))
+            base = 'test' if ns.endswith('-test') else 'src'
+            path = os.path.join(current_path(self.nvim), base, fname)
+        else:
+            path = args[1]
+
+        directory = os.path.dirname(path)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        with open(path, 'w') as fpath:
+            fpath.write('(ns {})'.format(ns))
+
+        return True
