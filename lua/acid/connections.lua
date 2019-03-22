@@ -73,7 +73,7 @@ connections.get = function(this, pwd)
 
   if ix == nil then
     local port_file = pwd .. '.nrepl-port'
-    if nvim.nvim_call_function('filereadable', {port_file}) then
+    if nvim.nvim_call_function('filereadable', {port_file}) == 1 then
       local port = nvim.nvim_call_function('readfile', {port_file})
       ix = this:add({'127.0.0.1', port[1]})
       this:select(pwd, ix)

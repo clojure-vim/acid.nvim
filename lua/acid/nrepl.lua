@@ -141,7 +141,7 @@ nrepl.start = function(obj)
      addr = {bind, port}
    }
 
-  local ix = connections:add{"127.0.0.1", port}
+  local ix = connections:add{bind, port}
 
   pending[ret] = {pwd = pwd, ix = ix}
   return true
