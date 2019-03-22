@@ -21,8 +21,11 @@ def current_path(nvim):
     return nvim.funcs.getcwd()
 
 
-def path_to_ns(nvim, force=False):
-    fpath = nvim.funcs.expand("%:p:r")
+def path_to_ns(nvim, fpath=None, force=False):
+    log_debug("fpath is {}", fpath)
+    if not fpath:
+        fpath = nvim.funcs.expand("%:p:r")
+
     if fpath in path_ns_cache and not force:
         ns = path_ns_cache[fpath]
         log_debug("Hitting cache for ns '{}'", ns)
@@ -75,11 +78,11 @@ def format_addr(*addr):
     return "{}://{}:{}".format('nrepl', *addr)
 
 
-def get_acid_ns(nvim):
+def get_acid_ns(nvim, fpath=None):
     strategy = get_customization_variable(nvim, 'acid_ns_strategy', '')
     if 'ns:' in strategy:
         return strategy.split(':')[-1]
-    return path_to_ns(nvim)
+    return path_to_ns(nvim, fpath)
 
 
 def test_paths(nvim):
@@ -148,15 +151,12 @@ def alt_paths(path_arr, alt_paths, root, rename_fn):
     path = list(path_arr)[1:]
     path[-1] = pure.rename_file(path[-1], rename_fn)
 
-    for ap in alt_paths:
-        fname = os.path.join(root, ap, *path)
-        if os.path.exists(fname):
-            log_debug("Alternate file exists. using '{}'", fname)
-            return fname
-
     def existing(ap):
         alt_root = os.path.join(root, ap)
         if os.path.exists(alt_root):
+            log_debug("Path {} exists", alt_root)
             return os.path.join(alt_root, *path)
+        log_debug("Path {} doesn't exist", alt_root)
+        return
 
     return filter(lambda i: i is not None, map(existing, alt_paths))
