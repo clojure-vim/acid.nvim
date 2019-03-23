@@ -34,7 +34,7 @@ endfunction
 
 function! AcidSendEval(handler)
   let ns = AcidGetNs()
-  if ns == v:null
+  if ns == ""
     let ns = "user"
   endif
   call inputsave()
