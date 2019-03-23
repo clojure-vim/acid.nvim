@@ -2,6 +2,9 @@ local utils = require("acid.utils")
 
 local nop = function(data) return data end
 
+local err = require("acid.middlewares.err").middleware{}(nop)
+
+
 local function builder(tbl, outer, key)
   local middleware = require("acid.middlewares." .. key)
   return function(config)
@@ -18,4 +21,4 @@ local function builder(tbl, outer, key)
   end
 end
 
-return setmetatable({}, {__index = function(_, key) return builder({}, nop, key) end})
+return setmetatable({}, {__index = function(_, key) return builder({}, err, key) end})
