@@ -41,7 +41,7 @@ def path_to_ns(path, stop_paths=None, base_files=None):
         path[-1] = path[-1].split('.')[0]
         for ix, _ in enumerate(path):
             for bf in base_files:
-                if os.path.exists(os.path.join(*["/", *path[:ix], bp])):
+                if os.path.exists(os.path.join(*["/", *path[:ix], bf])):
                     raw_path_list = path[ix+1:]
                     break
 
