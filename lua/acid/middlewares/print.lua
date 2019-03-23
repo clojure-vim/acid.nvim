@@ -10,6 +10,12 @@ do_print.middleware = function(config)
       if data.value ~= nil then
         vim.api.nvim_out_write(data.value .. "\n")
       end
+      if data.ex ~= nil then
+        vim.api.nvim_err_writeln(data.ex)
+      end
+      if data.err ~= nil then
+        vim.api.nvim_err_writeln(data.err)
+      end
 
       return middleware(data)
     end
