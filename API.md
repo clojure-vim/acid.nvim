@@ -68,6 +68,15 @@ code **(string)**: Clojure s-expression to be evaluated on the nrepl
  Defaults to current file's ns.
 
 
+## `acid.features.eval_print(code[, ns])`
+Evaluate the given code and print the result.
+
+code **(string)**: Clojure s-expression to be evaluated on the nrepl
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
 ## `acid.features.eval_expr([mode[, ns]])`
 Evaluate the current form or the given motion.
 

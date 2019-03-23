@@ -30,6 +30,16 @@ features.eval_cmdline = function(code, ns)
   ))
 end
 
+--- Evaluate the given code and print the result.
+-- @tparam string code Clojure s-expression to be evaluated on the nrepl
+-- @tparam[opt] string ns Namespace to be used when evaluating the code.
+-- Defaults to current file's ns.
+features.eval_print = function(code, ns)
+  acid.run(ops.eval{code = code, ns = ns}:with_handler(middlewares
+      .print{}
+  ))
+end
+
 --- Evaluate the current form or the given motion.
 -- The result will be shown on a virtualtext next to the current form
 -- and also stored on the clipboard.
