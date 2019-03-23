@@ -62,6 +62,7 @@ augroup acid
   au FileType clojure imap <buffer> <silent> <C-c>x <Cmd>call AcidSendEval("eval_cmdline")<CR>
   au FileType clojure map <buffer> <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
   au FileType clojure map <buffer> <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
+  au FileType clojure map <buffer> <silent> cqp <Cmd>call AcidSendEval("eval_print")<CR>
 
   au FileType clojure map <buffer> <silent> <C-c>ll <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
   au FileType clojure map <buffer> <silent> <C-c>ln <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<Cr>
