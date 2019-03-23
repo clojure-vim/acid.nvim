@@ -32,13 +32,17 @@ function! AcidMotion(mode)
   exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
 endfunction
 
-function! AcidInsertEval(...)
-  let ns = a:0 >= 1 ? a:1 : "user"
+function! AcidSendEval(handler)
+  let ns = AcidGetNs()
+  if ns == v:null
+    let ns = "user"
+  endif
   call inputsave()
   let code = input(ns."=> ")
   call inputrestore()
-  call luaeval("require('acid.features').eval_cmdline(_A[1], _A[2])", [code, ns])
+  call luaeval("require('acid.features')." . a:handler ."(_A[1], _A[2])", [code, ns])
 endfunction
+
 
 
 augroup acid
@@ -54,8 +58,8 @@ augroup acid
 
   au FileType clojure nmap <buffer> <silent> <C-]> <Cmd>lua require("acid.features").go_to()<CR>
   au FileType clojure nmap <buffer> <silent> K <Cmd>lua require("acid.features").docs()<CR>
-  au FileType clojure nmap <buffer> <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
-  au FileType clojure imap <buffer> <silent> <C-c>x <Cmd>call AcidInsertEval()<CR>
+  au FileType clojure nmap <buffer> <silent> <C-c>x <Cmd>call AcidSendEval("eval_cmdline")<CR>
+  au FileType clojure imap <buffer> <silent> <C-c>x <Cmd>call AcidSendEval("eval_cmdline")<CR>
   au FileType clojure map <buffer> <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
   au FileType clojure map <buffer> <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
 
