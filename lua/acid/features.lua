@@ -22,7 +22,16 @@ features.eval_cmdline = function(code, ns)
   local text = vim.api.nvim_call_function("getline", {"."})
   acid.run(ops.eval{code = code, ns = ns}:with_handler(middlewares
       .insert{
-        accessor = function(data) return data.value end,
+        accessor = function(data)
+          if data.ex ~= nil then
+            return data.ex
+          elseif data.err ~= nil then
+            return data.err
+          elseif data.out ~= nil then
+            return data.out:gsub("\n", "\\n")
+          end
+          return data.value
+        end,
         cb = cb,
         coords = curpos,
         current_line = text
