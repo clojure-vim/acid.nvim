@@ -1,3 +1,5 @@
+let g:acid_no_default_keymappings = get(g:, 'acid_no_default_keymappings', 0)
+
 function! s:require()
   if !luaeval("require('acid').connected()", v:null)
     return
@@ -43,9 +45,23 @@ function! AcidSendEval(handler)
   call luaeval("require('acid.features')." . a:handler ."(_A[1], _A[2])", [code, ns])
 endfunction
 
+function! AcidJobHandler(id, data, stream)
+  call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
+endfunction
 
+map <Plug>(acid-go-to)        <Cmd>lua require("acid.features").go_to()<CR>
+map <Plug>(acid-docs)         <Cmd>lua require("acid.features").docs()<CR>
+map <Plug>(acid-eval-cmdline) <Cmd>call AcidSendEval("eval_cmdline")<CR>
+map <Plug>(acid-motion-op)    <Cmd>set opfunc=AcidMotion<CR>g@
+map <Plug>(acid-eval-expr)    <Cmd>lua require("acid.features").eval_expr()<CR>
+map <Plug>(acid-eval-print)   <Cmd>call AcidSendEval("eval_print")<CR>
+
+map <Plug>(acid-virtualtext-clear-line) <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<CR>
+map <Plug>(acid-virtualtext-toggle)     <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<CR>
+map <Plug>(acid-virtualtext-clear-all)  <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<CR>
 
 augroup acid
+  autocmd!
   autocmd BufWritePost *.clj call s:require()
 
   autocmd User AcidConnected lua require("acid.features").preload()
@@ -55,23 +71,24 @@ augroup acid
   autocmd User AcidPreloadedCljFns call s:mute()
   autocmd User AcidLoadedAllNSs call s:mute()
   autocmd User AcidImported call s:mute()
-
-  au FileType clojure nmap <buffer> <silent> <C-]> <Cmd>lua require("acid.features").go_to()<CR>
-  au FileType clojure nmap <buffer> <silent> K <Cmd>lua require("acid.features").docs()<CR>
-  au FileType clojure nmap <buffer> <silent> <C-c>x <Cmd>call AcidSendEval("eval_cmdline")<CR>
-  au FileType clojure imap <buffer> <silent> <C-c>x <Cmd>call AcidSendEval("eval_cmdline")<CR>
-  au FileType clojure map <buffer> <silent> cp <Cmd>set opfunc=AcidMotion<CR>g@
-  au FileType clojure map <buffer> <silent> cpp <Cmd>lua require("acid.features").eval_expr()<CR>
-  au FileType clojure map <buffer> <silent> cqp <Cmd>call AcidSendEval("eval_print")<CR>
-
-  au FileType clojure map <buffer> <silent> <C-c>ll <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<Cr>
-  au FileType clojure map <buffer> <silent> <C-c>ln <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<Cr>
-  au FileType clojure map <buffer> <silent> <C-c>la <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<Cr>
 augroup END
 
-function! AcidJobHandler(id, data, stream)
-  call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
-endfunction
+if !g:acid_no_default_keymappings
+  augroup acid-keymappings
+    autocmd!
+    autocmd FileType clojure nmap <buffer> <silent> <C-]>  <Plug>(acid-go-to)
+    autocmd FileType clojure nmap <buffer> <silent> K      <Plug>(acid-docs)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
+    autocmd FileType clojure imap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
+    autocmd FileType clojure map  <buffer> <silent> cp     <Plug>(acid-motion-op)
+    autocmd FileType clojure map  <buffer> <silent> cpp    <Plug>(acid-eval-expr)
+    autocmd FileType clojure map  <buffer> <silent> cqp    <Plug>(acid-eval-print)
+
+    autocmd FileType clojure map <buffer> <silent> <C-c>ll <Plug>(acid-virtualtext-clear-line)
+    autocmd FileType clojure map <buffer> <silent> <C-c>ln <Plug>(acid-virtualtext-toggle)
+    autocmd FileType clojure map <buffer> <silent> <C-c>la <Plug>(acid-virtualtext-clear-all)
+  augroup END
+endif
 
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
 command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
