@@ -1,20 +1,21 @@
 -- luacheck: globals vim
 local do_print = {}
+local log = require("acid.log")
 
 do_print.middleware = function(config)
   return function(middleware)
     return function(data)
       if data.out ~= nil then
-        vim.api.nvim_out_write(data.out .. "\n")
+        log.msg(data.out)
       end
       if data.value ~= nil then
-        vim.api.nvim_out_write(data.value .. "\n")
+        log.msg(data.value)
       end
       if data.ex ~= nil then
-        vim.api.nvim_out_write(data.ex .. "\n")
+        log.msg(data.ex)
       end
       if data.err ~= nil then
-        vim.api.nvim_out_write(data.err .. "\n")
+        log.msg(data.err)
       end
 
       return middleware(data)

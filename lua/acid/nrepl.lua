@@ -3,6 +3,7 @@
 --- nRepl connectivity
 -- @module acid.nrepl
 local nvim = vim.api
+local log = require("acid.log")
 local utils = require("acid.utils")
 local connections = require("acid.connections")
 
@@ -173,7 +174,7 @@ nrepl.handle = {
           local opts = pending[ch]
           local port = connections.store[opts.ix][2]
           connections:select(opts.pwd, opts.ix)
-          vim.api.nvim_out_write("Acid connected on port " .. tostring(port) .. "\n")
+          log.msg("Connected on port" .. tostring(port))
           vim.api.nvim_command("doautocmd User AcidConnected")
           pending[ch] = nil
         end
