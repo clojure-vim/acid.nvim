@@ -26,6 +26,7 @@ nREPL connectivity, a python layer exists to provide them.
 
 Nonetheless, one should never require to interact with python directly.
 
+
 ## Version 2.x
 
 The new version 2.x uses a both lua (to implement high-level features, such as
@@ -55,3 +56,9 @@ differences:
 
 Most of the lua code is documented [here](API.md).
 Vim documents are updated on a best effort basis.
+
+## Key features
+
+### Eval with virtualtext support
+
+[![asciicast](https://asciinema.org/a/236693.svg)](https://asciinema.org/a/236693)
