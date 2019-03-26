@@ -52,7 +52,7 @@ virtualtext.middleware = function(_)
         table.insert(vt, {data.err, "Error"})
       elseif data.out ~= nil then
           table.insert(vt, {data.out:gsub("\n", "\\n"), "String"})
-      elseif data.value ~= nil then
+      elseif data.value ~= nil and data.value ~= "nil" then
         table.insert(vt, {data.value, "Function"})
       end
 

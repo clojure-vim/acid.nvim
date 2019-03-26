@@ -1,6 +1,12 @@
 -- luacheck: globals vim
 local refactor = {}
 
+refactor.config = {
+  accessor = function(dt)
+    return dt.out
+  end
+}
+
 
 refactor.middleware = function(config)
   return function(middleware)
@@ -10,15 +16,21 @@ refactor.middleware = function(config)
         vim.api.nvim_err_writeln("Error while processing: " .. msg)
         return
       elseif data.value ~= nil or data.status ~= nil then
+        -- TODO log
         return
       end
 
       local lns = {}
-      for v in data['out']:gmatch("([^\n]+)") do
+      local dt = config.accessor(data)
+      if dt == nil then
+        -- TODO log
+        return
+      end
+      for v in dt:gmatch("([^\n]+)") do
         table.insert(lns, v)
       end
 
-      vim.api.nvim_buf_set_lines(config.bufnr, config.from - 1, config.to, false, lns)
+      vim.api.nvim_buf_set_lines(config.bufnr, config.from[1] - 1, config.to[1], false, lns)
 
       return middleware(data)
     end
