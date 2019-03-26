@@ -94,14 +94,14 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 
 --- Starts a tools.deps nrepl server
 -- @tparam table obj Configuration for the nrepl process to be spawn
--- @tparam string obj.pwd Path where the nrepl process will be started
+-- @tparam[opt] string obj.pwd Path where the nrepl process will be started
 -- @tparam[opt] table obj.middlewares List of middlewares.
 -- @tparam[opt] string obj.alias alias on the local deps.edn
 -- @tparam[opt] string obj.connect -c parameter for the nrepl process
 -- @tparam[opt] string obj.bind -b parameter for the nrepl process
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
-  local pwd = obj.pwd
+  local pwd = obj.pwd or vim.api.nvim_call_function("getcwd", {})
 
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"

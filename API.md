@@ -237,7 +237,7 @@ obj **(table)**: Configuration for the nrepl process to be spawn
 
 Parameters for table `obj` are:
 
-* obj.pwd **(string)**: Path where the nrepl process will be started
+* *obj.pwd* **(string)**: Path where the nrepl process will be started
 * *obj.middlewares* **(table)**: List of middlewares.
 * *obj.alias* **(string)**: alias on the local deps.edn
 * *obj.connect* **(string)**: -c parameter for the nrepl process
