@@ -70,6 +70,7 @@ features.eval_expr = function(mode, ns)
   end
 
   acid.run(ops.eval(payload):with_handler(middlewares
+      .print{}
       .clipboard{}
       .virtualtext{}
   ))
