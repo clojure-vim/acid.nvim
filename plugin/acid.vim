@@ -46,6 +46,10 @@ function! AcidSendEval(handler)
   call luaeval("require('acid.features')." . a:handler ."(_A[1], _A[2])", [code, ns])
 endfunction
 
+function! AcidEval(code)
+  call luaeval("require('acid.features').eval_print(_A)", a:code)
+endfunction
+
 function! AcidJobHandler(id, data, stream)
   call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
 endfunction
@@ -98,3 +102,4 @@ endif
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
 command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
 command! -nargs=1 AcidAddRequire call AcidFnAddRequire("[<args>]")
+command! -nargs=* AcidEval call AcidEval("<args>")
