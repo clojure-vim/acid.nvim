@@ -18,7 +18,7 @@ def get(ls, ix, default=None):
 
 def lua(nvim, lua_cmd):
     def impl(msg, *_):
-        nvim.funcs.luaeval(lua_cmd, msg)
+        nvim.exec_lua(lua_cmd, msg)
 
     return impl
 
