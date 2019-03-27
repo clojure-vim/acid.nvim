@@ -42,6 +42,7 @@ function! AcidSendEval(handler)
   call inputsave()
   let code = input(ns."=> ")
   call inputrestore()
+  echo
   call luaeval("require('acid.features')." . a:handler ."(_A[1], _A[2])", [code, ns])
 endfunction
 

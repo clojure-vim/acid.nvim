@@ -4,6 +4,8 @@
 -- @module acid.core
 -- @todo merge with acid and acid.connections
 local connections = require("acid.connections")
+local utils = require("acid.utils")
+local log = require("acid.log")
 
 local core = {
   indirection = {}
@@ -20,8 +22,21 @@ core.send = function(conn, obj, handler)
   end
 
   local session = math.random(10000, 99999)
+  local pwd = vim.api.nvim_call_function("getcwd", {})
 
-  conn = conn or connections:get(vim.api.nvim_call_function("getcwd", {}))
+  conn = conn or connections:get(pwd)
+  local new_conn
+
+  if conn == nil then
+    local fpath = vim.api.nvim_call_function("findfile", {".nrepl-port"})
+    if fpath == "" then
+      log.msg("No active connection to a nrepl session. Aborting")
+      return
+    end
+    local portno = table.concat(vim.api.nvim_call_function("readfile", {fpath}), "")
+    conn = {"127.0.0.1", utils.trim(portno)}
+    new_conn = true
+  end
 
   core.indirection[session] = {
     fn = handler,
@@ -33,6 +48,10 @@ core.send = function(conn, obj, handler)
       conn,
       "lua"
     })
+
+  if new_conn then
+    connections:select(pwd, connections:add(new_conn))
+  end
 end
 
 return core

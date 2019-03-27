@@ -1,8 +1,12 @@
--- luacheck: globals table
+-- luacheck: globals table vim
 local utils = {}
 
 utils.pack = function (...)
   return {n=select('#',...); ...}
+end
+
+utils.trim = vim.trim or function(str)
+  return vim.api.nvim_call_function("trim", {str})
 end
 
 utils.interleave_first = function(tbl, itn)

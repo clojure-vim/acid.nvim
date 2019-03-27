@@ -1,5 +1,6 @@
 -- luacheck: globals vim
 local nvim = vim.api
+local log = require("acid.log")
 local utils = require("acid.utils")
 local go_to = {}
 
@@ -13,8 +14,7 @@ go_to.middleware = function(config)
       local fpath = nvim.nvim_call_function("AcidFindFileInPath", {data.file, data.resource})
 
       if fpath == nil then
-        vim.api.nvim_command("echo 'File not found'")
-        vim.api.nvim_err_writeln("File not found.")
+        log.msg("File not found (" .. data.file .. ").")
         return
       end
 
