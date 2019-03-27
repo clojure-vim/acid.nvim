@@ -60,6 +60,8 @@ features.eval_expr = function(mode, ns)
   if mode == nil then
     local form = forms.form_under_cursor()
     payload.code = table.concat(form, "\n")
+  elseif mode == "symbol" then
+    payload.code = forms.symbol_under_cursor()
   else
     local lines = forms.form_from_motion(mode)
     payload.code = table.concat(lines, "\n")

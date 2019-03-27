@@ -62,7 +62,6 @@ forms.motion = function(bufnr, mode)
   }
 end
 
-
 forms.extract = function(coordinates)
   local lines = vim.api.nvim_buf_get_lines(coordinates.bufnr, coordinates.from[1] - 1, coordinates.to[1], 0)
 
