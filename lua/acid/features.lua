@@ -95,7 +95,7 @@ end
 -- @tparam string java_ns Namespace of the java symbols that are being imported.
 -- @tparam {string,...} symbols List of java symbols to be imported
 features.do_import = function(java_ns, symbols)
-  acid.run(commands.req{java_ns = java_ns, symbols = symbols}:with_handler(middlewares
+  acid.run(commands.import{java_ns = java_ns, symbols = symbols}:with_handler(middlewares
     .doautocmd{autocmd = "AcidImported"}
   ))
 end
