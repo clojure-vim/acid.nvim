@@ -54,6 +54,7 @@ map <Plug>(acid-go-to)        <Cmd>lua require("acid.features").go_to()<CR>
 map <Plug>(acid-docs)         <Cmd>lua require("acid.features").docs()<CR>
 map <Plug>(acid-eval-cmdline) <Cmd>call AcidSendEval("eval_cmdline")<CR>
 map <Plug>(acid-motion-op)    <Cmd>set opfunc=AcidMotion<CR>g@
+map <Plug>(acid-eval-symbol)  <Cmd>call AcidMotion("symbol")<CR>
 map <Plug>(acid-eval-visual)  <Cmd>call AcidMotion("visual")<CR>
 map <Plug>(acid-eval-expr)    <Cmd>lua require("acid.features").eval_expr()<CR>
 map <Plug>(acid-eval-print)   <Cmd>call AcidSendEval("eval_print")<CR>
@@ -82,10 +83,11 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> K      <Plug>(acid-docs)
     autocmd FileType clojure nmap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
     autocmd FileType clojure imap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
-    autocmd FileType clojure map  <buffer> <silent> cp     <Plug>(acid-motion-op)
+    autocmd FileType clojure nmap <buffer> <silent> cp     <Plug>(acid-motion-op)
     autocmd FileType clojure vmap <buffer> <silent> cp     <Plug>(acid-eval-visual)
-    autocmd FileType clojure map  <buffer> <silent> cpp    <Plug>(acid-eval-expr)
-    autocmd FileType clojure map  <buffer> <silent> cqp    <Plug>(acid-eval-print)
+    autocmd FileType clojure nmap <buffer> <silent> cps    <Plug>(acid-eval-symbol)
+    autocmd FileType clojure nmap <buffer> <silent> cpp    <Plug>(acid-eval-expr)
+    autocmd FileType clojure nmap <buffer> <silent> cqp    <Plug>(acid-eval-print)
 
     autocmd FileType clojure map <buffer> <silent> <C-c>ll <Plug>(acid-virtualtext-clear-line)
     autocmd FileType clojure map <buffer> <silent> <C-c>ln <Plug>(acid-virtualtext-toggle)
