@@ -160,13 +160,26 @@ Returns the coordinates for the boundaries of the current form
 **(table)** coordinates {from = {row,col}, to = {row,col}}
 
 
+## `acid.forms.form_from_motion(mode[, bufnr])`
+Extracts the form according to given motion (or visual mode)
+
+mode **(string)**: Motion mode or 'visual'
+
+*bufnr* **(int)**: Buffer number in neovim. Will take current if none given
+
+
+**(string)** symbol under cursor
+
+**(table)** coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
+
+
 ## `acid.forms.form_under_cursor()`
 Extracts the innermost form under the cursor
 
 
 **(string)** symbol under cursor
 
-**(table)** coordinates {from = {row,col}, to = {row,col}}
+**(table)** coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
 
 
 ## `acid.forms.symbol_under_cursor()`
@@ -175,7 +188,7 @@ Extracts the symbol under the cursor
 
 **(string)** symbol under cursor
 
-**(table)** coordinates {from = {row,col}, to = {row,col}}
+**(table)** coordinates {from = {row,col}, to = {row,col}, bofnr = 1}
 
 
 ---

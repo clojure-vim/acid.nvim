@@ -61,8 +61,8 @@ features.eval_expr = function(mode, ns)
     local form = forms.form_under_cursor()
     payload.code = table.concat(form, "\n")
   else
-    local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
-    payload.code = table.concat(forms.extract(bufnr, mode), "\n")
+    local lines = forms.form_from_motion(mode)
+    payload.code = table.concat(lines, "\n")
   end
   ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
   if ns ~= nil or ns ~= "" then
@@ -177,14 +177,13 @@ end
 --`(:requires ...)` section.
 -- @tparam string req require vector, such as `[clojure.string :as str]`.
 features.add_require = function(req)
-  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
-  local lines, coords = forms.extract(bufnr)
+  local lines, coords = forms.form_under_cursor()
   local content = table.concat(lines, "")
 
   local code = "(format-code (upd-ns '" .. content .. " :require (partial add-req '" ..  req .. ")))"
 
     acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
-      .refactor{from = coords.from, to = coords.to, bufnr = bufnr}
+      .refactor(coords)
     ))
 end
 
@@ -192,27 +191,25 @@ end
 --`(:requires ...)` section.
 -- @tparam string req require namespace, such as `clojure.string`.
 features.remove_require = function(req)
-  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
-  local lines, coords = forms.extract(bufnr)
+  local lines, coords = forms.form_under_cursor()
   local content = table.concat(lines, "")
 
   local code = "(format-code (upd-ns '" ..  content .. " :require (partial rem-req '" ..  req .. ")))"
 
     acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
-      .refactor{from = coords.from, to = coords.to, bufnr = bufnr}
+      .refactor(coords)
     ))
 end
 
 --- Refactor the current file so the `(:require ...)` form is sorted.
 features.sort_requires = function()
-  local bufnr = vim.api.nvim_call_function("bufnr", {"%"})
-  local lines, coords = forms.extract(bufnr)
+  local lines, coords = forms.form_under_cursor()
   local content = table.concat(lines, "")
 
   local code = "(format-code (upd-ns '" ..  content .. " :require sort-reqs))"
 
     acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
-      .refactor{from = coords.from, to = coords.to, bufnr = bufnr}
+      .refactor(coords)
     ))
 
 end
