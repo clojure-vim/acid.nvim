@@ -174,7 +174,7 @@ nrepl.handle = {
           local opts = pending[ch]
           local port = connections.store[opts.ix][2]
           connections:select(opts.pwd, opts.ix)
-          log.msg("Connected on port" .. tostring(port))
+          log.msg("Connected on port", tostring(port))
           vim.api.nvim_command("doautocmd User AcidConnected")
           pending[ch] = nil
         end
