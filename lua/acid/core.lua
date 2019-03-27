@@ -24,7 +24,7 @@ core.send = function(conn, obj, handler)
   local session = math.random(10000, 99999)
   local pwd = vim.api.nvim_call_function("getcwd", {})
 
-  conn = conn or connections:get(pwd)
+  conn = conn or connections.get(pwd)
   local new_conn
 
   if conn == nil then
@@ -44,13 +44,12 @@ core.send = function(conn, obj, handler)
   }
 
   vim.api.nvim_call_function("AcidSendNrepl", {obj,
-      "require('acid').callback(" .. session .. ", ...)",
-      conn,
-      "lua"
+      session,
+      conn
     })
 
   if new_conn then
-    connections:select(pwd, connections:add(new_conn))
+    connections.select(pwd, connections.add(new_conn))
   end
 end
 

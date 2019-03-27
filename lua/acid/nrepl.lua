@@ -142,7 +142,7 @@ nrepl.start = function(obj)
      addr = {bind, port}
    }
 
-  local ix = connections:add{bind, port}
+  local ix = connections.add{bind, port}
 
   pending[ret] = {pwd = pwd, ix = ix}
   return true
@@ -159,8 +159,8 @@ nrepl.stop = function(obj)
   end
 
   nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
-  connections:unselect(pwd)
-  --connections:remove(nrepl.cache[pwd].addr)
+  connections.unselect(pwd)
+  --connections.remove(nrepl.cache[pwd].addr)
   nrepl.cache[obj.pwd] = nil
 end
 
@@ -173,7 +173,7 @@ nrepl.handle = {
         if string.sub(ln, 1, 20) == "nREPL server started" then
           local opts = pending[ch]
           local port = connections.store[opts.ix][2]
-          connections:select(opts.pwd, opts.ix)
+          connections.select(opts.pwd, opts.ix)
           log.msg("Connected on port", tostring(port))
           vim.api.nvim_command("doautocmd User AcidConnected")
           pending[ch] = nil

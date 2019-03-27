@@ -16,15 +16,9 @@ import os
 def get(ls, ix, default=None):
     return len(ls) > ix and ls[ix] or default
 
-def lua(nvim, lua_cmd):
+def lua(nvim, callback_id):
     def impl(msg, *_):
-        nvim.exec_lua(lua_cmd, msg)
-
-    return impl
-
-def vim(nvim, vim_fn):
-    def impl(msg, *_):
-        nvim.call(vim_fn, msg)
+        nvim.lua.acid.callback(callback_id, msg)
 
     return impl
 
@@ -41,11 +35,6 @@ def new_handler(nvim, handler_impl, finalizer):
                 finalizer(msg, wc, key)
 
     return handler
-
-handlers = {
-    "lua": lua,
-    "vim": vim
-}
 
 def partial_handler(nvim, handler):
     def impl(finalizer):
@@ -65,27 +54,21 @@ class Acid(object):
         self.nvim = nvim
         self.session_handler = SessionHandler(log_handler)
 
+        self.nvim.exec_lua("acid = require('acid')")
+        self.nvim.exec_lua("connections = require('acid.connections')")
+
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
         nvim = self.nvim
-        payload = data[0]
-        fn = data[1] # fn name
-        addr = get(data, 2)
-        addr_managed_by_acid = addr != None
-        addr = addr or repl_host_address(nvim)
+        payload, callback_id, addr = data
         url = format_addr(*addr)
-        backend = get(data, 3) or "lua"
 
-        handler_impl = handlers[backend](nvim, fn)
-        handler = partial_handler(nvim, handler_impl)
+        handler = partial_handler(nvim, lua(nvim, callback_id))
 
         success, msg = send(self.session_handler, url, [handler], payload)
 
-        if not success and addr_managed_by_acid:
-            nvim.api.err_writeln(
-            "Dropping connection on {} due to error when sending: {}".format(
-                addr[1], msg))
-            nvim.funcs.luaeval("require('acid.connections'):remove(_A)", addr)
+        if not success:
+            nvim.api.err_writeln("Error on nrepl connection: {}".format(msg))
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):

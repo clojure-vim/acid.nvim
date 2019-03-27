@@ -11,16 +11,15 @@ local connections = {
 }
 
 --- Stores connection for reuse later
--- @tparam table this Connections object.
 -- @tparam {string,string} addr Address tuple with ip and port.
-connections.add = function(this, addr)
-  table.insert(this.store, addr)
-  return #this.store
+connections.add = function(addr)
+  table.insert(connections.store, addr)
+  return #connections.store
 end
 
-connections.remove = function(this, addr)
+connections.remove = function(addr)
   local ix
-  for i, v in ipairs(this.store) do
+  for i, v in ipairs(connections.store) do
     if v[2] == addr[2] and v[1] == addr[1] then
       ix = i
       break
@@ -28,65 +27,58 @@ connections.remove = function(this, addr)
   end
   table.remove(connections.store, ix)
 
-  for pwd, v in pairs(this.current) do
+  for pwd, v in pairs(connections.current) do
     if v[2] == addr[2] and v[1] == addr[1] then
-      this.current[pwd] = nil
+      connections.current[pwd] = nil
     end
   end
 end
 
 --- Elects selected connection as primary (thus default) for a certain address
--- @tparam table this Connections object.
 -- @tparam string pwd path (usually project root).
 -- Assumed to be neovim's `pwd`.
 -- @tparam int ix index of the stored connection
-connections.select = function(this, pwd, ix)
+connections.select = function(pwd, ix)
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"
   end
 
-  this.current[pwd] = ix
+  connections.current[pwd] = ix
 end
 
 --- Dissociates the connection for the given path
--- @tparam table this Connections object.
 -- @tparam string pwd path (usually project root).
-connections.unselect = function(this, pwd)
+connections.unselect = function(pwd)
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"
   end
 
   -- TODO Potentially wrong
-  this.current[pwd] = nil
+  connections.current[pwd] = nil
 end
 
 --- Return active connection for the given path
--- @tparam table this Connections object.
 -- @tparam string pwd path (usually project root).
--- @treturn {string,string} Connection tuple with ip and port.
-connections.get = function(this, pwd)
+-- @treturn {string,string} Connection tuple with ip and port or nil.
+connections.get = function(pwd)
   if not utils.ends_with(pwd, "/") then
     pwd = pwd .. "/"
   end
 
-  local ix = tonumber(this.current[pwd])
+  local ix = connections.current[pwd]
 
   if ix == nil then
-    local port_file = pwd .. '.nrepl-port'
-    if nvim.nvim_call_function('filereadable', {port_file}) == 1 then
-      local port = nvim.nvim_call_function('readfile', {port_file})
-      ix = this:add({'127.0.0.1', port[1]})
-      this:select(pwd, ix)
-    else
-      if #this.store >= 1 then
-        ix = #this.store
-      else
-        return
-      end
-    end
+    return nil
   end
 
-  return this.store[ix]
+  return connections.store[tonumber(ix)]
+end
+
+--- Add and select the given connection for given path.
+-- @tparam string pwd path (usually project root).
+-- @tparam {string,string} Connection tuple with ip and port or nil.
+connections.set = function(pwd, addr)
+  connections.select(pwd, connections.add(addr))
 end
 
 return connections

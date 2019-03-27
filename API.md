@@ -1,18 +1,14 @@
 # acid.connections
 low-level connection handler
 
-## `acid.connections.add(this, addr)`
+## `acid.connections.add(addr)`
 Stores connection for reuse later
-
-this **(table)**: Connections object.
 
 addr **({string,string})**: Address tuple with ip and port.
 
 
-## `acid.connections.select(this, pwd, ix)`
+## `acid.connections.select(pwd, ix)`
 Elects selected connection as primary (thus default) for a certain address
-
-this **(table)**: Connections object.
 
 pwd **(string)**: path (usually project root).
  Assumed to be neovim's `pwd`.
@@ -20,23 +16,27 @@ pwd **(string)**: path (usually project root).
 ix **(int)**: index of the stored connection
 
 
-## `acid.connections.unselect(this, pwd)`
+## `acid.connections.unselect(pwd)`
 Dissociates the connection for the given path
 
-this **(table)**: Connections object.
-
 pwd **(string)**: path (usually project root).
 
 
-## `acid.connections.get(this, pwd)`
+## `acid.connections.get(pwd)`
 Return active connection for the given path
 
-this **(table)**: Connections object.
-
 pwd **(string)**: path (usually project root).
 
 
-**({string,string})** Connection tuple with ip and port.
+**({string,string})** Connection tuple with ip and port or nil.
+
+
+## `acid.connections.set(pwd, Connection)`
+Add and select the given connection for given path.
+
+pwd **(string)**: path (usually project root).
+
+Connection **({string,string})**: tuple with ip and port or nil.
 
 
 ---
