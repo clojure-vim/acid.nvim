@@ -44,13 +44,16 @@ forms.motion = function(bufnr, mode)
 
     b_col = b_col - 1
     e_col = e_col - 1
-  elseif mode == 'line' then
-    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '['))
-    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, ']'))
-  else
+  elseif mode == 'block' then
     b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '<'))
     e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '>'))
+  else
+    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '['))
+    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, ']'))
   end
+
+  b_col = b_col + 1
+  e_col = e_col + 2
 
   return {
     from = {b_line, b_col},
