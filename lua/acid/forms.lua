@@ -95,10 +95,9 @@ end
 -- @treturn string symbol under cursor
 -- @treturn table coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
 forms.form_under_cursor = function()
-  local cb = vim.api.nvim_get_current_buf()
   local coordinates = forms.get_form_boundaries()
 
-  return forms.extract(cb, coordinates)
+  return forms.extract(coordinates)
 end
 
 --- Extracts the symbol under the cursor
