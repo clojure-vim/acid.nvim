@@ -1,0 +1,10 @@
+#!/bin/bash
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+grep -q tap "${ROOT_DIR}"/lua/**/*.lua && {
+  echo "Don't commit a 'tap'."
+  exit 1
+}
+
+exit 0
+

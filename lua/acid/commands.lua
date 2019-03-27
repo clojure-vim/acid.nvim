@@ -36,6 +36,15 @@ commands.req = function(obj)
   return ops.eval{code = code}
 end
 
+commands.import = function(obj)
+
+  local code = "(import '(" ..
+    obj.java_ns .. " " .. table.concat(obj.symbols, " ") ..
+    "))"
+
+  return ops.eval{code = code}
+end
+
 commands.ns_load_all = function()
   return ops['ns-load-all']{}
 end

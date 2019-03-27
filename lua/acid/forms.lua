@@ -30,14 +30,41 @@ forms.get_form_boundaries = function()
 
   return {
     from = from,
-    to = to
+    to = to,
+    bufnr = vim.api.nvim_get_current_buf()
   }
 end
 
-forms.extract = function(bufnr)
-  local coordinates = forms.get_form_boundaries()
+forms.motion = function(bufnr, mode)
+  local b_line, b_col, e_line, e_col, _
 
-  local lines = vim.api.nvim_buf_get_lines(bufnr, coordinates.from[1] - 1, coordinates.to[1], 0)
+  if mode == 'visual' then
+    _, b_line, b_col = unpack(vim.api.nvim_call_function("getpos", {"v"}))
+    _, e_line, e_col = unpack(vim.api.nvim_call_function("getpos", {"."}))
+
+    b_col = b_col - 1
+    e_col = e_col - 1
+  elseif mode == 'block' then
+    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '<'))
+    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '>'))
+  else
+    b_line, b_col = unpack(vim.api.nvim_buf_get_mark(bufnr, '['))
+    e_line, e_col = unpack(vim.api.nvim_buf_get_mark(bufnr, ']'))
+  end
+
+  b_col = b_col + 1
+  e_col = e_col + 2
+
+  return {
+    from = {b_line, b_col},
+    to = {e_line, e_col},
+    bufnr = bufnr
+  }
+end
+
+
+forms.extract = function(coordinates)
+  local lines = vim.api.nvim_buf_get_lines(coordinates.bufnr, coordinates.from[1] - 1, coordinates.to[1], 0)
 
   if coordinates.from[2] ~= 0 then
     lines[1] = string.sub(lines[1], coordinates.from[2])
@@ -54,18 +81,31 @@ forms.extract = function(bufnr)
   return lines, coordinates
 end
 
+--- Extracts the form according to given motion (or visual mode)
+-- @tparam string mode Motion mode or 'visual'
+-- @tparam[opt] int bufnr Buffer number in neovim. Will take current if none given
+-- @treturn string symbol under cursor
+-- @treturn table coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
+forms.form_from_motion = function(mode, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local coordinates = forms.motion(bufnr, mode)
+
+  return forms.extract(coordinates)
+
+end
+
 --- Extracts the innermost form under the cursor
 -- @treturn string symbol under cursor
--- @treturn table coordinates {from = {row,col}, to = {row,col}}
+-- @treturn table coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
 forms.form_under_cursor = function()
-  local cb = vim.api.nvim_get_current_buf()
+  local coordinates = forms.get_form_boundaries()
 
-  return forms.extract(cb)
+  return forms.extract(coordinates)
 end
 
 --- Extracts the symbol under the cursor
 -- @treturn string symbol under cursor
--- @treturn table coordinates {from = {row,col}, to = {row,col}}
+-- @treturn table coordinates {from = {row,col}, to = {row,col}, bofnr = 1}
 forms.symbol_under_cursor = function()
   local cw = vim.api.nvim_call_function("expand", {"<cword>"})
   local from = vim.api.nvim_call_function("searchpos", {cw, "nc"})
@@ -73,7 +113,8 @@ forms.symbol_under_cursor = function()
 
   return cw, {
     from = from,
-    to = to
+    to = to,
+    bufnr = vim.api.nvim_get_current_buf()
   }
 end
 
