@@ -31,7 +31,7 @@ forms.get_form_boundaries = function()
   return {
     from = from,
     to = to,
-    bufnr = vim.api.nvim_get_current_buf()
+    bufnr = curpos[1]
   }
 end
 
