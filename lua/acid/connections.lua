@@ -102,7 +102,7 @@ end
 
 --- Add and select the given connection for given path.
 -- @tparam string pwd path (usually project root).
--- @tparam {string,string} Connection tuple with ip and port or nil.
+-- @tparam {string,string} addr tuple with ip and port or nil.
 connections.set = function(pwd, addr)
   connections.select(pwd, connections.add(addr))
 end

@@ -31,12 +31,12 @@ pwd **(string)**: path (usually project root).
 **({string,string})** Connection tuple with ip and port or nil.
 
 
-## `acid.connections.set(pwd, Connection)`
+## `acid.connections.set(pwd, addr)`
 Add and select the given connection for given path.
 
 pwd **(string)**: path (usually project root).
 
-Connection **({string,string})**: tuple with ip and port or nil.
+addr **({string,string})**: tuple with ip and port or nil.
 
 
 ---
