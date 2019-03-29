@@ -21,37 +21,31 @@ core.send = function(conn, obj, handler)
     return
   end
 
-  -- Random number from 0 .. 9999999999
-  local session = utils.random(10)
   local pwd = vim.api.nvim_call_function("getcwd", {})
 
-  conn = conn or connections.get(pwd)
-  local new_conn
+  conn = conn or connections.attempt_get(pwd)
 
   if conn == nil then
-    local fpath = vim.api.nvim_call_function("findfile", {".nrepl-port"})
-    if fpath == "" then
-      log.msg("No active connection to a nrepl session. Aborting")
-      return
-    end
-    local portno = table.concat(vim.api.nvim_call_function("readfile", {fpath}), "")
-    conn = {"127.0.0.1", utils.trim(portno)}
-    new_conn = true
+    log.msg("No active connection to a nrepl session. Aborting")
   end
 
-  core.indirection[session] = {
-    fn = handler,
-    conn = conn
-  }
+  local session = core.register_callback(conn, handler)
 
   vim.api.nvim_call_function("AcidSendNrepl", {obj,
       session,
       conn
     })
 
-  if new_conn then
-    connections.select(pwd, connections.add(new_conn))
-  end
+end
+
+core.register_callback = function(conn, handler)
+  -- Random number from 0 .. 9999999999
+  local session = utils.random(10)
+  core.indirection[session] = {
+    fn = handler,
+    conn = conn
+  }
+  return session
 end
 
 return core
