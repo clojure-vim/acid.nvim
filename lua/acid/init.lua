@@ -36,6 +36,7 @@ end
 -- @param ret The response from nrepl
 acid.callback = function(session, ret)
   local proxy = core.indirection[session]
+
   local new_ret = proxy.fn(ret)
 
   if type(new_ret) == "table" and new_ret.type == "command" then
