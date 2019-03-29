@@ -16,43 +16,32 @@ import os
 def get(ls, ix, default=None):
     return len(ls) > ix and ls[ix] or default
 
-def lua(nvim, callback_id):
-    def impl(msg, *_):
-        nvim.lua.acid.callback(callback_id, msg)
-
-    return impl
-
 def should_finalize(msg):
     return ('status' in msg and
              not set(msg['status']).intersection({'eval-error', }))
 
-def new_handler(nvim, handler_impl, finalizer):
-    def handler(msg, wc, key):
-        try:
-            nvim.async_call(lambda: handler_impl(msg, wc, key))
-        finally:
-            if should_finalize(msg):
-                finalizer(msg, wc, key)
-
-    return handler
-
-def partial_handler(nvim, handler):
+def partial_handler(nvim, callback_id):
     def impl(finalizer):
-        return new_handler(nvim, handler, finalizer)
+        def handler(msg, wc, key):
+            try:
+                if not "changed-namespaces" in msg:
+                    log_info(msg)
+                    nvim.async_call(
+                        lambda: nvim.lua.acid.callback(callback_id, msg)
+                    )
+            finally:
+                if should_finalize(msg):
+                    finalizer(msg, wc, key)
+
+        return handler
     return impl
 
 @neovim.plugin
 class Acid(object):
 
     def __init__(self, nvim):
-        log_handler = new_handler(
-            nvim,
-            lambda msg, *_: not "changed-namespaces" in msg and log_info(msg),
-            lambda *_: False
-        )
-
         self.nvim = nvim
-        self.session_handler = SessionHandler(log_handler)
+        self.session_handler = SessionHandler()
 
         self.nvim.exec_lua("acid = require('acid')")
         self.nvim.exec_lua("connections = require('acid.connections')")
@@ -63,7 +52,7 @@ class Acid(object):
         payload, callback_id, addr = data
         url = format_addr(*addr)
 
-        handler = partial_handler(nvim, lua(nvim, callback_id))
+        handler = partial_handler(nvim, callback_id)
 
         success, msg = send(self.session_handler, url, [handler], payload)
 

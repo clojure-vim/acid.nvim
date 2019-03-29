@@ -50,7 +50,7 @@ class SessionHandler(object):
 
         conn.watch(watcher_key, matches, handler)
 
-    def send(self, url, data, handlers):
+    def send(self, url, data):
         conn = self.get_or_create(url)
         log.log_info('sending data -> {}', str(data))
 
@@ -73,4 +73,4 @@ def send(session, url, handlers, data, matcher={}):
     for handler in handlers:
         session.add_atomic_watch(url, msg_id, handler, matcher)
 
-    return session.send(url, data, handlers)
+    return session.send(url, data)
