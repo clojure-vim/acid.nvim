@@ -1,5 +1,18 @@
 let g:acid_no_default_keymappings = get(g:, 'acid_no_default_keymappings', 0)
 
+function AcidWrappedSend(payload, handler)
+  let conn = luaeval("require('acid.connections').attempt_get(_A)", getcwd())
+  if type(conn) == type(v:null)
+    call luaeval("require('acid.log').msg(_A)", "No active connection to a nrepl session. Aborting")
+    return
+  endif
+
+  let luafn = "function(data) vim.api.nvim_call_function(_A[2], {data}) end"
+
+  let session = luaeval("require('acid.core').register_callback(_A[1], ".luafn.")", [conn, a:handler])
+  call AcidSendNrepl(a:payload, session, conn)
+endfunction
+
 function! s:require()
   if !luaeval("require('acid').connected()", v:null)
     return
