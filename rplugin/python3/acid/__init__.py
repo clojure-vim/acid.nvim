@@ -85,11 +85,11 @@ class Acid(object):
 
     @neovim.function("AcidLog", sync=False)
     def acid_log(self, args):
-        ns, level, message, *_ = args
+        ns, message, *_ = args
         logger = logging.getLogger(ns)
         logger.addHandler(fh)
         logger.setLevel(logging.DEBUG)
-        getattr(logger , level.upper())(message)
+        logger.debug(message)
 
     @neovim.function("AcidAlternateFiles", sync=True)
     def acid_alternate_file(self, args):
