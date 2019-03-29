@@ -111,6 +111,25 @@ utils.split_lines = function(txt)
   return result
 end
 
+utils.random = function(sz)
+
+local gen = {
+  [[head -c 200 /dev/urandom]],
+  [[sha256sum]],
+  [[awk '{print toupper($1)}']],
+  [[xargs -I{} echo "obase=10; ibase=16; {}"]],
+  [[bc]] ,
+  [[tr '\n' ' ']],
+  [[sed 's/\\* //g']],
+}
+
+local random = vim.api.nvim_call_function("system", {
+    table.concat(gen, " | ")
+  })
+
+return tonumber(random:sub(1, sz))
+end
+
 
 return utils
 

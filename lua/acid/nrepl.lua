@@ -51,8 +51,6 @@ local build_cmd = function(obj)
     get_deps(obj.selected),
     "-m",
     "nrepl.cmdline",
-    "-p",
-    obj.port,
     "--middleware",
     "[" ..
       table.concat(utils.join(
@@ -67,6 +65,11 @@ local build_cmd = function(obj)
 
   if obj.alias ~= nil then
     table.insert(opts, 4, obj.alias)
+  end
+
+  if obj.port ~= nil then
+    table.insert(opts, "-p")
+    table.insert(opts, tostring(obj.port))
   end
 
   if obj.bind ~= nil then
@@ -109,11 +112,10 @@ nrepl.start = function(obj)
   end
 
   local selected = obj.middlewares or nrepl.default_middlewares
-  local port = tostring(obj.port or math.random(1024, 65534))
   local bind = obj.bind
   local cmd = obj.cmd or build_cmd{
     selected = selected,
-    port = port,
+    port = obj.port,
     alias = obj.alias,
     bind = obj.bind,
     host = obj.host,
@@ -131,18 +133,19 @@ nrepl.start = function(obj)
       }
     })
 
-
    if ret <= 0 then
      -- TODO log, inform..
      return
    end
 
+   local conn = {bind, obj.port}
+
    nrepl.cache[pwd] = {
      job = ret,
-     addr = {bind, port}
+     addr = conn
    }
 
-  local ix = connections.add{bind, port}
+  local ix = connections.add(conn)
 
   pending[ret] = {pwd = pwd, ix = ix}
   return true
@@ -172,7 +175,8 @@ nrepl.handle = {
       for _, ln in ipairs(dt) do
         if string.sub(ln, 1, 20) == "nREPL server started" then
           local opts = pending[ch]
-          local port = connections.store[opts.ix][2]
+          local port = ln:match("%d+")
+          connections.store[opts.ix][2] = port
           connections.select(opts.pwd, opts.ix)
           log.msg("Connected on port", tostring(port))
           vim.api.nvim_command("doautocmd User AcidConnected")

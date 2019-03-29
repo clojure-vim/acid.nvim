@@ -21,7 +21,8 @@ core.send = function(conn, obj, handler)
     return
   end
 
-  local session = math.random(10000, 99999)
+  -- Random number from 0 .. 9999999999
+  local session = utils.random(10)
   local pwd = vim.api.nvim_call_function("getcwd", {})
 
   conn = conn or connections.get(pwd)
