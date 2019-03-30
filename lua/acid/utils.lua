@@ -113,8 +113,8 @@ end
 
 utils.random = function(sz)
   local gen = {
-    [[head -c 200 /dev/urandom]],
-    [[sha256sum]],
+    [[head -c 100 /dev/urandom]],
+    [[md5sum]],
     [[awk '{print toupper($1)}']],
     [[xargs -I{} echo "obase=10; ibase=16; {}"]],
     [[bc]] ,
