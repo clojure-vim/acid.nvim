@@ -10,25 +10,25 @@ from acid.nvim import (
 
 from acid.pure import ns_to_path
 from acid.nvim.log import log_info, log_debug, fh
-from acid.session import send, SessionHandler
+from acid.session import send, ThinSession
 import os
 
 def get(ls, ix, default=None):
     return len(ls) > ix and ls[ix] or default
 
 def should_finalize(msg):
-    return ('status' in msg and
-             not set(msg['status']).intersection({'eval-error', }))
+    return 'status' in msg
 
 def partial_handler(nvim, callback_id):
     def impl(finalizer):
         def handler(msg, wc, key):
             try:
-                if not "changed-namespaces" in msg:
-                    log_info(msg)
-                    nvim.async_call(
-                        lambda: nvim.lua.acid.callback(callback_id, msg)
-                    )
+                nvim.async_call(
+                    lambda: nvim.exec_lua(
+                        "require('acid').callback(...)",
+                        callback_id, msg)
+                )
+                log_info(msg)
             finally:
                 if should_finalize(msg):
                     finalizer(msg, wc, key)
@@ -41,7 +41,7 @@ class Acid(object):
 
     def __init__(self, nvim):
         self.nvim = nvim
-        self.session_handler = SessionHandler()
+        self.session_handler = ThinSession()
 
         self.nvim.exec_lua("acid = require('acid')")
         self.nvim.exec_lua("connections = require('acid.connections')")
@@ -54,7 +54,7 @@ class Acid(object):
 
         handler = partial_handler(nvim, callback_id)
 
-        success, msg = send(self.session_handler, url, [handler], payload)
+        success, msg = send(self.session_handler, url, payload, handler)
 
         if not success:
             nvim.api.err_writeln("Error on nrepl connection: {}".format(msg))
@@ -76,8 +76,6 @@ class Acid(object):
     def acid_log(self, args):
         ns, message, *_ = args
         logger = logging.getLogger(ns)
-        logger.addHandler(fh)
-        logger.setLevel(logging.DEBUG)
         logger.debug(message)
 
     @neovim.function("AcidAlternateFiles", sync=True)
