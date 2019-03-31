@@ -29,7 +29,11 @@ core.send = function(conn, obj, handler)
     log.msg("No active connection to a nrepl session. Aborting")
   end
 
-  local session = core.register_callback(conn, handler)
+  if obj.id == nil then
+    obj.id = vim.api.nvim_call_function("AcidNewUUID", {})
+  end
+
+  local session = core.register_callback(conn, handler, obj.id)
 
   vim.api.nvim_call_function("AcidSendNrepl", {obj,
       session,
@@ -38,9 +42,9 @@ core.send = function(conn, obj, handler)
 
 end
 
-core.register_callback = function(conn, handler)
+core.register_callback = function(conn, handler, session)
   -- Random number from 0 .. 9999999999
-  local session = utils.random(10)
+  session = session or utils.random(10)
   core.indirection[session] = {
     fn = handler,
     conn = conn
