@@ -31,7 +31,7 @@ end
 local nop = function(_) return end
 
 local new = function(op)
-  return composable{}:with_payload{op = op}
+  return composable{}:with_payload{op = op, id = utils.ulid()}
 end
 
 local for_op = function(op)

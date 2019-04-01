@@ -129,6 +129,12 @@ utils.random = function(sz)
   return tonumber(random:sub(1, sz))
 end
 
+utils.uuid = function()
+ return vim.api.nvim_call_function("AcidNewUUID", {})
+end
+
+utils.ulid = require("acid.extra.ulid")
+
 utils.keys = function(tbl)
   local new = {}
   for k, _ in pairs(tbl) do

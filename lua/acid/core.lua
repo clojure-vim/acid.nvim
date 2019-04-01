@@ -30,7 +30,7 @@ core.send = function(conn, obj, handler)
   end
 
   if obj.id == nil then
-    obj.id = vim.api.nvim_call_function("AcidNewUUID", {})
+    obj.id = utils.ulid()
   end
 
   local session = core.register_callback(conn, handler, obj.id)
