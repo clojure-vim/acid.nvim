@@ -219,10 +219,8 @@ cmd: A command (op + payload + handler) to be executed.
 conn: A connection where this command will be run.
 
 
-## `acid.callback(session, ret)`
+## `acid.callback(ret)`
 Callback proxy for handling command responses
-
-session: Session ID for matching response with request
 
 ret: The response from nrepl
 

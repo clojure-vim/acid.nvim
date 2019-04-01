@@ -32,10 +32,13 @@ end
 
 
 --- Callback proxy for handling command responses
--- @param session Session ID for matching response with request
 -- @param ret The response from nrepl
-acid.callback = function(session, ret)
-  local proxy = core.indirection[session]
+acid.callback = function(ret)
+  local proxy = core.indirection[ret.id]
+
+  --if proxy == nil then
+    ----TODO log
+  --end
 
   local new_ret = proxy.fn(ret)
 

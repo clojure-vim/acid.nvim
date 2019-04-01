@@ -33,12 +33,9 @@ core.send = function(conn, obj, handler)
     obj.id = utils.ulid()
   end
 
-  local session = core.register_callback(conn, handler, obj.id)
+  core.register_callback(conn, handler, obj.id)
 
-  vim.api.nvim_call_function("AcidSendNrepl", {obj,
-      session,
-      conn
-    })
+  vim.api.nvim_call_function("AcidSendNrepl", {obj, conn})
 
 end
 

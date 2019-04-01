@@ -19,14 +19,17 @@ def get(ls, ix, default=None):
 def should_finalize(msg):
     return 'status' in msg
 
-def partial_handler(nvim, callback_id):
-    def impl(finalizer):
+@neovim.plugin
+class Acid(object):
+
+    def partial_handler(self, finalizer):
+        nvim = self.nvim
         def handler(msg, wc, key):
             try:
                 nvim.async_call(
                     lambda: nvim.exec_lua(
                         "require('acid').callback(...)",
-                        callback_id, msg)
+                        msg)
                 )
                 log_info(msg)
             finally:
@@ -34,10 +37,6 @@ def partial_handler(nvim, callback_id):
                     finalizer(msg, wc, key)
 
         return handler
-    return impl
-
-@neovim.plugin
-class Acid(object):
 
     def __init__(self, nvim):
         self.nvim = nvim
@@ -48,10 +47,10 @@ class Acid(object):
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
-        payload, callback_id, addr = data
+        payload, addr = data
         url = format_addr(*addr)
-        handler = partial_handler(self.nvim, callback_id)
-        success, msg = self.session_handler.send(url, payload, handler)
+        success, msg = self.session_handler.send(url, payload,
+                                                 self.partial_handler)
 
         if not success:
             self.nvim.api.err_writeln(
