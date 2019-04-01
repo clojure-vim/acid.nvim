@@ -40,8 +40,6 @@ core.send = function(conn, obj, handler)
 end
 
 core.register_callback = function(conn, handler, session)
-  -- Random number from 0 .. 9999999999
-  session = session or utils.random(10)
   core.indirection[session] = {
     fn = handler,
     conn = conn

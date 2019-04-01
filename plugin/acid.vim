@@ -13,8 +13,8 @@ function! AcidWrappedSend(payload, handler)
 
   let luafn = "function(data) vim.api.nvim_call_function(_A[2], {data}) end"
 
-  let session = luaeval("require('acid.core').register_callback(_A[1], ".luafn.")", [conn, a:handler])
-  call AcidSendNrepl(a:payload, session, conn)
+  call luaeval("require('acid.core').register_callback(_A[1], ".luafn.", _A[3])", [conn, a:handler, a:payload.id])
+  call AcidSendNrepl(a:payload, conn)
 endfunction
 
 function! s:require()
