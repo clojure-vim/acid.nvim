@@ -61,6 +61,20 @@ class SessionHandler(object):
             del self.sessions[url]
             return False, str(e)
 
+def send(session, url, handlers, data, matcher={}):
+    if not isinstance(session, SessionHandler):
+        return
+
+    msg_id = data.get('id', uuid.uuid4().hex)
+    data.update({"id": msg_id})
+
+    handlers = list(handlers)
+
+    for handler in handlers:
+        session.add_atomic_watch(url, msg_id, handler, matcher)
+
+    return session.send(url, data, handlers)
+
 class ThinSession(object):
 
     def __init__(self, default_handler = None):
