@@ -10,7 +10,7 @@ from acid.nvim import (
 
 from acid.pure import ns_to_path
 from acid.nvim.log import log_info, log_debug, fh
-from acid.session import send, ThinSession
+from acid.session import ThinSession
 import os
 
 def get(ls, ix, default=None):
