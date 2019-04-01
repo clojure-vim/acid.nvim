@@ -41,44 +41,15 @@ else
 end
 
 
---- Sets the time function to get default times from.
--- This function should return time in seconds since unix epoch, with millisecond
--- precision. The default set will be `ngx.now()` or alternatively `socket.gettime()`, if
--- niether is available, it will insert an error throwing placeholder function.
--- @param f the function to set
--- @return `true`
--- @name set_time_func
-local function set_time_func(f)
-  assert(type(f) == "function", "expected 1st argument to be a function")
-  now = f
-  return true
-end
-
-
---- Sets the random function to get random input from.
--- This function should return a number between 0 and 1 when called without
--- arguments. The default is `math.random`, this is ok for LuaJIT, but the
--- standard PuC-Rio Lua versions have a weak randomizer that is better replaced.
--- @param f the function to set
--- @return `true`
--- @name set_random_func
-local function set_random_func(f)
-  assert(type(f) == "function", "expected 1st argument to be a function")
-  random = f
-  return true
-end
-
-
 --- generates the time-based part of a `ulid`.
--- @param time (optional) time to generate the string from, in seconds since 
+-- @param[opt] time time to generate the string from, in seconds since
 -- unix epoch, with millisecond precision (defaults to now)
--- @param len (optional) the length of the time-based string to return (defaults to 10)
+-- @param[opt] len the length of the time-based string to return (defaults to 10)
 -- @return time-based part of `ulid` string
--- @name encode_time
-local function encode_time(time, len) 
+local function encode_time(time, len)
   time = floor((time or now()) * 1000)
   len = len or TIME_LEN
-  
+
   local result = {}
   for i = len, 1, -1 do
     local mod = time % ENCODING_LEN
@@ -89,9 +60,8 @@ local function encode_time(time, len)
 end
 
 --- generates the random part of a `ulid`.
--- @param len (optional) the length of the random string to return (defaults to 16)
+-- @param[opt] len the length of the random string to return (defaults to 16)
 -- @return random part of `ulid` string
--- @name encode_random
 local function encode_random(len)
   len = len or RANDOM_LEN
   local result = {}
@@ -105,7 +75,6 @@ end
 -- @param[opt] time time to generate the `ulid` from, in seconds since
 -- unix epoch, with millisecond precision (defaults to now)
 -- @return `ulid` string
--- @name ulid
 -- @usage local ulid_mod = require("ulid")
 --
 -- -- load LuaSocket so we can reuse its gettime function
