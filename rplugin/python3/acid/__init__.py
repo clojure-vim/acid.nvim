@@ -48,16 +48,16 @@ class Acid(object):
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
-        nvim = self.nvim
         payload, callback_id, addr = data
         url = format_addr(*addr)
-
-        handler = partial_handler(nvim, callback_id)
-
-        success, msg = send(self.session_handler, url, payload, handler)
+        handler = partial_handler(self.nvim, callback_id)
+        success, msg = self.session_handler.send(url, payload, handler)
 
         if not success:
-            nvim.api.err_writeln("Error on nrepl connection: {}".format(msg))
+            self.nvim.api.err_writeln(
+                "Error on nrepl connection: {}".format(msg))
+
+        return success
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
