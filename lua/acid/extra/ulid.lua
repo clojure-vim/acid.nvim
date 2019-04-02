@@ -9,10 +9,10 @@
 -- unfortunately very weak regarding time functions and randomizers.
 -- So make sure to set it up properly!
 --
--- @see https://github.com/Tieske/ulid.lua
--- @copyright Copyright 2016-2017 Thijs Schreijer
--- @license [mit](https://opensource.org/licenses/MIT)
--- @author Thijs Schreijer
+--see https://github.com/Tieske/ulid.lua
+--copyright Copyright 2016-2017 Thijs Schreijer
+--license [mit](https://opensource.org/licenses/MIT)
+--author Thijs Schreijer
 
 
 -- Crockford's Base32 https://en.wikipedia.org/wiki/Base32
@@ -25,13 +25,10 @@ local ENCODING_LEN = #ENCODING
 local TIME_LEN = 10
 local RANDOM_LEN = 16
 
-
 local floor = math.floor
 local concat = table.concat
 local random = math.random
 local now
-
-math.randomseed(os.time())
 
 if package.loaded["socket"] and package.loaded["socket"].gettime then
   -- LuaSocket
@@ -40,6 +37,7 @@ else
   now = function() return vim.api.nvim_call_function("localtime", {}) end
 end
 
+math.randomseed(now())
 
 --- generates the time-based part of a `ulid`.
 -- @param[opt] time time to generate the string from, in seconds since
@@ -71,25 +69,6 @@ local function encode_random(len)
   return concat(result)
 end
 
---- generates a `ulid`.
--- @param[opt] time time to generate the `ulid` from, in seconds since
--- unix epoch, with millisecond precision (defaults to now)
--- @return `ulid` string
--- @usage local ulid_mod = require("ulid")
---
--- -- load LuaSocket so we can reuse its gettime function
--- local socket = require("socket")
--- -- set the time function explicitly, but by default it
--- -- will be picked up as well
--- ulid_mod.set_time_func(socket.gettime)
---
--- -- seed the random generator, needed for the example, but ONLY DO THIS ONCE in your
--- -- application, unless you know what you are doing! And try to use a better seed than
--- -- the time based seed used here.
--- math.randomseed(socket.gettime()*10000)
---
--- -- get a ulid from current time
--- local id = ulid_mod.ulid()
 local function ulid(time)
   return encode_time(time) .. encode_random()
 end
