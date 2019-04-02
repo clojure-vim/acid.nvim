@@ -2,7 +2,6 @@
 
 --- low-level connection handler
 -- @module acid.connections
-local nvim = vim.api
 local utils = require("acid.utils")
 
 local connections = {
@@ -20,23 +19,27 @@ end
 --- Stores connection for reuse later
 -- @tparam {string,string} addr Address tuple with ip and port.
 connections.add = function(addr)
-  table.insert(connections.store, addr)
-  return #connections.store
+  local uuid = utils.uuid()
+  connections.store[uuid] = addr
+  return uuid
 end
 
 connections.remove = function(addr)
   local ix
-  for i, v in ipairs(connections.store) do
-    if v[2] == addr[2] and v[1] == addr[1] then
-      ix = i
-      break
-    end
-  end
-  table.remove(connections.store, ix)
 
+  -- Remove current connections first
+  -- Then remove remaining
   for pwd, v in pairs(connections.current) do
     if v[2] == addr[2] and v[1] == addr[1] then
+      ix = connections.current[pwd]
+      connections.store[ix] = nil
       connections.current[pwd] = nil
+    end
+  end
+
+  for i, v in ipairs(connections.store) do
+    if v[2] == addr[2] and v[1] == addr[1] then
+      connections.store[i] = nil
     end
   end
 end
@@ -72,7 +75,7 @@ connections.get = function(pwd)
     return nil
   end
 
-  return connections.store[tonumber(ix)]
+  return connections.store[ix]
 end
 
 connections.search = function(pwd)

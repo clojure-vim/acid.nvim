@@ -163,7 +163,7 @@ nrepl.stop = function(obj)
 
   nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
   connections.unselect(pwd)
-  --connections.remove(nrepl.cache[pwd].addr)
+  connections.remove(nrepl.cache[pwd].addr)
   nrepl.cache[obj.pwd] = nil
 end
 
