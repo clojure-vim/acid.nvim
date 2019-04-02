@@ -94,7 +94,7 @@ DEFAULT MAPPINGS				*acid-mapping*
 {key}		{function}
 --------	------------------------
 K		Shows documentation for the symbol below cursor
-<C-]>		Goes to definition of symbol below cursor (`AcidGoto`)
+gd		Goes to definition of symbol below cursor (`AcidGoto`)
 cp<motion>	Sends the block to nrepl for evaluation (`AcidEval`)
 cpp		Evaluating the whole block below cursor (`AcidEval`)
 

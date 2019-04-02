@@ -83,7 +83,7 @@ augroup END
 if !g:acid_no_default_keymappings
   augroup acid-keymappings
     autocmd!
-    autocmd FileType clojure nmap <buffer> <silent> <C-]>  <Plug>(acid-go-to)
+    autocmd FileType clojure nmap <buffer> <silent> gd     <Plug>(acid-go-to)
     autocmd FileType clojure nmap <buffer> <silent> K      <Plug>(acid-docs)
     autocmd FileType clojure nmap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
     autocmd FileType clojure imap <buffer> <silent> <C-c>x <Plug>(acid-eval-cmdline)
