@@ -64,6 +64,14 @@ connections.unselect = function(pwd)
 end
 
 --- Return active connection for the given path
+-- @tparam[opt] string pwd path (usually project root).
+-- @treturn {string,string} Connection tuple with ip and port or nil.
+connections.peek = function(pwd)
+  pwd = pwd_to_key(pwd or vim.api.nvim_call_function("getcwd", {}))
+  return connections.current[pwd]
+end
+
+--- Return active connection for the given path
 -- @tparam string pwd path (usually project root).
 -- @treturn {string,string} Connection tuple with ip and port or nil.
 connections.get = function(pwd)

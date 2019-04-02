@@ -6,6 +6,7 @@
 local core = require("acid.core")
 local connections = require("acid.connections")
 local utils = require("acid.utils")
+local sessions = require("acid.sessions")
 
 local acid = {}
 
@@ -27,7 +28,8 @@ end
 -- @param cmd A command (op + payload + handler) to be executed.
 -- @param conn A connection where this command will be run.
 acid.run = function(cmd, conn)
-  return core.send(conn, cmd:build())
+  local filtered = cmd:update_payload(sessions.filter)
+  return core.send(conn, filtered:build())
 end
 
 

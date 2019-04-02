@@ -22,6 +22,15 @@ Dissociates the connection for the given path
 pwd **(string)**: path (usually project root).
 
 
+## `acid.connections.peek([pwd])`
+Return active connection for the given path
+
+*pwd* **(string)**: path (usually project root).
+
+
+**({string,string})** Connection tuple with ip and port or nil.
+
+
 ## `acid.connections.get(pwd)`
 Return active connection for the given path
 

@@ -90,6 +90,7 @@ augroup acid
   autocmd!
   autocmd BufWritePost *.clj call s:require()
 
+  autocmd User AcidConnected lua require("acid.sessions").new_session()
   autocmd User AcidConnected lua require("acid.features").preload()
   autocmd User AcidConnected lua require("acid.features").load_all_nss()
 
