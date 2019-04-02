@@ -8,7 +8,7 @@ local utils = require("acid.utils")
 local log = require("acid.log")
 
 local core = {
-  indirection = {}
+  indirection = setmetatable({}, utils.LRU(10))
 }
 
 --- Forward messages to the nrepl and registers the handler.
@@ -21,37 +21,30 @@ core.send = function(conn, obj, handler)
     return
   end
 
-  local session = math.random(10000, 99999)
   local pwd = vim.api.nvim_call_function("getcwd", {})
 
-  conn = conn or connections:get(pwd)
-  local new_conn
+  conn = conn or connections.attempt_get(pwd)
 
   if conn == nil then
-    local fpath = vim.api.nvim_call_function("findfile", {".nrepl-port"})
-    if fpath == "" then
-      log.msg("No active connection to a nrepl session. Aborting")
-      return
-    end
-    local portno = table.concat(vim.api.nvim_call_function("readfile", {fpath}), "")
-    conn = {"127.0.0.1", utils.trim(portno)}
-    new_conn = true
+    log.msg("No active connection to a nrepl session. Aborting")
   end
 
+  if obj.id == nil then
+    obj.id = utils.ulid()
+  end
+
+  core.register_callback(conn, handler, obj.id)
+
+  vim.api.nvim_call_function("AcidSendNrepl", {obj, conn})
+
+end
+
+core.register_callback = function(conn, handler, session)
   core.indirection[session] = {
     fn = handler,
     conn = conn
   }
-
-  vim.api.nvim_call_function("AcidSendNrepl", {obj,
-      "require('acid').callback(" .. session .. ", _A)",
-      conn,
-      "lua"
-    })
-
-  if new_conn then
-    connections:select(pwd, connections:add(new_conn))
-  end
+  return session
 end
 
 return core

@@ -10,82 +10,53 @@ from acid.nvim import (
 
 from acid.pure import ns_to_path
 from acid.nvim.log import log_info, log_debug, fh
-from acid.session import send, SessionHandler
+from acid.session import ThinSession
 import os
 
 def get(ls, ix, default=None):
     return len(ls) > ix and ls[ix] or default
 
-def lua(nvim, lua_cmd):
-    def impl(msg, *_):
-        nvim.funcs.luaeval(lua_cmd, msg)
-
-    return impl
-
-def vim(nvim, vim_fn):
-    def impl(msg, *_):
-        nvim.call(vim_fn, msg)
-
-    return impl
-
 def should_finalize(msg):
-    return ('status' in msg and
-             not set(msg['status']).intersection({'eval-error', }))
-
-def new_handler(nvim, handler_impl, finalizer):
-    def handler(msg, wc, key):
-        try:
-            nvim.async_call(lambda: handler_impl(msg, wc, key))
-        finally:
-            if should_finalize(msg):
-                finalizer(msg, wc, key)
-
-    return handler
-
-handlers = {
-    "lua": lua,
-    "vim": vim
-}
-
-def partial_handler(nvim, handler):
-    def impl(finalizer):
-        return new_handler(nvim, handler, finalizer)
-    return impl
+    return 'status' in msg
 
 @neovim.plugin
 class Acid(object):
 
-    def __init__(self, nvim):
-        log_handler = new_handler(
-            nvim,
-            lambda msg, *_: not "changed-namespaces" in msg and log_info(msg),
-            lambda *_: False
-        )
+    def partial_handler(self, finalizer):
+        nvim = self.nvim
+        def handler(msg, wc, key):
+            try:
+                nvim.async_call(
+                    lambda: nvim.exec_lua(
+                        "require('acid').callback(...)",
+                        msg)
+                )
+                log_info(msg)
+            finally:
+                if should_finalize(msg):
+                    finalizer(msg, wc, key)
 
+        return handler
+
+    def __init__(self, nvim):
         self.nvim = nvim
-        self.session_handler = SessionHandler(log_handler)
+        self.session_handler = ThinSession()
+
+        self.nvim.exec_lua("acid = require('acid')")
+        self.nvim.exec_lua("connections = require('acid.connections')")
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
-        nvim = self.nvim
-        payload = data[0]
-        fn = data[1] # fn name
-        addr = get(data, 2)
-        addr_managed_by_acid = addr != None
-        addr = addr or repl_host_address(nvim)
+        payload, addr = data
         url = format_addr(*addr)
-        backend = get(data, 3) or "lua"
+        success, msg = self.session_handler.send(url, payload,
+                                                 self.partial_handler)
 
-        handler_impl = handlers[backend](nvim, fn)
-        handler = partial_handler(nvim, handler_impl)
+        if not success:
+            self.nvim.api.err_writeln(
+                "Error on nrepl connection: {}".format(msg))
 
-        success, msg = send(self.session_handler, url, [handler], payload)
-
-        if not success and addr_managed_by_acid:
-            nvim.api.err_writeln(
-            "Dropping connection on {} due to error when sending: {}".format(
-                addr[1], msg))
-            nvim.funcs.luaeval("require('acid.connections'):remove(_A)", addr)
+        return success
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
@@ -102,11 +73,9 @@ class Acid(object):
 
     @neovim.function("AcidLog", sync=False)
     def acid_log(self, args):
-        ns, level, message, *_ = args
+        ns, message, *_ = args
         logger = logging.getLogger(ns)
-        logger.addHandler(fh)
-        logger.setLevel(logging.DEBUG)
-        getattr(logger , level.upper())(message)
+        logger.debug(message)
 
     @neovim.function("AcidAlternateFiles", sync=True)
     def acid_alternate_file(self, args):

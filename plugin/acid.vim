@@ -1,21 +1,40 @@
+if !exists("g:acid_skip_test_paths")
+  let g:acid_skip_test_paths = 1
+endif
+
 let g:acid_no_default_keymappings = get(g:, 'acid_no_default_keymappings', 0)
+
+function! AcidWrappedSend(payload, handler)
+  let conn = luaeval("require('acid.connections').attempt_get(_A)", getcwd())
+  if type(conn) == type(v:null)
+    call luaeval("require('acid.log').msg(_A)", "No active connection to a nrepl session. Aborting")
+    return
+  endif
+
+  let luafn = "function(data) vim.api.nvim_call_function(_A[2], {data}) end"
+
+  call luaeval("require('acid.core').register_callback(_A[1], ".luafn.", _A[3])", [conn, a:handler, a:payload.id])
+  call AcidSendNrepl(a:payload, conn)
+endfunction
 
 function! s:require()
   if !luaeval("require('acid').connected()", v:null)
     return
   endif
 
-  if exists("g:acid_alt_test_paths")
-    let test_paths = add(g:acid_alt_test_paths, "test")
-  else
-    let test_paths = ["test"]
-  endif
-
-  for test_path in test_paths
-    if expand("%") =~ ".*".test_path.".*"
-      return
+  if g:acid_skip_test_paths
+    if exists("g:acid_alt_test_paths")
+      let test_paths = add(g:acid_alt_test_paths, "test")
+    else
+      let test_paths = ["test"]
     endif
-  endfor
+
+    for test_path in test_paths
+      if expand("%") =~ ".*".test_path.".*"
+        return
+      endif
+    endfor
+  endif
   let ns = AcidGetNs()
 
   call luaeval("require('acid.features').do_require(_A)", ns)

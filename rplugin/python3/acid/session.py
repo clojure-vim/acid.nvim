@@ -13,7 +13,6 @@ from acid.nvim import log
 
 def finalize_watch(_, wc, key):
     wc.unwatch(key)
-    log.log_info("stopped watching key {}", key)
 
 class SessionHandler(object):
 
@@ -50,9 +49,8 @@ class SessionHandler(object):
 
         conn.watch(watcher_key, matches, handler)
 
-    def send(self, url, data, handlers):
+    def send(self, url, data):
         conn = self.get_or_create(url)
-        log.log_info('sending data -> {}', str(data))
 
         try:
             conn.send(data)
@@ -63,8 +61,10 @@ class SessionHandler(object):
             del self.sessions[url]
             return False, str(e)
 
-
 def send(session, url, handlers, data, matcher={}):
+    if not isinstance(session, SessionHandler):
+        return
+
     msg_id = data.get('id', uuid.uuid4().hex)
     data.update({"id": msg_id})
 
@@ -74,3 +74,31 @@ def send(session, url, handlers, data, matcher={}):
         session.add_atomic_watch(url, msg_id, handler, matcher)
 
     return session.send(url, data, handlers)
+
+class ThinSession(object):
+
+    def __init__(self, default_handler = None):
+        self.sessions = {}
+
+    def get_or_create(self, url):
+        if url not in self.sessions:
+            conn = nrepl.connect(url)
+            wconn = nrepl.WatchableConnection(conn)
+
+            self.sessions[url] = wconn
+            return wconn
+
+        return self.sessions[url]
+
+    def send(self, url, data, handler_fn):
+        conn = self.get_or_create(url)
+
+        watcher_key = "{}-watcher".format(data['id'])
+        conn.watch(watcher_key, {"id": data['id']}, handler_fn(finalize_watch))
+        try:
+            conn.send(data)
+            log.log_info('sent -> {}', str(data))
+            return True, ""
+        except Exception as e:
+            log.log_error('failed to send data: {} -  {}', e, str(data))
+            return False, str(e)

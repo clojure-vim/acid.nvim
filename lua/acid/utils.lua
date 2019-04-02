@@ -111,6 +111,60 @@ utils.split_lines = function(txt)
   return result
 end
 
+utils.random = function(sz)
+  local gen = {
+    [[head -c 100 /dev/urandom]],
+    [[md5sum]],
+    [[awk '{print toupper($1)}']],
+    [[xargs -I{} echo "obase=10; ibase=16; {}"]],
+    [[bc]] ,
+    [[tr '\n' ' ']],
+    [[sed 's/\\* //g']],
+  }
+
+  local random = vim.api.nvim_call_function("system", {
+      table.concat(gen, " | ")
+    })
+
+  return tonumber(random:sub(1, sz))
+end
+
+utils.uuid = function()
+ return vim.api.nvim_call_function("AcidNewUUID", {})
+end
+
+utils.ulid = require("acid.extra.ulid")
+
+utils.keys = function(tbl)
+  local new = {}
+  for k, _ in pairs(tbl) do
+    table.insert(new, k)
+  end
+  return new
+end
+
+utils.LRU = function(sz)
+  return {
+    __newindex = function(tbl, key, value)
+      local lru = rawget(tbl, "__lru_tbl")
+      if lru == nil then
+        lru = {}
+        rawset(tbl, "__lru_tbl", lru)
+      end
+
+      table.insert(lru, key)
+
+      if (#utils.keys(lru) - 1 >= sz) then
+        local old = table.remove(lru, 1)
+        rawset(tbl, old, nil)
+      end
+
+      rawset(tbl, "__lru_tbl", lru)
+
+      rawset(tbl, key, value)
+    end
+  }
+end
 
 return utils
 

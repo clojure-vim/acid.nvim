@@ -22,14 +22,14 @@ def current_path(nvim):
 
 
 def path_to_ns(nvim, fpath=None, force=False):
-    log_debug("fpath is {}", fpath)
     if not fpath:
         fpath = nvim.funcs.expand("%:p:r")
 
     if fpath in path_ns_cache and not force:
         ns = path_ns_cache[fpath]
-        log_debug("Hitting cache for ns '{}'", ns)
         return ns
+
+    log_debug("Namespace is not cached. Finding from path")
 
     stop_paths = get_stop_paths(nvim)
     ns = pure.path_to_ns(fpath, stop_paths)
@@ -50,22 +50,17 @@ def repl_host_address(nvim):
     if path[-1] != "/":
         path = path + "/"
 
-    ix = nvim.funcs.luaeval(
-        "require('acid.connections').current[_A]",
-        path)
-
-    if ix != None:
-        connection = nvim.funcs.luaeval(
-        "require('acid.connections').store[_A]",
-        ix)
-        log_debug("Return from lua: {}", str(connection))
-
+    connection = nvim.lua.connections.get(path)
+    if connection is not None:
         return connection
 
-
-    host = nvim.vars.get('acid_lein_host', '127.0.0.1')
+    log_debug("Failed to connect from lua connections.")
+    host = nvim.vars.get('acid_nrepl_host', '127.0.0.1')
     try:
-        return [host, get_port_no(nvim)]
+        addr = [host, get_port_no(nvim)]
+        nvim.lua.connections.set(path, addr)
+        log_debug("Found a .nrepl-port file, using that")
+        return addr
     except:
         return None
 
