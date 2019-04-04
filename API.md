@@ -28,7 +28,7 @@ Return active connection for the given path
 *pwd* **(string)**: path (usually project root).
 
 
-**({string,string})** Connection tuple with ip and port or nil.
+**(string)** Id of the current connection for the path or nil.
 
 
 ## `acid.connections.get(pwd)`
