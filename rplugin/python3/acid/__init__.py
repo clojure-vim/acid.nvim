@@ -24,9 +24,7 @@ def partial_handler(nvim):
         def handler(msg, wc, key):
             try:
                 nvim.async_call(
-                    lambda: nvim.exec_lua(
-                        "require('acid').callback(...)",
-                        msg)
+                    lambda: nvim.lua.acid.callback(msg)
                 )
                 log_info(msg)
             finally:
@@ -44,7 +42,6 @@ class Acid(object):
         self.session_handler = ThinSession()
 
         self.nvim.exec_lua("acid = require('acid')")
-        self.nvim.exec_lua("connections = require('acid.connections')")
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
