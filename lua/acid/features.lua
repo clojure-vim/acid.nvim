@@ -62,6 +62,9 @@ features.eval_expr = function(mode, ns)
     payload.code = table.concat(form, "\n")
   elseif mode == "symbol" then
     payload.code = forms.symbol_under_cursor()
+  elseif mode == "top" then
+    local form = forms.form_under_cursor(true)
+    payload.code = table.concat(form, "\n")
   else
     local lines = forms.form_from_motion(mode)
     payload.code = table.concat(lines, "\n")

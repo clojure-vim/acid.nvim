@@ -167,8 +167,10 @@ Refactor the current file so the `(:require ...)` form is sorted.
 # acid.forms
 Forms extraction
 
-## `acid.forms.get_form_boundaries()`
+## `acid.forms.get_form_boundaries([top])`
 Returns the coordinates for the boundaries of the current form
+
+*top* **(boolean)**: if true, recursively searches for top level.
 
 
 **(table)** coordinates {from = {row,col}, to = {row,col}}

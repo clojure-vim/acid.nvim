@@ -73,14 +73,15 @@ function! AcidJobHandler(id, data, stream)
   call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
 endfunction
 
-map <Plug>(acid-go-to)        <Cmd>lua require("acid.features").go_to()<CR>
-map <Plug>(acid-docs)         <Cmd>lua require("acid.features").docs()<CR>
-map <Plug>(acid-eval-cmdline) <Cmd>call AcidSendEval("eval_cmdline")<CR>
-map <Plug>(acid-motion-op)    <Cmd>set opfunc=AcidMotion<CR>g@
-map <Plug>(acid-eval-symbol)  <Cmd>call AcidMotion("symbol")<CR>
-map <Plug>(acid-eval-visual)  <Cmd>call AcidMotion("visual")<CR>
-map <Plug>(acid-eval-expr)    <Cmd>lua require("acid.features").eval_expr()<CR>
-map <Plug>(acid-eval-print)   <Cmd>call AcidSendEval("eval_print")<CR>
+map <Plug>(acid-go-to)         <Cmd>lua require("acid.features").go_to()<CR>
+map <Plug>(acid-docs)          <Cmd>lua require("acid.features").docs()<CR>
+map <Plug>(acid-eval-cmdline)  <Cmd>call AcidSendEval("eval_cmdline")<CR>
+map <Plug>(acid-motion-op)     <Cmd>set opfunc=AcidMotion<CR>g@
+map <Plug>(acid-eval-symbol)   <Cmd>call AcidMotion("symbol")<CR>
+map <Plug>(acid-eval-visual)   <Cmd>call AcidMotion("visual")<CR>
+map <Plug>(acid-eval-top-expr) <Cmd>lua require("acid.features").eval_expr("top")<CR>
+map <Plug>(acid-eval-expr)     <Cmd>lua require("acid.features").eval_expr()<CR>
+map <Plug>(acid-eval-print)    <Cmd>call AcidSendEval("eval_print")<CR>
 
 map <Plug>(acid-virtualtext-clear-line) <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<CR>
 map <Plug>(acid-virtualtext-toggle)     <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<CR>
@@ -110,6 +111,7 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> cp     <Plug>(acid-motion-op)
     autocmd FileType clojure vmap <buffer> <silent> cp     <Plug>(acid-eval-visual)
     autocmd FileType clojure nmap <buffer> <silent> cps    <Plug>(acid-eval-symbol)
+    autocmd FileType clojure nmap <buffer> <silent> cpt    <Plug>(acid-eval-top-expr)
     autocmd FileType clojure nmap <buffer> <silent> cpp    <Plug>(acid-eval-expr)
     autocmd FileType clojure nmap <buffer> <silent> cqp    <Plug>(acid-eval-print)
 
