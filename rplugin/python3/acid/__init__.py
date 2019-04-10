@@ -19,17 +19,12 @@ def get(ls, ix, default=None):
 def should_finalize(msg):
     return 'status' in msg
 
-@neovim.plugin
-class Acid(object):
-
-    def partial_handler(self, finalizer):
-        nvim = self.nvim
+def partial_handler(nvim):
+    def fn(finalizer):
         def handler(msg, wc, key):
             try:
                 nvim.async_call(
-                    lambda: nvim.exec_lua(
-                        "require('acid').callback(...)",
-                        msg)
+                    lambda: nvim.lua.acid.callback(msg)
                 )
                 log_info(msg)
             finally:
@@ -37,20 +32,23 @@ class Acid(object):
                     finalizer(msg, wc, key)
 
         return handler
+    return fn
+
+@neovim.plugin
+class Acid(object):
 
     def __init__(self, nvim):
         self.nvim = nvim
         self.session_handler = ThinSession()
 
         self.nvim.exec_lua("acid = require('acid')")
-        self.nvim.exec_lua("connections = require('acid.connections')")
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
         payload, addr = data
         url = format_addr(*addr)
         success, msg = self.session_handler.send(url, payload,
-                                                 self.partial_handler)
+                                                 partial_handler(self.nvim))
 
         if not success:
             self.nvim.api.err_writeln(
@@ -60,7 +58,7 @@ class Acid(object):
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
-        return get_acid_ns(self.nvim, get(args, 0))
+        return get_acid_ns(self.nvim)
 
     @neovim.function("AcidFindFileInPath", sync=True)
     def find_fpath(self, args):
