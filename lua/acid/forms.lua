@@ -5,14 +5,16 @@
 local forms = {}
 
 --- Returns the coordinates for the boundaries of the current form
+-- @tparam[opt] boolean top if true, recursively searches for top level.
 -- @treturn table coordinates {from = {row,col}, to = {row,col}}
-forms.get_form_boundaries = function()
+forms.get_form_boundaries = function(top)
+  -- TODO Update once tree-sitter
   local to_filter, from_filter
   local curpos = vim.api.nvim_call_function("getcurpos", {})
   local last_parens = vim.api.nvim_call_function("strcharpart", {
       vim.api.nvim_call_function("getline", {curpos[2]}),
       curpos[3] - 1, 1
-  })
+    })
 
   if last_parens == ")" then
     to_filter = "nc"
@@ -20,6 +22,11 @@ forms.get_form_boundaries = function()
   else
     to_filter = "n"
     from_filter = "nbc"
+  end
+
+  if top then
+    to_filter = to_filter .. "r"
+    from_filter = from_filter .. "r"
   end
 
   local to = vim.api.nvim_call_function("searchpairpos", {"(", "", ")", to_filter})
