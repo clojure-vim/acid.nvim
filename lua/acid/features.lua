@@ -142,7 +142,11 @@ features.docs = function(symbol, ns)
       coords = coords,
       accessor = function(_, data)
         local lines = {}
-        table.insert(lines, data.ns .. "/" .. data.name)
+        if data.name ~= nil then
+          table.insert(lines, data.ns .. "/" .. data.name)
+        elseif data.member ~= nil then
+          table.insert(lines, data.member)
+        end
         for _, v in ipairs(data.eldoc) do
           table.insert(lines, "[" .. table.concat(v, " ") .. "]")
         end
