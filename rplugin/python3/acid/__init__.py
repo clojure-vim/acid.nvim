@@ -42,6 +42,7 @@ class Acid(object):
         self.session_handler = ThinSession()
 
         self.nvim.exec_lua("acid = require('acid')")
+        self.nvim.exec_lua("connections = require('acid.connections')")
 
     @neovim.function("AcidSendNrepl")
     def acid_eval(self, data):
