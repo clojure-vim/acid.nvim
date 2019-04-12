@@ -102,9 +102,10 @@ end
 
 --- Extracts the innermost form under the cursor
 -- @treturn string symbol under cursor
+-- @tparam[opt] boolean top if true, recursively searches for top level.
 -- @treturn table coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
-forms.form_under_cursor = function()
-  local coordinates = forms.get_form_boundaries()
+forms.form_under_cursor = function(opt)
+  local coordinates = forms.get_form_boundaries(opt)
 
   return forms.extract(coordinates)
 end

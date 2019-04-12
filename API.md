@@ -189,8 +189,10 @@ mode **(string)**: Motion mode or 'visual'
 **(table)** coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
 
 
-## `acid.forms.form_under_cursor()`
+## `acid.forms.form_under_cursor([top])`
 Extracts the innermost form under the cursor
+
+*top* **(boolean)**: if true, recursively searches for top level.
 
 
 **(string)** symbol under cursor
