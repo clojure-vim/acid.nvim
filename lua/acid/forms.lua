@@ -104,8 +104,8 @@ end
 -- @treturn string symbol under cursor
 -- @tparam[opt] boolean top if true, recursively searches for top level.
 -- @treturn table coordinates {from = {row,col}, to = {row,col}, bufnr = 1}
-forms.form_under_cursor = function(opt)
-  local coordinates = forms.get_form_boundaries(opt)
+forms.form_under_cursor = function(top)
+  local coordinates = forms.get_form_boundaries(top)
 
   return forms.extract(coordinates)
 end
