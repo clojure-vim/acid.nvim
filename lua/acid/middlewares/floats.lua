@@ -1,5 +1,4 @@
 -- luacheck: globals vim
-local forms = require("acid.forms")
 local utils = require("acid.utils")
 local floats = {}
 
@@ -55,8 +54,10 @@ floats.middleware = function(config)
 
       local pos = config:get_positions(lines)
 
-      config.winid = vim.api.nvim_open_win(config.buff, false, pos.width, pos.height, {
+      config.winid = vim.api.nvim_open_win(config.buff, false, {
         relative = pos.relative,
+        width = pos.width,
+        height = pos.height,
         row = pos.row,
         col = pos.col
       })
@@ -82,17 +83,18 @@ floats.middleware = function(config)
 end
 
 floats.set_cleaner = function(buffer)
-  vim.api.nvim_command(
-    [[au CursorMoved * once call luaeval('require("acid.middlewares.floats").close(]] ..
-    buffer ..
-    ")', v:null)"
-  )
+  for _, event in ipairs{"CursorMoved", "CursorMovedI"} do
+    vim.api.nvim_command(
+      "au " ..
+      event ..
+      " <buffer=" ..
+      buffer ..
+      [[> ++once call luaeval('require("acid.middlewares.floats").close(]] ..
+      buffer ..
+      ")', v:null)"
+    )
+end
 
-  vim.api.nvim_command(
-    [[au CursorMovedI * once call luaeval('require("acid.middlewares.floats").close(]] ..
-    buffer ..
-    ")', v:null)"
-  )
 end
 
 floats.close = function(buffer)
@@ -102,6 +104,8 @@ floats.close = function(buffer)
     vim.api.nvim_win_close(winid, true)
     floats.cache[buffer] = nil
   end
+
+  vim.api.nvim_command("delfunction! DynamicAcidSetCleaner" .. buffer)
 end
 
 return floats
