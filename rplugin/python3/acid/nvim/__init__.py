@@ -47,10 +47,9 @@ def get_port_no(nvim):
 def repl_host_address(nvim):
     path = current_path(nvim)
 
-    if path[-1] != "/":
-        path = path + "/"
-
-    connection = nvim.lua.connections.get(path)
+    connection = nvim.exec_lua(
+        "return require('acid.connections').get(...)", path
+    )
     if connection is not None:
         return connection
 
@@ -58,7 +57,8 @@ def repl_host_address(nvim):
     host = nvim.vars.get('acid_nrepl_host', '127.0.0.1')
     try:
         addr = [host, get_port_no(nvim)]
-        nvim.lua.connections.set(path, addr)
+        nvim.exec_lua(
+            "require('acid.connections').set(...)", path, addr, async_ = True)
         log_debug("Found a .nrepl-port file, using that")
         return addr
     except:
