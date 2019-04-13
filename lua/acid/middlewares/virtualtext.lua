@@ -1,4 +1,5 @@
 -- luacheck: globals vim
+local utils = require("acid.utils")
 local virtualtext = {}
 
 virtualtext.name = "virtualtext"
@@ -31,7 +32,10 @@ end
 
 virtualtext.middleware = function(_)
   return function(middleware)
-    return function(data)
+    return function(data, calls)
+      if utils.contains("floats", calls) then
+        return middleware(data, calls)
+      end
       local cb = vim.api.nvim_get_current_buf()
       local ln = vim.api.nvim_call_function("line", {"."}) - 1
       local key = tostring(cb) .. "/" .. tostring(ln)
@@ -66,7 +70,7 @@ virtualtext.middleware = function(_)
         -- TODO split_lines
         vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, vt, {})
       end
-      return middleware(data)
+      return middleware(data, table.insert(calls, virtualtext.name))
     end
   end
 end

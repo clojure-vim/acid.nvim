@@ -20,9 +20,9 @@ clipboard.config = {
 
 clipboard.set = function(config)
   return function(middleware)
-    return function(data)
+    return function(data, calls)
       vim.api.nvim_call_function("setreg", {config.register, config.accessor(data), config.options})
-      return middleware(data)
+      return middleware(data, table.insert(calls, clipboard.name))
     end
   end
 end

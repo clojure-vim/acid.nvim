@@ -78,6 +78,11 @@ features.eval_expr = function(mode, ns)
       .print{}
       .clipboard{}
       .virtualtext{}
+      .floats{
+        post_config = function(config)
+          vim.api.nvim_win_set_option(config.winid, "ft", "clojure")
+        end
+    }
   ))
 end
 
@@ -137,6 +142,7 @@ features.docs = function(symbol, ns)
   end
 
   acid.run(ops.eldoc{ns = ns, symbol = symbol}:with_handler(middlewares
+    .virtualtext{}
     .floats{
       cb = cb,
       coords = coords,

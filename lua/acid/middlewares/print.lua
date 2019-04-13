@@ -2,9 +2,11 @@
 local do_print = {}
 local log = require("acid.log")
 
+do_print.name = "do_print"
+
 do_print.middleware = function(config)
   return function(middleware)
-    return function(data)
+    return function(data, calls)
       if data.out ~= nil then
         log.msg(data.out)
       end
@@ -18,7 +20,7 @@ do_print.middleware = function(config)
         log.msg(data.err)
       end
 
-      return middleware(data)
+      return middleware(data, table.insert(calls, do_print.name))
     end
   end
 end

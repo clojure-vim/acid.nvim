@@ -38,16 +38,10 @@ end
 acid.callback = function(ret)
   local proxy = core.indirection[ret.id]
 
-  --if proxy == nil then
-    ----TODO log
-  --end
-
-  local new_ret = proxy.fn(ret)
+  local new_ret = proxy.fn(ret, {})
 
   if type(new_ret) == "table" and new_ret.type == "command" then
     core.send(proxy.conn, new_ret:build())
-  else
-    return new_ret
   end
 end
 

@@ -166,5 +166,34 @@ utils.LRU = function(sz)
   }
 end
 
+utils.filter_iter = function(pred, coll)
+  local function fltr(c, ix)
+    local itm = c[ix]
+    local nix = ix + 1
+    if itm == nil then
+      return
+    elseif pred(itm) then
+      return nix, itm
+    else
+      return fltr(c, nix)
+    end
+  end
+
+  return fltr, coll, 1
+end
+
+utils.filter = function(pred, coll)
+  local iter = utils.filter_iter(pred, coll)
+  return iter(coll, 1)
+end
+
+utils.any = function(pred, coll)
+  return utils.filter(pred, coll) ~= nil
+end
+
+utils.contains = function(item, coll)
+  return utils.any(function(i) return i == item end, coll)
+end
+
 return utils
 

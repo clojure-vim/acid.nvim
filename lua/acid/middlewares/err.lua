@@ -3,9 +3,11 @@ local err = {}
 
 local cache = {}
 
+err.name ="err"
+
 err.middleware = function(config)
   return function(middleware)
-    return function(data)
+    return function(data, calls)
       local has_err = false
       if data.ex ~= nil then
         has_err = true
@@ -17,7 +19,7 @@ err.middleware = function(config)
       end
 
       if not has_err or not config.bail_out then
-        return middleware(data)
+        return middleware(data, table.insert(calls, err.name))
       end
     end
   end

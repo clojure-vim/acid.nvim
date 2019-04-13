@@ -67,7 +67,8 @@ end
 -- @treturn string Id of the current connection for the path or nil.
 connections.peek = function(pwd)
   pwd = pwd_to_key(pwd or vim.api.nvim_call_function("getcwd", {}))
-  return connections.current[pwd]
+  local result = connections.current[pwd]
+  return result
 end
 
 --- Return active connection for the given path

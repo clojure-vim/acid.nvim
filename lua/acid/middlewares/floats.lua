@@ -2,6 +2,7 @@
 local utils = require("acid.utils")
 local floats = {}
 
+floats.name = "floats"
 floats.cache = {}
 
 floats.config = {
@@ -29,21 +30,26 @@ floats.config = {
       col = 0,
       relative = "win"
     }
+  end,
+  post_config = function(config)
+      vim.api.nvim_win_set_option(config.winid, "number", false)
+      vim.api.nvim_win_set_option(config.winid, "relativenumber", false)
   end
+
 }
 
 -- FIXME Needs to close the window
 floats.middleware = function(config)
   if vim.api.nvim_open_win == nil then
     return function(middleware)
-      return function(data)
-        return middleware(data)
+      return function(data, calls)
+        return middleware(data, calls)
       end
     end
   end
 
   return function(middleware)
-    return function(data)
+    return function(data, calls)
       floats.close(config.cb)
       config.buff = vim.api.nvim_create_buf(false, true)
       vim.api.nvim_buf_set_option(config.buff, "bufhidden", "wipe")
@@ -62,8 +68,7 @@ floats.middleware = function(config)
         col = pos.col
       })
 
-      vim.api.nvim_win_set_option(config.winid, "number", false)
-      vim.api.nvim_win_set_option(config.winid, "relativenumber", false)
+      config:post_config()
 
       floats.cache[config.cb] = config.winid
 
@@ -77,7 +82,7 @@ floats.middleware = function(config)
         "50", "DynamicAcidSetCleaner" .. config.cb
       })
 
-      return middleware(data)
+      return middleware(data, table.insert(calls, flats.name))
     end
   end
 end

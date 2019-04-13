@@ -4,13 +4,15 @@ local log = require("acid.log")
 local utils = require("acid.utils")
 local go_to = {}
 
+go_to.name = "go_to"
+
 go_to.config = {
   open = "edit"
 }
 
 go_to.middleware = function(config)
   return function(middleware)
-    return function(data)
+    return function(data, calls)
       local fpath = nvim.nvim_call_function("AcidFindFileInPath", {data.file, data.resource})
 
       if fpath == nil then
@@ -32,7 +34,7 @@ go_to.middleware = function(config)
 
       nvim.nvim_set_option("scrolloff", cur_scroll)
 
-      return middleware(data)
+      return middleware(data, table.insert(calls, go_to.name))
     end
   end
 end
