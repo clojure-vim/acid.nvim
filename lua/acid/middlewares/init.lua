@@ -4,7 +4,6 @@ local nop = function(data) return data end
 
 local err = require("acid.middlewares.err").middleware{}(nop)
 
-
 local function builder(tbl, outer, key)
   local middleware = require("acid.middlewares." .. key)
   return function(config)

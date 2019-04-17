@@ -58,15 +58,16 @@ end
 features.eval_expr = function(mode, ns)
   local payload = {}
   if mode == nil then
-    local form = forms.form_under_cursor()
+    local form, coord = forms.form_under_cursor()
     payload.code = table.concat(form, "\n")
   elseif mode == "symbol" then
-    payload.code = forms.symbol_under_cursor()
+    local form, coord = forms.symbol_under_cursor()
+    payload.code = form
   elseif mode == "top" then
-    local form = forms.form_under_cursor(true)
+    local form, coord = forms.form_under_cursor(true)
     payload.code = table.concat(form, "\n")
   else
-    local lines = forms.form_from_motion(mode)
+    local lines, coord = forms.form_from_motion(mode)
     payload.code = table.concat(lines, "\n")
   end
   ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
@@ -74,10 +75,39 @@ features.eval_expr = function(mode, ns)
     payload.ns = ns
   end
 
+  local accessor = function(_, data)
+    if data.ex ~= nil then
+      return utils.split_lines(data.ex)
+    elseif data.err ~= nil then
+      return utils.split_lines(data.err)
+    elseif data.out ~= nil then
+      return utils.split_lines(data.out)
+    elseif data.value ~= nil and data.value ~= "nil" then
+      return utils.split_lines(data.value)
+    end
+  end
+
   acid.run(ops.eval(payload):with_handler(middlewares
       .print{}
       .clipboard{}
-      .virtualtext{}
+      .select{
+        select = function(data)
+          if #accessor(data) > 1 then
+            return middlewares.floats{
+              get_positions = function(_, lines)
+                return {
+                  width = 0,
+                  height = #lines,
+                  row = coord.from[1],
+                  col = 0
+                }
+              end
+            }(function(d) return d end)
+          else
+            return middlewares.virtualtext{}(function(d) return d end)
+        end
+
+      }
   ))
 end
 
