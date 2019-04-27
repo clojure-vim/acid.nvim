@@ -25,7 +25,7 @@ but evolved to be a proper clojure plugin for neovim.
 FUNCTIONS					*acid-functions*
 
 Here are documented the functions that are defined in viml. Please refer to
-*acid-remote-functions* for functions defined in python.
+|acid-remote-functions| for functions defined in python.
 
 
 :AcidFnAddRequire(require)			*AcidFnAddRequire()*
