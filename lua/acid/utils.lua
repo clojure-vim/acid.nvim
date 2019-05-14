@@ -130,6 +130,7 @@ utils.random = function(sz)
 end
 
 utils.uuid = function()
+  vim.api.nvim_err_writeln("Deprecated. Please use utils.ulid instead")
  return vim.api.nvim_call_function("AcidNewUUID", {})
 end
 
