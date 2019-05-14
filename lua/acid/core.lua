@@ -27,6 +27,7 @@ core.send = function(conn, obj, handler)
 
   if conn == nil then
     log.msg("No active connection to a nrepl session. Aborting")
+    return
   end
 
   if obj.id == nil then
