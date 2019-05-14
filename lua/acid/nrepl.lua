@@ -64,7 +64,8 @@ local build_cmd = function(obj)
   end
 
   if obj.alias ~= nil then
-    table.insert(opts, 4, obj.alias)
+    table.insert(opts, 4, "-C" .. table.concat(obj.alias, ""))
+    table.insert(opts, 4, "-R" .. table.concat(obj.alias, ""))
   end
 
   if obj.port ~= nil then
@@ -89,7 +90,6 @@ local build_cmd = function(obj)
   return opts
 end
 
-
 nrepl.cache = {}
 
 --- Default middlewares that will be used by the nrepl server
@@ -100,9 +100,10 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- @tparam table obj Configuration for the nrepl process to be spawn
 -- @tparam[opt] string obj.pwd Path where the nrepl process will be started
 -- @tparam[opt] table obj.middlewares List of middlewares.
--- @tparam[opt] string obj.alias alias on the local deps.edn
+-- @tparam[opt] string obj.alias aliases on the local deps.edn
 -- @tparam[opt] string obj.connect -c parameter for the nrepl process
 -- @tparam[opt] string obj.bind -b parameter for the nrepl process
+-- @tparam[opt] boolean obj.skip_autocmd don't fire an autocmd after starting this repl
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
   local pwd = obj.pwd or vim.api.nvim_call_function("getcwd", {})
@@ -141,6 +142,7 @@ nrepl.start = function(obj)
    local conn = {bind, obj.port}
 
    nrepl.cache[pwd] = {
+     skip_autocmd = obj.skip_autocmd,
      job = ret,
      addr = conn
    }
@@ -178,9 +180,11 @@ nrepl.handle = {
           local port = ln:match("%d+")
           connections.store[opts.ix][2] = port
           connections.select(opts.pwd, opts.ix)
-          log.msg("Connected on port", tostring(port))
-          vim.api.nvim_command("doautocmd User AcidConnected")
           pending[ch] = nil
+          if not nrepl.cache[opts.pwd].skip_autocmd then
+            log.msg("Connected on port", tostring(port))
+            vim.api.nvim_command("doautocmd User AcidConnected")
+          end
         end
       end
     end
