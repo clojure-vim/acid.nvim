@@ -19,9 +19,9 @@ end
 --- Stores connection for reuse later
 -- @tparam {string,string} addr Address tuple with ip and port.
 connections.add = function(addr)
-  local uuid = utils.uuid()
-  connections.store[uuid] = addr
-  return uuid
+  local ulid = utils.ulid()
+  connections.store[ulid] = addr
+  return ulid
 end
 
 connections.remove = function(addr)
