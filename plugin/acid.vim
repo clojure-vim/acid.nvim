@@ -121,6 +121,7 @@ if !g:acid_no_default_keymappings
   augroup END
 endif
 
+command! -nargs=0 AcidConnectNrepl lua require('acid.nrepl').start{}
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
 command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
 command! -nargs=1 AcidAddRequire call AcidFnAddRequire("[<args>]")
