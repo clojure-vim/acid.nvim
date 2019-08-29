@@ -118,7 +118,7 @@ symbols **({string,...})**: List of java symbols to be imported
 
 
 ## `acid.features.go_to([symbol[, ns]])`
-Navigates the the definition of the given symbol.
+Navigates the definition of the given symbol.
 
 *symbol* **(string)**: Symbol to navigate to. Defaults to symbol under
  cursor.
@@ -137,7 +137,7 @@ Shows the docstring of the given symbol.
 
 
 ## `acid.features.preload()`
-Inject some clojure files into the nrepl sesion.
+Inject some clojure files into the nrepl session.
 
 
 ## `acid.features.load_all_nss()`
