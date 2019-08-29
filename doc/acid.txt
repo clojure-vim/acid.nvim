@@ -45,7 +45,7 @@ REMOTE-FUNCTIONS				*acid-remote-functions*
 	Return the namespace of the current file.
 
 :AcidNewUUID()					*AcidNewUUID()*
-	Return a new universaly unique identifier.
+	Return a new universally unique identifier.
 
 :AcidLog(ns, level, message)			*AcidLog()*
 	Write a log message into acid's log file.

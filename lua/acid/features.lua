@@ -105,7 +105,7 @@ features.do_import = function(java_ns, symbols)
   ))
 end
 
---- Navigates the the definition of the given symbol.
+--- Navigates the definition of the given symbol.
 -- @tparam[opt] string symbol Symbol to navigate to. Defaults to symbol under
 -- cursor.
 -- @tparam[opt] string ns Namespace to be used when evaluating the code.
@@ -169,7 +169,7 @@ features.docs = function(symbol, ns)
 end
 
 
---- Inject some clojure files into the nrepl sesion.
+--- Inject some clojure files into the nrepl session.
 features.preload = function()
   local preload_commands = commands.preload{files = {"clj/acid/inject.clj"}}
   for _, cmd in ipairs(preload_commands) do
