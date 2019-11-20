@@ -71,6 +71,10 @@ function! AcidEvalInplace(mode)
   exec 'lua require("acid.features").eval_inplace("'.a:mode.'")'
 endfunction
 
+function! AcidEvalInplace(mode)
+  exec 'lua require("acid.features").eval_inplace("'.a:mode.'")'
+endfunction
+
 function! AcidSendEval(handler)
   let ns = AcidGetNs()
   if ns == ""
@@ -157,10 +161,9 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> cpp        <Plug>(acid-eval-expr)
     autocmd FileType clojure nmap <buffer> <silent> cqp        <Plug>(acid-eval-print)
 
-
-    autocmd FileType clojure nmap <buffer> <silent> <C-c>ta <Plug>(acid-run-tests)
-    autocmd FileType clojure nmap <buffer> <silent> <C-c>tt <Plug>(acid-run-tests-here)
-    autocmd FileType clojure nmap <buffer> <silent> <C-c>tj <Plug>(acid-run-the-tests)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>ta    <Plug>(acid-run-tests)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tt    <Plug>(acid-run-tests-here)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tj    <Plug>(acid-run-the-tests)
 
     autocmd FileType clojure nmap <buffer> <silent> cr         <Plug>(acid-replace-op)
     autocmd FileType clojure vmap <buffer> <silent> cr         <Plug>(acid-replace-visual)
