@@ -12,6 +12,16 @@ local acid = require("acid")
 -- TODO split features to folder
 local features = {}
 
+features.interrupt = function(session)
+  acid.run(ops.interrupt{session = session}:with_handler(middlewares.on_status{
+        condition = "interrupt",
+        action = function(_)
+          local log = require("acid.log")
+            log.msg("Interrupted!")
+        end
+    }))
+end
+
 --- Evaluate the given code and insert the result at the cursor position
 -- @tparam string code Clojure s-expression to be evaluated on the nrepl
 -- @tparam[opt] string ns Namespace to be used when evaluating the code.
@@ -45,8 +55,42 @@ end
 -- Defaults to current file's ns.
 features.eval_print = function(code, ns)
   acid.run(ops.eval{code = code, ns = ns}:with_handler(middlewares
-      .print{}
+      .print()
   ))
+end
+
+--- Evaluate the current form or the given motion.
+-- The result will replace the current form
+-- @tparam[opt] string mode motion mode
+-- @tparam[opt] string ns Namespace to be used when evaluating the code.
+-- Defaults to current file's ns.
+features.eval_inplace = function(mode, ns)
+  local payload = {}
+  local coord, form
+  if mode == nil then
+    form, coord = forms.form_under_cursor()
+    payload.code = table.concat(form, "\n")
+  elseif mode == "symbol" then
+    payload.code, coord = forms.symbol_under_cursor()
+  elseif mode == "top" then
+    form, coord = forms.form_under_cursor(true)
+    payload.code = table.concat(form, "\n")
+  else
+    lines, coord = forms.form_from_motion(mode)
+    payload.code = table.concat(lines, "\n")
+  end
+  ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
+  if ns ~= nil or ns ~= "" then
+    payload.ns = ns
+  end
+  acid.run(ops.eval(payload):with_handler(middlewares
+      .refactor(utils.merge(coord, {accessor = function(dt)
+        if dt.value ~= nil then
+          return dt.value
+        else
+          return dt.out
+        end
+      end}))))
 end
 
 --- Evaluate the current form or the given motion.
@@ -73,7 +117,6 @@ features.eval_expr = function(mode, ns)
   if ns ~= nil or ns ~= "" then
     payload.ns = ns
   end
-
   acid.run(ops.eval(payload):with_handler(middlewares
       .print{}
       .clipboard{}
@@ -224,6 +267,23 @@ features.sort_requires = function()
 
 end
 
+
+features.thread_first = function()
+  local lines, coords = forms.form_under_cursor()
+  local content = table.concat(lines, "\n")
+  acid.run(ops['iced-refactor-thread-first']{code = content}:with_handler(
+    middlewares.refactor(utils.merge(coords, {accessor = function(dt) return dt.code end}))
+  ))
+end
+
+features.thread_last = function()
+  local lines, coords = forms.form_under_cursor()
+  local content = table.concat(lines, "\n")
+  acid.run(ops['iced-refactor-thread-last']{code = content}:with_handler(
+    middlewares.refactor(utils.merge(coords, {accessor = function(dt) return dt.code end}))
+  ))
+end
+
 --- Refactor the current file so the `(:require ...)` form is sorted.
 features.clean_ns = function()
   local lines, coords = forms.form_under_cursor()
@@ -238,4 +298,5 @@ features.clean_ns = function()
     ))
 
 end
+
 return features
