@@ -1,6 +1,3 @@
-format: using built-in markdown
-format: using built-in markdown
-format: discount not found, using markdown
 # acid.connections
 low-level connection handler
 
