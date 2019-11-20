@@ -2,6 +2,10 @@ if !exists("g:acid_skip_test_paths")
   let g:acid_skip_test_paths = 1
 endif
 
+if !exists("g:acid_start_admin_nrepl")
+  let g:acid_start_admin_nrepl = 0
+endif
+
 let g:acid_no_default_keymappings = get(g:, 'acid_no_default_keymappings', 0)
 
 function! AcidWrappedSend(payload, handler)
@@ -121,6 +125,11 @@ if !g:acid_no_default_keymappings
   augroup END
 endif
 
+if g:acid_start_admin_nrepl
+  lua require('acid').admin_session_start()
+endif
+
+command! -nargs=0 AcidConnectNrepl lua require('acid.nrepl').start{}
 command! -nargs=? AcidClearVtext lua require('acid.middlewares.virtualtext').clear(<f-args>)
 command! -nargs=* AcidRequire lua require('acid.features').do_require(<f-args>)
 command! -nargs=1 AcidAddRequire call AcidFnAddRequire("[<args>]")

@@ -51,4 +51,29 @@ acid.callback = function(ret)
   end
 end
 
+--- Setup admin nrepl session
+-- This nrepl session should be used by plugins to deal with clojure code
+-- without injecting things in the user nrepl session
+-- or for things that clojure could deal with better while not having a 
+-- nrepl session to use.
+acid.admin_session_start = function()
+  local pwd = "/tmp/acid/admin/"
+  if require("acid.nrepl").cache[pwd] ~= nil then
+    return acid.admin_session()
+  end
+
+  local nrepl = require("acid.nrepl")
+  vim.api.nvim_call_function("mkdir", {pwd, "p"})
+  nrepl.start{pwd = pwd, skip_autocmd = true}
+end
+
+acid.admin_session = function()
+  local pwd = "/tmp/acid/admin/"
+  local conn = connections.get(pwd)
+  if conn ~= nil and conn[2] ~= nil then
+    return conn
+  end
+  return
+end
+
 return acid
