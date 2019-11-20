@@ -224,4 +224,18 @@ features.sort_requires = function()
 
 end
 
+--- Refactor the current file so the `(:require ...)` form is sorted.
+features.clean_ns = function()
+  local lines, coords = forms.form_under_cursor()
+  local fpath = vim.api.nvim_call_function('expand', {'%:p'})
+
+  coords.accessor = function(x)
+    return x.ns
+  end
+
+    acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
+      .refactor(coords)
+    ))
+
+end
 return features

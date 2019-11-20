@@ -53,6 +53,12 @@ function! AcidFnAddRequire(req)
   exec 'lua require("acid.features").add_require("'.a:req.'")'
 endfunction
 
+function! AcidCleanNs()
+  call search("(ns")
+  exec "normal vaf\<Esc>"
+  lua require("acid.features").clean_ns()
+endfunction
+
 function! AcidMotion(mode)
   exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
 endfunction
