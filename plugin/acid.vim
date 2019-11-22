@@ -60,11 +60,11 @@ function! AcidCleanNs()
 endfunction
 
 function! AcidMotion(mode)
-  exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
+  exec 'lua require("acid.features").eval_expr("'.a:mode.'", false)'
 endfunction
 
 function! AcidEvalInplace(mode)
-  exec 'lua require("acid.features").eval_inplace("'.a:mode.'")'
+  exec 'lua require("acid.features").eval_expr("'.a:mode.'", true)'
 endfunction
 
 function! AcidSendEval(handler)
@@ -105,8 +105,8 @@ map <Plug>(acid-eval-print)       <Cmd>call AcidSendEval("eval_print")<CR>
 map <Plug>(acid-replace-op)       <Cmd>set opfunc=AcidEvalInplace<CR>g@
 map <Plug>(acid-replace-symbol)   <Cmd>call AcidEvalInplace("symbol")<CR>
 map <Plug>(acid-replace-visual)   <Cmd>call AcidEvalInplace("visual")<CR>
-map <Plug>(acid-replace-top-expr) <Cmd>lua require("acid.features").eval_inplace("top")<CR>
-map <Plug>(acid-replace-expr)     <Cmd>lua require("acid.features").eval_inplace()<CR>
+map <Plug>(acid-replace-top-expr) <Cmd>lua require("acid.features").eval_expr("top", true)<CR>
+map <Plug>(acid-replace-expr)     <Cmd>lua require("acid.features").eval_expr(nil, true)<CR>
 
 map <Plug>(acid-thread-first)     <Cmd>lua require("acid.features").thread_first()<CR>
 map <Plug>(acid-thread-last)      <Cmd>lua require("acid.features").thread_last()<CR>

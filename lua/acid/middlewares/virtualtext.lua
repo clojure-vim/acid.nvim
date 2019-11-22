@@ -29,11 +29,11 @@ virtualtext.toggle = function()
 
 end
 
-virtualtext.middleware = function(_)
+virtualtext.middleware = function(config)
   return function(middleware)
     return function(data)
       local cb = vim.api.nvim_get_current_buf()
-      local ln = vim.api.nvim_call_function("line", {"."}) - 1
+      local ln = config.to[1] - 1
       local key = tostring(cb) .. "/" .. tostring(ln)
 
       if data.status then
@@ -58,13 +58,13 @@ virtualtext.middleware = function(_)
 
       if #vt > 0 then
         table.insert(vt, 1, {";; => ", "Comment"})
-
         table.insert(virtualtext.cache[key], vt)
 
         virtualtext.cache_index[key] = #virtualtext.cache[key]
 
         -- TODO split_lines
         vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, vt, {})
+
       end
       return middleware(data)
     end
