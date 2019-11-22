@@ -60,12 +60,15 @@ features.eval_print = function(code, ns)
 end
 
 --- Evaluate the current form or the given motion.
--- The result will replace the current form
+-- The result will be shown on a virtualtext next to the current form
+-- and also stored on the clipboard.
 -- @tparam[opt] string mode motion mode
+-- @tparam[opt] boolean replace whether it should replace the form with its result
 -- @tparam[opt] string ns Namespace to be used when evaluating the code.
 -- Defaults to current file's ns.
-features.eval_inplace = function(mode, ns)
+features.eval_expr = function(mode, replace, ns)
   local payload = {}
+  local midlws
   local coord, form
   if mode == nil then
     form, coord = forms.form_under_cursor()
@@ -83,46 +86,26 @@ features.eval_inplace = function(mode, ns)
   if ns ~= nil or ns ~= "" then
     payload.ns = ns
   end
-  acid.run(ops.eval(payload):with_handler(middlewares
-      .refactor(utils.merge(coord, {accessor = function(dt)
-        if dt.value ~= nil then
-          return dt.value
-        else
-          return dt.out
-        end
-      end}))))
-end
 
---- Evaluate the current form or the given motion.
--- The result will be shown on a virtualtext next to the current form
--- and also stored on the clipboard.
--- @tparam[opt] string mode motion mode
--- @tparam[opt] string ns Namespace to be used when evaluating the code.
--- Defaults to current file's ns.
-features.eval_expr = function(mode, ns)
-  local payload = {}
-  if mode == nil then
-    local form = forms.form_under_cursor()
-    payload.code = table.concat(form, "\n")
-  elseif mode == "symbol" then
-    payload.code = forms.symbol_under_cursor()
-  elseif mode == "top" then
-    local form = forms.form_under_cursor(true)
-    payload.code = table.concat(form, "\n")
+  if replace then
+    midlws = middlewares
+    .refactor(utils.merge(coord, {accessor = function(dt)
+      if dt.value ~= nil then
+        return dt.value
+      else
+        return dt.out
+      end
+    end}))
   else
-    local lines = forms.form_from_motion(mode)
-    payload.code = table.concat(lines, "\n")
-  end
-  ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
-  if ns ~= nil or ns ~= "" then
-    payload.ns = ns
-  end
-  acid.run(ops.eval(payload):with_handler(middlewares
+    midlws = middlewares
       .print{}
       .clipboard{}
-      .virtualtext{}
-  ))
+      .virtualtext(coord)
+    end
+
+  acid.run(ops.eval(payload):with_handler(midlws))
 end
+
 
 --- Sends a `(require '[...])` function to the nrepl.
 -- Will send an `AcidRequired` autocommand after complete.
