@@ -92,7 +92,7 @@ def get_stop_paths(nvim):
     return {'test', 'src', *test_paths(nvim), *src_paths(nvim)}
 
 
-def find_file_in_path(nvim, fname, resource):
+def find_file_in_path(nvim, fname, resource = None):
     log_debug("finding path")
     protocol, *_, fpath = fname.split(':')
 
