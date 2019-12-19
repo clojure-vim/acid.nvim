@@ -19,6 +19,7 @@ commands.list_usage = function(callback, symbol, ns, pwd, fname)
         name = data.name,
         line = math.floor(data.line or 1),
         column = math.floor(data.column or 1),
+        ['ignore-errors'] = "true",
         ['serialization-format'] = 'bencode'
       }:with_handler(callback)
   end

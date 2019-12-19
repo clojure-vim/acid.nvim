@@ -62,6 +62,7 @@ acid.admin_session_start = function()
   end
 
   if require("acid.nrepl").cache[admin_session_path] ~= nil then
+
     return acid.admin_session()
   end
 
@@ -75,6 +76,7 @@ end
 
 acid.admin_session = function()
   local conn = connections.get(admin_session_path)
+
   if conn ~= nil and conn[2] ~= nil then
     return conn
   end

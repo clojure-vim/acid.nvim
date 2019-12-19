@@ -91,19 +91,13 @@ code **(string)**: Clojure s-expression to be evaluated on the nrepl
  Defaults to current file's ns.
 
 
-## `acid.features.eval_inplace([mode[, ns]])`
+
+## `acid.features.eval_expr([mode[, replace[, ns]]])`
 Evaluate the current form or the given motion.
 
 *mode* **(string)**: motion mode
 
-*ns* **(string)**: Namespace to be used when evaluating the code.
- Defaults to current file's ns.
-
-
-## `acid.features.eval_expr([mode[, ns]])`
-Evaluate the current form or the given motion.
-
-*mode* **(string)**: motion mode
+*replace* **(boolean)**: whether it should replace the form with its result
 
 *ns* **(string)**: Namespace to be used when evaluating the code.
  Defaults to current file's ns.

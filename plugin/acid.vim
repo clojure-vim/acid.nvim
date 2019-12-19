@@ -60,7 +60,11 @@ function! AcidCleanNs()
 endfunction
 
 function! AcidMotion(mode)
-  exec 'lua require("acid.features").eval_expr("'.a:mode.'")'
+  exec 'lua require("acid.features").eval_expr("'.a:mode.'", false)'
+endfunction
+
+function! AcidEvalInplace(mode)
+  exec 'lua require("acid.features").eval_expr("'.a:mode.'", true)'
 endfunction
 
 function! AcidEvalInplace(mode)
@@ -105,8 +109,9 @@ map <Plug>(acid-eval-print)       <Cmd>call AcidSendEval("eval_print")<CR>
 map <Plug>(acid-replace-op)       <Cmd>set opfunc=AcidEvalInplace<CR>g@
 map <Plug>(acid-replace-symbol)   <Cmd>call AcidEvalInplace("symbol")<CR>
 map <Plug>(acid-replace-visual)   <Cmd>call AcidEvalInplace("visual")<CR>
-map <Plug>(acid-replace-top-expr) <Cmd>lua require("acid.features").eval_inplace("top")<CR>
-map <Plug>(acid-replace-expr)     <Cmd>lua require("acid.features").eval_inplace()<CR>
+
+map <Plug>(acid-replace-top-expr) <Cmd>lua require("acid.features").eval_expr("top", true)<CR>
+map <Plug>(acid-replace-expr)     <Cmd>lua require("acid.features").eval_expr(nil, true)<CR>
 
 map <Plug>(acid-thread-first)     <Cmd>lua require("acid.features").thread_first()<CR>
 map <Plug>(acid-thread-last)      <Cmd>lua require("acid.features").thread_last()<CR>
@@ -114,6 +119,10 @@ map <Plug>(acid-thread-last)      <Cmd>lua require("acid.features").thread_last(
 map <Plug>(acid-virtualtext-clear-line) <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(_A)", line('.'))<CR>
 map <Plug>(acid-virtualtext-toggle)     <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<CR>
 map <Plug>(acid-virtualtext-clear-all)  <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<CR>
+
+map <Plug>(acid-run-tests)       <Cmd>lua require("acid.features").run_test{}<CR>
+map <Plug>(acid-run-tests-here)  <Cmd>lua require("acid.features").run_test{['get-ns'] = true}<CR>
+map <Plug>(acid-run-the-tests)   <Cmd>lua require("acid.features").run_test{['get-symbol'] = true, ['get-ns'] = true}<CR>
 
 augroup acid
   autocmd!
@@ -147,6 +156,11 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> cpt        <Plug>(acid-eval-top-expr)
     autocmd FileType clojure nmap <buffer> <silent> cpp        <Plug>(acid-eval-expr)
     autocmd FileType clojure nmap <buffer> <silent> cqp        <Plug>(acid-eval-print)
+
+
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>ta <Plug>(acid-run-tests)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tt <Plug>(acid-run-tests-here)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tj <Plug>(acid-run-the-tests)
 
     autocmd FileType clojure nmap <buffer> <silent> cr         <Plug>(acid-replace-op)
     autocmd FileType clojure vmap <buffer> <silent> cr         <Plug>(acid-replace-visual)
