@@ -25,7 +25,7 @@ but evolved to be a proper clojure plugin for neovim.
 FUNCTIONS					*acid-functions*
 
 Here are documented the functions that are defined in viml. Please refer to
-*acid-remote-functions* for functions defined in python.
+|acid-remote-functions| for functions defined in python.
 
 
 :AcidFnAddRequire(require)			*AcidFnAddRequire()*
@@ -45,7 +45,7 @@ REMOTE-FUNCTIONS				*acid-remote-functions*
 	Return the namespace of the current file.
 
 :AcidNewUUID()					*AcidNewUUID()*
-	Return a new universaly unique identifier.
+	Return a new universally unique identifier.
 
 :AcidLog(ns, level, message)			*AcidLog()*
 	Write a log message into acid's log file.

@@ -91,6 +91,15 @@ code **(string)**: Clojure s-expression to be evaluated on the nrepl
  Defaults to current file's ns.
 
 
+## `acid.features.eval_inplace([mode[, ns]])`
+Evaluate the current form or the given motion.
+
+*mode* **(string)**: motion mode
+
+*ns* **(string)**: Namespace to be used when evaluating the code.
+ Defaults to current file's ns.
+
+
 ## `acid.features.eval_expr([mode[, ns]])`
 Evaluate the current form or the given motion.
 
@@ -118,7 +127,7 @@ symbols **({string,...})**: List of java symbols to be imported
 
 
 ## `acid.features.go_to([symbol[, ns]])`
-Navigates the the definition of the given symbol.
+Navigates the definition of the given symbol.
 
 *symbol* **(string)**: Symbol to navigate to. Defaults to symbol under
  cursor.
@@ -137,7 +146,7 @@ Shows the docstring of the given symbol.
 
 
 ## `acid.features.preload()`
-Inject some clojure files into the nrepl sesion.
+Inject some clojure files into the nrepl session.
 
 
 ## `acid.features.load_all_nss()`
@@ -159,6 +168,10 @@ req **(string)**: require namespace, such as `clojure.string`.
 
 
 ## `acid.features.sort_requires()`
+Refactor the current file so the `(:require ...)` form is sorted.
+
+
+## `acid.features.clean_ns()`
 Refactor the current file so the `(:require ...)` form is sorted.
 
 
@@ -238,6 +251,14 @@ Callback proxy for handling command responses
 ret: The response from nrepl
 
 
+## `acid.admin_session_start()`
+Setup admin nrepl session
+ This nrepl session should be used by plugins to deal with clojure code
+ without injecting things in the user nrepl session
+ or for things that clojure could deal with better while not having a 
+ nrepl session to use.
+
+
 ---
 
 # acid.nrepl
@@ -268,9 +289,10 @@ Parameters for table `obj` are:
 
 * *obj.pwd* **(string)**: Path where the nrepl process will be started
 * *obj.middlewares* **(table)**: List of middlewares.
-* *obj.alias* **(string)**: alias on the local deps.edn
+* *obj.alias* **(string)**: aliases on the local deps.edn
 * *obj.connect* **(string)**: -c parameter for the nrepl process
 * *obj.bind* **(string)**: -b parameter for the nrepl process
+* *obj.skip_autocmd* **(boolean)**: don't fire an autocmd after starting this repl
 
 **(boolean)** Whether it was possible to spawn a nrepl process
 
