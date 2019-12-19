@@ -91,6 +91,7 @@ code **(string)**: Clojure s-expression to be evaluated on the nrepl
  Defaults to current file's ns.
 
 
+
 ## `acid.features.eval_expr([mode[, replace[, ns]]])`
 Evaluate the current form or the given motion.
 

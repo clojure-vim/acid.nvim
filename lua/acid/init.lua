@@ -7,7 +7,7 @@ local core = require("acid.core")
 local connections = require("acid.connections")
 local utils = require("acid.utils")
 local sessions = require("acid.sessions")
-
+local admin_session_path
 local acid = {}
 
 --- Checks whether a connection exists for supplied path or not.
@@ -57,19 +57,26 @@ end
 -- or for things that clojure could deal with better while not having a 
 -- nrepl session to use.
 acid.admin_session_start = function()
-  local pwd = "/tmp/acid/admin/"
-  if require("acid.nrepl").cache[pwd] ~= nil then
+  if admin_session_path == nil then
+    admin_session_path = vim.fn.fnamemodify(vim.fn.findfile("admin_deps.edn", vim.api.nvim_get_option('rtp')), ":p:h")
+  end
+
+  if require("acid.nrepl").cache[admin_session_path] ~= nil then
+
     return acid.admin_session()
   end
 
   local nrepl = require("acid.nrepl")
-  vim.api.nvim_call_function("mkdir", {pwd, "p"})
-  nrepl.start{pwd = pwd, skip_autocmd = true}
+  nrepl.start{
+    pwd = admin_session_path,
+    skip_autocmd = true,
+    deps_file = admin_session_path .. "/admin_deps.edn"
+  }
 end
 
 acid.admin_session = function()
-  local pwd = "/tmp/acid/admin/"
-  local conn = connections.get(pwd)
+  local conn = connections.get(admin_session_path)
+
   if conn ~= nil and conn[2] ~= nil then
     return conn
   end
