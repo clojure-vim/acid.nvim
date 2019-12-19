@@ -57,7 +57,7 @@ class Acid(object):
 
     @neovim.function("AcidGetNs", sync=True)
     def acid_get_ns(self, args):
-        return get_acid_ns(self.nvim)
+        return get_acid_ns(self.nvim, *args)
 
     @neovim.function("AcidFindFileInPath", sync=True)
     def find_fpath(self, args):

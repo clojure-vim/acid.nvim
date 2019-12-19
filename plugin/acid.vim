@@ -115,6 +115,10 @@ map <Plug>(acid-virtualtext-clear-line) <Cmd>call luaeval("require('acid.middlew
 map <Plug>(acid-virtualtext-toggle)     <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<CR>
 map <Plug>(acid-virtualtext-clear-all)  <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<CR>
 
+map <Plug>(acid-run-tests)       <Cmd>lua require("acid.features").run_test{}<CR>
+map <Plug>(acid-run-tests-here)  <Cmd>lua require("acid.features").run_test{['get-ns'] = true}<CR>
+map <Plug>(acid-run-the-tests)   <Cmd>lua require("acid.features").run_test{['get-symbol'] = true, ['get-ns'] = true}<CR>
+
 augroup acid
   autocmd!
   autocmd BufWritePost *.clj call s:require()
@@ -147,6 +151,10 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> cpt        <Plug>(acid-eval-top-expr)
     autocmd FileType clojure nmap <buffer> <silent> cpp        <Plug>(acid-eval-expr)
     autocmd FileType clojure nmap <buffer> <silent> cqp        <Plug>(acid-eval-print)
+
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>ta <Plug>(acid-run-tests)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tt <Plug>(acid-run-tests-here)
+    autocmd FileType clojure nmap <buffer> <silent> <C-c>tj <Plug>(acid-run-the-tests)
 
     autocmd FileType clojure nmap <buffer> <silent> cr         <Plug>(acid-replace-op)
     autocmd FileType clojure vmap <buffer> <silent> cr         <Plug>(acid-replace-visual)

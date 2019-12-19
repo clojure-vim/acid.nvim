@@ -137,9 +137,7 @@ end
 -- @tparam[opt] string ns Namespace to be used when evaluating the code.
 -- Defaults to current file's ns.
 features.go_to = function(symbol, ns)
-  local sym = forms.symbol_under_cursor()
-
-  symbol = symbol or sym
+  symbol = symbol or forms.symbol_under_cursor()
   if ns == nil then
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
@@ -247,9 +245,7 @@ features.sort_requires = function()
     acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
       .refactor(coords)
     ))
-
 end
-
 
 features.thread_first = function()
   local lines, coords = forms.form_under_cursor()
@@ -279,7 +275,69 @@ features.clean_ns = function()
     acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
       .refactor(coords)
     ))
+end
 
+features.get_ns = function(fname)
+  local ns = nil
+  local lock = true
+  local attempts = 8
+
+  acid.run(ops.eval{
+      code = '(get-ns "' .. fname .. '")',
+      ns = "user"
+    }:with_handler(function(data)
+    if data.err ~= nil then
+      ns = data.value
+    end
+    lock = false
+    end), acid.admin_session())
+
+    while lock or attempts > 0 do
+      vim.api.nvim_command("sleep")
+      attempts = attempts - 1
+    end
+
+    return ns
+end
+
+features.retest = function()
+end
+
+features.run_test = function(opts)
+  local var_query = {}
+  local payload = {}
+
+  if opts['get-symbol'] then
+    var_query.search = forms.symbol_under_cursor()
+  elseif opts.symbol ~= nil then
+    var_query.search = opts.symbol
+  end
+
+  if opts['get-ns'] then
+    var_query['ns-query'] = {exactly = {vim.api.nvim_call_function("AcidGetNs", {})}}
+  elseif opts.ns ~= nil then
+    var_query['ns-query'] = {exaclty = {opts.ns}}
+  elseif opts.nss ~= nil then
+    var_query['ns-query'] = {exaclty = opts.nss}
+  end
+
+  if next(var_query) ~= nil then
+    payload['var-query'] = var_query
+  end
+
+
+  acid.run(ops['test-var-query'](payload):with_handler(middlewares.print{
+    accessor = function(data)
+      local ret
+      if data.summary ~= nil then
+        ret = ""
+        for k, v in pairs(data.summary) do
+          ret = ret .. k .. " → " .. v .. " "
+        end
+    end
+    return ret
+  end}.quickfix{}
+))
 end
 
 return features

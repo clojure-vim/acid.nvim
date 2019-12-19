@@ -5,8 +5,6 @@ utils.pack = function (...)
   return {n=select('#',...); ...}
 end
 
-
-
 utils.trim = vim.trim or function(str)
   return vim.api.nvim_call_function("trim", {str})
 end

@@ -11,7 +11,18 @@ go_to.config = {
 go_to.middleware = function(config)
   return function(middleware)
     return function(data)
-      local fpath = nvim.nvim_call_function("AcidFindFileInPath", {data.file, data.resource})
+
+      if utils.find(data.status, "no-info") then
+        log.msg("No information found")
+        return
+      end
+
+      local args = {data.file}
+      if data.resource ~= nil then
+        table.insert(args, data.resource)
+      end
+
+      local fpath = nvim.nvim_call_function("AcidFindFileInPath", args)
 
       if fpath == nil then
         log.msg("File not found (" .. data.file .. ").")
