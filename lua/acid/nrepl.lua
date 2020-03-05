@@ -14,9 +14,9 @@ local deps = {
   ['nrepl/nrepl'] = '{:mvn/version "0.6.0"}',
   ['org.clojure/clojurescript'] =  '{:mvn/version "1.10.439"}',
   ['cider/piggieback'] = '{:mvn/version "0.4.0"}',
-  ['cider/cider-nrepl'] = '{:mvn/version "0.22.0"}',
-  ['refactor-nrepl'] = '{:mvn/version "2.4.0"}',
-  ['iced-nrepl'] = '{:mvn/version "0.6.6"}'
+  ['cider/cider-nrepl'] = '{:mvn/version "0.24.0"}',
+  ['refactor-nrepl'] = '{:mvn/version "2.5.0"}',
+  ['iced-nrepl'] = '{:mvn/version "1.0.0"}'
 }
 
 --- List of supported middlewares and the wrappers to invoke when spawning a nrepl process.
