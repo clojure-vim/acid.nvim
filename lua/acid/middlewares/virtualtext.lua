@@ -25,6 +25,7 @@ virtualtext.toggle = function()
   end
 
   vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, possible_vts[current_ix], {})
+  vim.api.nvim__buf_redraw_range(cb, ln, ln)
   virtualtext.cache_index[key] = current_ix
 
 end
@@ -66,6 +67,7 @@ virtualtext.middleware = function(config)
 
         -- TODO split_lines
         vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, vt, {})
+        vim.api.nvim__buf_redraw_range(cb, ln, ln)
 
       end
       return middleware(data)
