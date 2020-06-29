@@ -91,8 +91,7 @@ class Acid(object):
             else:
                 paths = alt_paths(
                     rel_path, src, root_path,
-                    lambda f: "_".join(f.split('_')[:-1]),
-                    'src'
+                    lambda f: "_".join(f.split('_')[:-1])
                 )
         except Exception as e:
             log_debug("error: {}", e)
