@@ -67,10 +67,6 @@ function! AcidEvalInplace(mode)
   exec 'lua require("acid.features").eval_expr("'.a:mode.'", true)'
 endfunction
 
-function! AcidEvalInplace(mode)
-  exec 'lua require("acid.features").eval_inplace("'.a:mode.'")'
-endfunction
-
 function! AcidSendEval(handler)
   let ns = AcidGetNs()
   if ns == ""

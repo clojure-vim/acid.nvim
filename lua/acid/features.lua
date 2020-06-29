@@ -60,40 +60,6 @@ features.eval_print = function(code, ns)
 end
 
 --- Evaluate the current form or the given motion.
--- The result will replace the current form
--- @tparam[opt] string mode motion mode
--- @tparam[opt] string ns Namespace to be used when evaluating the code.
--- Defaults to current file's ns.
-features.eval_inplace = function(mode, ns)
-  local payload = {}
-  local coord, form
-  if mode == nil then
-    form, coord = forms.form_under_cursor()
-    payload.code = table.concat(form, "\n")
-  elseif mode == "symbol" then
-    payload.code, coord = forms.symbol_under_cursor()
-  elseif mode == "top" then
-    form, coord = forms.form_under_cursor(true)
-    payload.code = table.concat(form, "\n")
-  else
-    lines, coord = forms.form_from_motion(mode)
-    payload.code = table.concat(lines, "\n")
-  end
-  ns = ns or vim.api.nvim_call_function("AcidGetNs", {})
-  if ns ~= nil or ns ~= "" then
-    payload.ns = ns
-  end
-  acid.run(ops.eval(payload):with_handler(middlewares
-      .refactor(utils.merge(coord, {accessor = function(dt)
-        if dt.value ~= nil then
-          return dt.value
-        else
-          return dt.out
-        end
-      end}))))
-end
-
---- Evaluate the current form or the given motion.
 -- The result will be shown on a virtualtext next to the current form
 -- and also stored on the clipboard.
 -- @tparam[opt] string mode motion mode
@@ -132,6 +98,10 @@ features.eval_expr = function(mode, replace, ns)
     end}))
   else
     midlws = middlewares
+      .print{}
+      .clipboard{}
+      .virtualtext(coord)
+  end
 
       .print{}
       .clipboard{}
