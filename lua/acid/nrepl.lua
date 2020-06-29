@@ -130,6 +130,7 @@ nrepl.start = function(obj)
       cmd , {
         on_stdout = "AcidJobHandler",
         on_stderr = "AcidJobHandler",
+        on_exit = "AcidJobCleanup",
         cwd = pwd
       }
     })
@@ -165,8 +166,19 @@ nrepl.stop = function(obj)
 
   nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
   connections.unselect(pwd)
-  connections.remove(nrepl.cache[pwd].addr)
+  connections.remove(pwd, nrepl.cache[pwd].addr)
   nrepl.cache[obj.pwd] = nil
+end
+
+nrepl.cleanup = function(job_id)
+  nrepl.handle._store[job_id] = nil
+  local pwd = utils.search(nrepl.cache, function(obj)
+    return obj.job == job_id
+  end)
+
+  if pwd ~= nil then
+    nrepl.stop{pwd = pwd}
+  end
 end
 
 nrepl.handle = {

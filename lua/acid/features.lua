@@ -59,7 +59,6 @@ features.eval_print = function(code, ns)
   ))
 end
 
-
 --- Evaluate the current form or the given motion.
 -- The result will be shown on a virtualtext next to the current form
 -- and also stored on the clipboard.
@@ -99,6 +98,10 @@ features.eval_expr = function(mode, replace, ns)
     end}))
   else
     midlws = middlewares
+      .print{}
+      .clipboard{}
+      .virtualtext(coord)
+  end
 
   acid.run(ops.eval(payload):with_handler(midlws))
 end

@@ -25,6 +25,7 @@ virtualtext.toggle = function()
   end
 
   vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, possible_vts[current_ix], {})
+  vim.api.nvim__buf_redraw_range(cb, ln, ln)
   virtualtext.cache_index[key] = current_ix
 
 end
@@ -54,6 +55,8 @@ virtualtext.middleware = function(config)
           table.insert(vt, {data.out:gsub("\n", "\\n"), "String"})
       elseif data.value ~= nil and data.value ~= "nil" then
         table.insert(vt, {data.value, "Function"})
+      elseif data.value == "nil" then
+        table.insert(vt, {"nil", "Delimiter"})
       end
 
       if #vt > 0 then
@@ -64,6 +67,7 @@ virtualtext.middleware = function(config)
 
         -- TODO split_lines
         vim.api.nvim_buf_set_virtual_text(cb, virtualtext.ns, ln, vt, {})
+        vim.api.nvim__buf_redraw_range(cb, ln, ln)
 
       end
       return middleware(data)

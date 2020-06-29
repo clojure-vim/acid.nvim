@@ -51,6 +51,22 @@ utils.find = function(coll, val)
   return false
 end
 
+utils.search = function(coll, pred)
+  for key, v in pairs(coll) do
+    if pred(v, key) then
+      return key
+    end
+  end
+  for ix, v in ipairs(coll) do
+    if pred(v, ix) then
+      return ix
+    end
+  end
+  return nil
+end
+
+
+
 utils.map = function(tbl, fn)
   local new = {}
 

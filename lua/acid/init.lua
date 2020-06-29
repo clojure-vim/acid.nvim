@@ -54,7 +54,7 @@ end
 --- Setup admin nrepl session
 -- This nrepl session should be used by plugins to deal with clojure code
 -- without injecting things in the user nrepl session
--- or for things that clojure could deal with better while not having a 
+-- or for things that clojure could deal with better while not having a
 -- nrepl session to use.
 acid.admin_session_start = function()
   if admin_session_path == nil then
