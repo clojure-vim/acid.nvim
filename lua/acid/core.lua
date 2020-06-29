@@ -8,7 +8,7 @@ local utils = require("acid.utils")
 local log = require("acid.log")
 
 local core = {
-  indirection = setmetatable({}, utils.LRU(10))
+  indirection = setmetatable({}, utils.LRU(5))
 }
 
 --- Forward messages to the nrepl and registers the handler.
