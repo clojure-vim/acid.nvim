@@ -87,6 +87,11 @@ function! AcidJobHandler(id, data, stream)
   call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
 endfunction
 
+function! AcidJobCleanup(id, data, _)
+  call luaeval('require("acid.nrepl").cleanup(_A[1])', [a:id])
+endfunction
+
+
 map <Plug>(acid-interrupt)        <Cmd>lua require("acid.features").interrupt()<CR>
 map <Plug>(acid-go-to)            <Cmd>lua require("acid.features").go_to()<CR>
 map <Plug>(acid-go-to)            <Cmd>lua require("acid.features").go_to()<CR>
