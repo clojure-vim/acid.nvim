@@ -103,11 +103,6 @@ features.eval_expr = function(mode, replace, ns)
       .virtualtext(coord)
   end
 
-      .print{}
-      .clipboard{}
-      .virtualtext(coord)
-    end
-
   acid.run(ops.eval(payload):with_handler(midlws))
 end
 
@@ -343,6 +338,38 @@ features.run_test = function(opts)
     return ret
   end}.quickfix{}
 ))
+end
+
+
+features.thread_first = function()
+  local lines, coords = forms.form_under_cursor()
+  local content = table.concat(lines, "\n")
+  acid.run(ops['iced-refactor-thread-first']{code = content}:with_handler(
+    middlewares.refactor(utils.merge(coords, {accessor = function(dt) return dt.code end}))
+  ))
+end
+
+features.thread_last = function()
+  local lines, coords = forms.form_under_cursor()
+  local content = table.concat(lines, "\n")
+  acid.run(ops['iced-refactor-thread-last']{code = content}:with_handler(
+    middlewares.refactor(utils.merge(coords, {accessor = function(dt) return dt.code end}))
+  ))
+end
+
+--- Refactor the current file so the `(:require ...)` form is sorted.
+features.clean_ns = function()
+  local lines, coords = forms.form_under_cursor()
+  local fpath = vim.api.nvim_call_function('expand', {'%:p'})
+
+  coords.accessor = function(x)
+    return x.ns
+  end
+
+    acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
+      .refactor(coords)
+    ))
+
 end
 
 
