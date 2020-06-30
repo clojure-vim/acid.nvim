@@ -150,6 +150,8 @@ nrepl.start = function(obj)
 
   local ix = connections.add(conn)
 
+  nrepl.cache[pwd].id = ix
+
   pending[ret] = {pwd = pwd, ix = ix}
   return true
 end
@@ -158,15 +160,8 @@ end
 -- @tparam table obj Configuration for the nrepl process to be stopped
 -- @tparam string obj.pwd Path where the nrepl process was started
 nrepl.stop = function(obj)
-  local pwd = obj.pwd
-
-  if not utils.ends_with(pwd, "/") then
-    pwd = pwd .. "/"
-  end
-
-  nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
-  connections.unselect(pwd)
-  connections.remove(pwd, nrepl.cache[pwd].addr)
+  nvim.nvim_call_function("jobstop", {nrepl.cache[obj.pwd].job})
+  connections.remove(nrepl.cache[obj.pwd].id)
   nrepl.cache[obj.pwd] = nil
 end
 

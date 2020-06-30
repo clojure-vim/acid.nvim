@@ -24,33 +24,15 @@ connections.add = function(addr)
   return ulid
 end
 
-connections.remove = function(pwd, addr)
-  -- If removed address is current to a pwd
-  local key = connections.current[pwd]
-  local conn = connections.store[key]
-
-  -- Double-check if address is correct
-  if key ~= nil and conn ~= nil and conn[2] == addr[2] and conn[1] == addr[1] then
-    -- Then remove it from current pwd
-    connections.current[pwd] = nil
-    -- Remove it's definition
-    connections.store[key] = nil
-
-    -- And remove all other addresses that point to it
-    for ix, v in pairs(connections.current) do
-      if v == key then
-        connections.current[ix] = nil
-      end
-    end
-  else
-    -- Else, remove it from the connections if no address points to it
-    for i, v in pairs(connections.store) do
-      if v[2] == addr[2] and v[1] == addr[1] then
-        connections.store[i] = nil
-      end
+connections.remove = function(key)
+  -- Remove all addresses that point to id
+  for ix, v in pairs(connections.current) do
+    if v == key then
+      connections.current[ix] = nil
     end
   end
 
+  connections.store[key] = nil
 end
 
 --- Elects selected connection as primary (thus default) for a certain address
