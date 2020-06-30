@@ -85,6 +85,16 @@ connections.search = function(pwd)
   return nil
 end
 
+connections.reverse_lookup = function(conn)
+  for k, v in pairs(connections.store) do
+    if v[2] == conn[2] and v[1] == conn[1] then
+      return k
+    end
+  end
+
+  return nil
+end
+
 connections.attempt_get = function(pwd)
   local conn = connections.get(pwd)
   if conn == nil then
