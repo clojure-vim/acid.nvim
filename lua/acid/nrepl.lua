@@ -6,6 +6,7 @@ local nvim = vim.api
 local log = require("acid.log")
 local utils = require("acid.utils")
 local connections = require("acid.connections")
+local output = require("acid.output")
 
 local job_mapping = {}
 local nrepl = {}
@@ -104,6 +105,7 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- @tparam[opt] string obj.connect -c parameter for the nrepl process
 -- @tparam[opt] string obj.bind -b parameter for the nrepl process
 -- @tparam[opt] boolean obj.skip_autocmd don't fire an autocmd after starting this repl
+-- @tparam[opt] boolean obj.disable_output_capture disables output capturing.
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
   local pwd = obj.pwd or vim.api.nvim_call_function("getcwd", {})
@@ -200,6 +202,8 @@ nrepl.handle = {
         end
       end
     end
+
+    output.draw(job.conn, dt)
     table.insert(nrepl.handle._store[ch], dt)
   end,
   stderr = function(dt, ch)
