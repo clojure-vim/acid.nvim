@@ -47,5 +47,15 @@ sessions.new_session = function(connection_ix)
   core.send(conn, clone.payload(), handler)
 end
 
+sessions.reverse_lookup = function(session_id)
+  for k, v in pairs(sessions.store) do
+    for _, v2 in ipairs(v.list) do
+      if v2 == session_id then
+        return k
+      end
+    end
+  end
+end
+
 
 return sessions
