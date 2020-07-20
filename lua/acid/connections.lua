@@ -57,7 +57,7 @@ end
 -- @tparam[opt] string pwd path (usually project root).
 -- @treturn string Id of the current connection for the path or nil.
 connections.peek = function(pwd)
-  pwd = pwd_to_key(pwd or vim.api.nvim_call_function("getcwd", {}))
+  pwd = pwd_to_key(pwd or vim.fn.getcwd())
   return connections.current[pwd]
 end
 
@@ -76,9 +76,9 @@ end
 
 connections.search = function(pwd)
   pwd = pwd_to_key(pwd)
-  local fpath = vim.api.nvim_call_function("findfile", {pwd .. ".nrepl-port"})
+  local fpath = vim.fn.findfile(pwd .. ".nrepl-port")
   if fpath ~= "" then
-    local portno = table.concat(vim.api.nvim_call_function("readfile", {fpath}), "")
+    local portno = table.concat(vim.fn.readfile(fpath), "")
     local conn = {"127.0.0.1", utils.trim(portno)}
     return connections.add(conn)
   end
