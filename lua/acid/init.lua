@@ -8,6 +8,7 @@ local connections = require("acid.connections")
 local utils = require("acid.utils")
 local sessions = require("acid.sessions")
 local admin_session_path
+local has_bb
 local acid = {}
 
 --- Checks whether a connection exists for supplied path or not.
@@ -64,13 +65,26 @@ acid.admin_session_start = function()
     )
   end
 
+  if has_bb == nil then
+    has_bb = vim.fn.executable('bb') == 1
+  end
+
   if nrepl.cache[admin_session_path] ~= nil then
     return acid.admin_session()
   end
 
-  nrepl.bbnrepl{
-    pwd = admin_session_path,
-  }
+  if has_bb then
+    nrepl.bbnrepl{
+      pwd = admin_session_path,
+    }
+  else
+    nrepl.start{
+      pwd = admin_session_path,
+      skip_autocmd = true,
+      deps_file = admin_session_path .. "/admin_deps.edn"
+    }
+  end
+
 end
 
 acid.admin_session = function()
