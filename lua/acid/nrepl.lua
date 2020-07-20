@@ -140,10 +140,47 @@ nrepl.start = function(obj)
   nrepl.cache[pwd].id = conn_id
 
   job_mapping[ret] = {pwd = pwd, conn = conn_id, init = false}
-  if obj.disable_output_capture == false then
+
+  if not obj.disable_output_capture then
     output.buffer(conn_id)
   end
   return true
+end
+
+nrepl.bbnrepl = function(obj)
+  local pwd = utils.ensure_path(obj.pwd or vim.api.nvim_call_function("getcwd", {}))
+
+  obj.port = obj.port or "1667"
+
+  local cmd = {
+    "bb", "--nrepl-server", obj.port
+  }
+
+  local ret = nvim.nvim_call_function('jobstart', {
+      cmd , {
+        on_exit = "AcidJobCleanup",
+        cwd = pwd
+      }
+    })
+
+   if ret <= 0 then
+     -- TODO log, inform..
+     return false
+   end
+
+   local conn = {"127.0.0.1", obj.port}
+
+   nrepl.cache[pwd] = {
+     skip_autocmd = true,
+     job = ret,
+     addr = conn
+   }
+
+  local conn_id = connections.add(conn)
+  connections.select(obj.pwd, conn_id)
+
+  nrepl.cache[pwd].id = conn_id
+
 end
 
 --- Stops a nrepl process managed by acid
