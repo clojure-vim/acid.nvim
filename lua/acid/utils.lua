@@ -5,6 +5,13 @@ utils.pack = function (...)
   return {n=select('#',...); ...}
 end
 
+utils.ensure_path = function(pwd)
+  if not utils.ends_with(pwd, "/") then
+    pwd = pwd .. "/"
+  end
+  return pwd
+end
+
 
 
 utils.trim = vim.trim or function(str)

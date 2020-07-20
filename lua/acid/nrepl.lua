@@ -79,15 +79,6 @@ local build_cmd = function(obj)
     table.insert(opts, obj.bind)
   end
 
-  if obj.host ~= nil or obj.connect ~= nil then
-    table.insert(opts,"-c")
-  end
-
-  if obj.host ~= nil then
-    table.insert(opts,"-h")
-    table.insert(opts, obj.host)
-  end
-
   return opts
 end
 
@@ -102,17 +93,13 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- @tparam[opt] string obj.pwd Path where the nrepl process will be started
 -- @tparam[opt] table obj.middlewares List of middlewares.
 -- @tparam[opt] string obj.alias aliases on the local deps.edn
--- @tparam[opt] string obj.connect -c parameter for the nrepl process
+-- @tparam[opt] int obj.port -p parameter for the nrepl process
 -- @tparam[opt] string obj.bind -b parameter for the nrepl process
 -- @tparam[opt] boolean obj.skip_autocmd don't fire an autocmd after starting this repl
 -- @tparam[opt] boolean obj.disable_output_capture disables output capturing.
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
-  local pwd = obj.pwd or vim.api.nvim_call_function("getcwd", {})
-
-  if not utils.ends_with(pwd, "/") then
-    pwd = pwd .. "/"
-  end
+  local pwd = utils.ensure_path(obj.pwd or vim.api.nvim_call_function("getcwd", {}))
 
   local selected = obj.middlewares or nrepl.default_middlewares
   local bind = obj.bind
@@ -121,8 +108,6 @@ nrepl.start = function(obj)
     port = obj.port,
     alias = obj.alias,
     bind = obj.bind,
-    host = obj.host,
-    connect = obj.connect,
     deps_file = obj.deps_file
   }
 
@@ -139,7 +124,7 @@ nrepl.start = function(obj)
 
    if ret <= 0 then
      -- TODO log, inform..
-     return
+     return false
    end
 
    local conn = {bind, obj.port}
