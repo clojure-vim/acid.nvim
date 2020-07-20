@@ -43,7 +43,7 @@ core.send = function(connection, obj, handler)
   end
 
   if obj.code ~= nil then
-    output.draw(conn_id, {(obj.ns or "") .. "=> " .. obj.code})
+    output.draw(conn_id, (obj.ns or "") .. "=> " .. obj.code)
   end
 
   if obj.id == nil then
