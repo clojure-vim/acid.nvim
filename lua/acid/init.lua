@@ -57,24 +57,24 @@ end
 -- or for things that clojure could deal with better while not having a
 -- nrepl session to use.
 acid.admin_session_start = function()
+  local nrepl = require("acid.nrepl")
   if admin_session_path == nil then
-    admin_session_path = vim.fn.fnamemodify(vim.fn.findfile("admin_deps.edn", vim.api.nvim_get_option('rtp')), ":p:h")
+    admin_session_path = utils.ensure_path(
+      vim.fn.fnamemodify(vim.fn.findfile("admin_deps.edn", vim.api.nvim_get_option('rtp')), ":p:h")
+    )
   end
 
-  if require("acid.nrepl").cache[admin_session_path] ~= nil then
-
+  if nrepl.cache[admin_session_path] ~= nil then
     return acid.admin_session()
   end
 
-  local nrepl = require("acid.nrepl")
-  nrepl.start{
+  nrepl.bbnrepl{
     pwd = admin_session_path,
-    skip_autocmd = true,
-    deps_file = admin_session_path .. "/admin_deps.edn"
   }
 end
 
 acid.admin_session = function()
+
   local conn = connections.get(admin_session_path)
 
   if conn ~= nil and conn[2] ~= nil then
