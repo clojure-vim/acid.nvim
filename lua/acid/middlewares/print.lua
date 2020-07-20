@@ -26,9 +26,9 @@ do_print.middleware = function(config)
         end
       end
 
-      if utils.find(config.status, "namespace-not-found") then
+      if utils.find(data.status, "namespace-not-found") then
         log.msg("Namespace not found")
-      elseif utils.find(config.status, "error") then
+      elseif utils.find(data.status, "error") then
         log.msg("Error")
       end
 
