@@ -1,6 +1,7 @@
 -- luacheck: globals vim
 local connections = require("acid.connections")
 local ops = require("acid.ops")
+local utils = require("acid.utils")
 local core = require("acid.core")
 
 local pwd_to_key = function(pwd)

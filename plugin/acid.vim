@@ -6,6 +6,10 @@ if !exists("g:acid_start_admin_nrepl")
   let g:acid_start_admin_nrepl = 0
 endif
 
+if !exists("g:acid_no_require_on_save")
+  let g:acid_no_require_on_save = 0
+endif
+
 let g:acid_no_default_keymappings = get(g:, 'acid_no_default_keymappings', 0)
 
 function! AcidWrappedSend(payload, handler)
@@ -21,7 +25,10 @@ function! AcidWrappedSend(payload, handler)
   call AcidSendNrepl(a:payload, conn)
 endfunction
 
-function! s:require()
+function! <SID>require()
+  if g:acid_no_require_on_save || (exists("b:acid_no_require_on_save") && b:acid_no_require_on_save)
+    return
+  endif
   if !luaeval("require('acid').connected()", v:null)
     return
   endif
@@ -121,13 +128,17 @@ map <Plug>(acid-virtualtext-clear-line) <Cmd>call luaeval("require('acid.middlew
 map <Plug>(acid-virtualtext-toggle)     <Cmd>call luaeval("require('acid.middlewares.virtualtext').toggle()", v:null)<CR>
 map <Plug>(acid-virtualtext-clear-all)  <Cmd>call luaeval("require('acid.middlewares.virtualtext').clear(nil)", v:null)<CR>
 
+map <Plug>(acid-output-open)      <Cmd>call luaeval("require('acid.output').open()", v:null)<CR>
+map <Plug>(acid-output-close)     <Cmd>call luaeval("require('acid.output').close()", v:null)<CR>
+map <Plug>(acid-output-clear)     <Cmd>call luaeval("require('acid.output').clear()", v:null)<CR>
+
 map <Plug>(acid-run-tests)       <Cmd>lua require("acid.features").run_test{}<CR>
 map <Plug>(acid-run-tests-here)  <Cmd>lua require("acid.features").run_test{['get-ns'] = true}<CR>
 map <Plug>(acid-run-the-tests)   <Cmd>lua require("acid.features").run_test{['get-symbol'] = true, ['get-ns'] = true}<CR>
 
 augroup acid
   autocmd!
-  autocmd BufWritePost *.clj call s:require()
+  autocmd BufWritePost *.clj call <SID>require()
 
   autocmd User AcidConnected lua require("acid.sessions").new_session()
   autocmd User AcidConnected lua require("acid.features").preload()
@@ -171,6 +182,10 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure map <buffer> <silent> <C-c>ll     <Plug>(acid-virtualtext-clear-line)
     autocmd FileType clojure map <buffer> <silent> <C-c>ln     <Plug>(acid-virtualtext-toggle)
     autocmd FileType clojure map <buffer> <silent> <C-c>la     <Plug>(acid-virtualtext-clear-all)
+
+    autocmd FileType clojure map <buffer> <silent> <C-c>oo     <Plug>(acid-output-open)
+    autocmd FileType clojure map <buffer> <silent> <C-c>ox     <Plug>(acid-output-close)
+    autocmd FileType clojure map <buffer> <silent> <C-c>ol     <Plug>(acid-output-clear)
   augroup END
 endif
 

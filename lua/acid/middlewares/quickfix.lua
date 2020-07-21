@@ -30,7 +30,6 @@ quickfix.set = function(config)
                   '**/' .. assert.file,
                   false,
                   true)[1]
-                tap(fpath)
                 table.insert(qf, {
                   module = ns .. "/" .. test,
                   lnum  = assert.line,
@@ -42,7 +41,6 @@ quickfix.set = function(config)
             end
           end
         end
-        tap(qf)
         vim.fn.setqflist({}, 'r', {
             id = config.qflistid,
             items = qf

@@ -1,5 +1,6 @@
 -- luacheck: globals vim
 
+local connections = require("acid.connections")
 local output = {}
 
 local location = function(opts)
@@ -10,7 +11,6 @@ local location = function(opts)
     width = opts.width or 60,
     height = height,
     row = 0,
-    focusable = false,
     col = width - (opts.width or 60)
   }
 end
@@ -29,7 +29,7 @@ output.buffer = function(conn)
 end
 
 output.window = function(conn, opts)
-  local buf =  output.buffer(conn)
+  local buf = output.buffer(conn)
   local winnr = vim.fn.bufwinnr(buf)
   local winid
 
@@ -45,7 +45,7 @@ output.window = function(conn, opts)
   vim.api.nvim_set_current_win(winid)
 end
 
-output.close_window = function(conn, opts)
+output.close_window = function(conn)
   local buf = output.buffer(conn)
   local winnr = vim.fn.bufwinnr(buf)
 
@@ -55,14 +55,42 @@ output.close_window = function(conn, opts)
   end
 end
 
-
 output.draw = function(conn, lines)
   local buf = output.conn_to_buf[conn]
+
+  if type(lines) == "string" then
+    old = lines
+    lines = {}
+    old:gsub("[^\n]+", function(dt) table.insert(lines, dt) end)
+  end
   if buf == nil then
     return
   end
 
   vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+end
+
+
+output.open = function()
+  local conn = connections.peek()
+
+  output.window(conn)
+end
+
+output.close = function()
+  local conn = connections.peek()
+  output.close_window(conn)
+end
+
+output.clear = function(conn)
+  conn = conn or connections.peek()
+
+  local buf = output.conn_to_buf[conn]
+  if buf == nil then
+    return
+  end
+
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
 end
 
 return output
