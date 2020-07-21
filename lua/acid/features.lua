@@ -98,6 +98,7 @@ features.eval_expr = function(mode, replace, ns)
     end}))
   else
     midlws = middlewares
+      .output{}
       .print{}
       .clipboard{}
       .virtualtext(coord)

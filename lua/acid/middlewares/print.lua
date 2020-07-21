@@ -22,7 +22,7 @@ do_print.middleware = function(config)
       if config.accessor ~= nil then
         local msg = config.accessor(data)
         if msg ~= nil and msg ~= "" then
-          log.msg(config.accessor(data))
+          log.msg(msg)
         end
       end
 

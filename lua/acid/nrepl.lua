@@ -6,8 +6,9 @@ local nvim = vim.api
 local log = require("acid.log")
 local utils = require("acid.utils")
 local connections = require("acid.connections")
+local output = require("acid.output")
 
-local pending = {}
+local job_mapping = {}
 local nrepl = {}
 
 local deps = {
@@ -104,6 +105,7 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- @tparam[opt] string obj.connect -c parameter for the nrepl process
 -- @tparam[opt] string obj.bind -b parameter for the nrepl process
 -- @tparam[opt] boolean obj.skip_autocmd don't fire an autocmd after starting this repl
+-- @tparam[opt] boolean obj.disable_output_capture disables output capturing.
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
   local pwd = obj.pwd or vim.api.nvim_call_function("getcwd", {})
@@ -148,9 +150,14 @@ nrepl.start = function(obj)
      addr = conn
    }
 
-  local ix = connections.add(conn)
+  local conn_id = connections.add(conn)
 
-  pending[ret] = {pwd = pwd, ix = ix}
+  nrepl.cache[pwd].id = conn_id
+
+  job_mapping[ret] = {pwd = pwd, conn = conn_id, init = false}
+  if obj.disable_output_capture == false then
+    output.buffer(conn_id)
+  end
   return true
 end
 
@@ -158,15 +165,8 @@ end
 -- @tparam table obj Configuration for the nrepl process to be stopped
 -- @tparam string obj.pwd Path where the nrepl process was started
 nrepl.stop = function(obj)
-  local pwd = obj.pwd
-
-  if not utils.ends_with(pwd, "/") then
-    pwd = pwd .. "/"
-  end
-
-  nvim.nvim_call_function("jobstop", {nrepl.cache[pwd].job})
-  connections.unselect(pwd)
-  connections.remove(pwd, nrepl.cache[pwd].addr)
+  nvim.nvim_call_function("jobstop", {nrepl.cache[obj.pwd].job})
+  connections.remove(nrepl.cache[obj.pwd].id)
   nrepl.cache[obj.pwd] = nil
 end
 
@@ -185,21 +185,25 @@ nrepl.handle = {
   _store = {},
   stdout = function(dt, ch)
     nrepl.handle._store[ch] = nrepl.handle._store[ch] or {}
-    if pending[ch] ~= nil then
+    local job = job_mapping[ch]
+
+    if not job.init then
       for _, ln in ipairs(dt) do
         if string.sub(ln, 1, 20) == "nREPL server started" then
-          local opts = pending[ch]
           local port = ln:match("%d+")
-          connections.store[opts.ix][2] = port
-          connections.select(opts.pwd, opts.ix)
-          pending[ch] = nil
-          if not nrepl.cache[opts.pwd].skip_autocmd then
+          connections.store[job.conn][2] = port
+          connections.select(job.pwd, job.conn)
+          job_mapping[ch].init = true
+          if not nrepl.cache[job.pwd].skip_autocmd then
             log.msg("Connected on port", tostring(port))
             vim.api.nvim_command("doautocmd User AcidConnected")
           end
+          break
         end
       end
     end
+
+    output.draw(job.conn, dt)
     table.insert(nrepl.handle._store[ch], dt)
   end,
   stderr = function(dt, ch)
