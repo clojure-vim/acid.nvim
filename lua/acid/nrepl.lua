@@ -150,7 +150,7 @@ end
 nrepl.bbnrepl = function(obj)
   local pwd = utils.ensure_path(obj.pwd or vim.api.nvim_call_function("getcwd", {}))
 
-  obj.port = obj.port or "1667"
+  obj.port = obj.port or math.random(1024, 65535)
 
   local cmd = {
     "bb", "--nrepl-server", obj.port
