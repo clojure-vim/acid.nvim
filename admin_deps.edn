@@ -2,6 +2,6 @@
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
         nrepl/nrepl {:mvn/version "0.6.0"}
         cider/cider-nrepl {:mvn/version "0.24.0"}
-        refactor-nrepl {:mvn/version "2.5.0"}
-        iced-nrepl {:mvn/version "1.0.0"}
+        refactor-nrepl/refactor-nrepl {:mvn/version "2.5.0"}
+        iced-nrepl/iced-nrepl {:mvn/version "1.0.0"}
         org.clojure/tools.namespace {:mvn/version "0.3.1"}}}
