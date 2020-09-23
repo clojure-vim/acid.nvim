@@ -139,6 +139,7 @@ map <Plug>(acid-run-the-tests)   <Cmd>lua require("acid.features").run_test{['ge
 augroup acid
   autocmd!
   autocmd BufWritePost *.clj call <SID>require()
+  autocmd BufWritePost *.cljc call <SID>require()
 
   autocmd User AcidConnected lua require("acid.sessions").new_session()
   autocmd User AcidConnected lua require("acid.features").preload()
