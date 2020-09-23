@@ -4,6 +4,24 @@
 -- @module acid.forms
 local forms = {}
 
+forms.ns_pos = function()
+  local curpos = vim.api.nvim_win_get_cursor(0)
+  local from = vim.api.nvim_call_function("searchpos", {"(ns", "bcnw"})
+
+  vim.api.nvim_win_set_cursor(0, {from[1], from[2] - 1})
+
+  local pos = forms.get_form_boundaries(true)
+
+  vim.api.nvim_win_set_cursor(0, curpos)
+
+  return pos
+end
+
+forms.ns = function()
+  local coordinates = forms.ns_pos()
+  return forms.extract(coordinates)
+end
+
 --- Returns the coordinates for the boundaries of the current form
 -- @tparam[opt] boolean top if true, recursively searches for top level.
 -- @treturn table coordinates {from = {row,col}, to = {row,col}}
