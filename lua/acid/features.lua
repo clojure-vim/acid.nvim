@@ -119,7 +119,8 @@ features.do_require = function(ns, ...)
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
   acid.run(commands.req{ns = ns, mod = {...}}:with_handler(middlewares
-    .doautocmd{autocmd = "AcidRequired"}
+        .doautocmd{autocmd = "AcidRequired"}
+        .err{}
   ))
 end
 
@@ -129,7 +130,8 @@ end
 -- @tparam {string,...} symbols List of java symbols to be imported
 features.do_import = function(java_ns, symbols)
   acid.run(commands.import{java_ns = java_ns, symbols = symbols}:with_handler(middlewares
-    .doautocmd{autocmd = "AcidImported"}
+        .doautocmd{autocmd = "AcidImported"}
+        .err{}
   ))
 end
 
@@ -172,6 +174,12 @@ features.docs = function(symbol, ns)
           table.insert(lines, data.ns .. "/" .. data.name)
         elseif data.member ~= nil then
           table.insert(lines, data.member)
+        end
+        if data.eldoc == nil then
+          if utils.find(data.status, "no-eldoc") then
+          local log = require("acid.log")
+            log.msg("No documentation for symbol " .. symbol)
+          end
         end
         for _, v in ipairs(data.eldoc) do
           table.insert(lines, "[" .. table.concat(v, " ") .. "]")
@@ -220,12 +228,13 @@ features.add_require = function(req)
     if data.status ~= nil then
       return
     else
-      return ops['format-code']{
-        code = data.value
+      return ops.eval{
+        ns = "acid.inject",
+        code = '(format-code "' .. data.value .. '")'
       }:with_handler(middlewares
           .refactor(utils.merge({
           accessor = function(dt)
-            return dt['formatted-code']
+            return dt['out']
           end
         }, coords)))
     end
@@ -289,11 +298,11 @@ end
 
 --- Refactor the current file so the `(:require ...)` form is sorted.
 features.clean_ns = function()
-  local lines, coords = forms.form_under_cursor()
+  local _, coords = forms.ns()
   local fpath = vim.api.nvim_call_function('expand', {'%:p'})
 
-  coords.accessor = function(x)
-    return x.ns
+  coords.accessor = function(data)
+    return data.ns
   end
 
     acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares

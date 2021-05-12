@@ -16,7 +16,7 @@ err.middleware = function(config)
         table.insert(cache, data.err)
       end
 
-      if not has_err or not config.bail_out then
+      if not has_err or config.pass_through then
         return middleware(data)
       end
     end
