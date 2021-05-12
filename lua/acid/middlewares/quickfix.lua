@@ -15,7 +15,6 @@ quickfix.config.qflistid = vim.fn.getqflist({id = 0,
   title = "[acid] clojure.test failures",
 }).id
 
-
 quickfix.set = function(config)
   return function(middleware)
     return function(data)

@@ -23,8 +23,6 @@ core.send = function(connection, obj, handler)
     return
   end
 
-  local pwd = vim.api.nvim_call_function("getcwd", {})
-
   local ctp = type(connection)
   if ctp == "string" then
     conn_id = connection

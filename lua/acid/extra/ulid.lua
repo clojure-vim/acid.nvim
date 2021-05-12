@@ -77,8 +77,6 @@ local _M = {
     ulid = ulid,
     encode_time = encode_time,
     encode_random = encode_random,
-    set_time_func = set_time_func,
-    set_random_func = set_random_func,
   }
 
 return setmetatable(_M, {

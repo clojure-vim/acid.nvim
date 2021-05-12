@@ -2,7 +2,6 @@
 
 --- nRepl connectivity
 -- @module acid.nrepl
-local nvim = vim.api
 local log = require("acid.log")
 local utils = require("acid.utils")
 local connections = require("acid.connections")

@@ -79,6 +79,7 @@ features.eval_expr = function(mode, replace, ns)
     form, coord = forms.form_under_cursor(true)
     payload.code = table.concat(form, "\n")
   else
+    local lines
     lines, coord = forms.form_from_motion(mode)
     payload.code = table.concat(lines, "\n")
   end
@@ -395,5 +396,6 @@ features.thread_last = function()
     middlewares.refactor(utils.merge(coords, {accessor = function(dt) return dt.code end}))
   ))
 end
+
 
 return features

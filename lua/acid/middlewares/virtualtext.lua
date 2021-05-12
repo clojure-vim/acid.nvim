@@ -77,17 +77,12 @@ end
 
 virtualtext.clear = function(ln)
   local cb = vim.api.nvim_get_current_buf()
-  local to
-  local from
+  local from, to
 
   if ln ~= nil then
-    local key = tostring(cb) .. "/" .. tostring(ln)
-    ln = tonumber(ln) - 1
-    virtualtext.cache[key] = {}
     from = ln
     to = ln + 1
   else
-    virtualtext.cache = {}
     from = 0
     to = -1
   end

@@ -1,11 +1,9 @@
 -- luacheck: globals vim
-local do_print = {}
+local mdw = {}
 local output = require("acid.output")
 local sessions = require("acid.sessions")
-local utils = require("acid.utils")
-local log = require("acid.log")
 
-output.middleware = function(config)
+mdw.middleware = function(config)
   return function(middleware)
     return function(data)
       local session = data.session
@@ -21,7 +19,6 @@ output.middleware = function(config)
         output.draw(conn_id, "!! " .. data.ex)
       end
       if data.err ~= nil then
-        local out = {}
         output.draw(conn_id, data.err)
       end
 
@@ -37,4 +34,4 @@ output.middleware = function(config)
   end
 end
 
-return output
+return mdw
