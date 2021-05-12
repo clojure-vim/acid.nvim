@@ -23,19 +23,28 @@ quickfix.set = function(config)
         for ns, tests in pairs(data.results) do
           for test, asserts in pairs(tests) do
             for _, assert in ipairs(asserts) do
-              if assert.type == "fail" then
+              if assert.type ~= "pass" then
                 local fpath = vim.fn.globpath(
                   vim.fn.getcwd(),
                   '**/' .. assert.file,
                   false,
                   true)[1]
-                table.insert(qf, {
+                local obj = {
                   module = ns .. "/" .. test,
                   lnum  = assert.line,
-                  nr = assert.index,
-                  text = assert.context,
+                  nr = assert.index + 1,
+                  valid = assert.context,
+                  type = 'F',
                   filename = fpath
-                  })
+                }
+
+                if assert.type == 'fail' then
+                  obj.text = assert.actual .. " != " .. assert.expected
+                elseif assert.type == 'error' then
+                  obj.text = assert.error
+                end
+
+                table.insert(qf, obj)
               end
             end
           end

@@ -132,12 +132,12 @@ end
 -- @treturn string symbol under cursor
 -- @treturn table coordinates {from = {row,col}, to = {row,col}, bofnr = 1}
 forms.symbol_under_cursor = function()
-  local isk = vim.api.nvim_get_option('iskeyword')
-  vim.api.nvim_command("setlocal iskeyword=" .. isk .. ",#,%,&,'")
+  local isk = vim.api.nvim_buf_get_option(0, 'iskeyword')
+  vim.api.nvim_buf_set_option(0, 'iskeyword', isk .. ",#,%,&,'")
   local cw = vim.api.nvim_call_function("expand", {"<cword>"})
   local from = vim.api.nvim_call_function("searchpos", {cw, "nc"})
   local to = vim.api.nvim_call_function("searchpos", {cw, "nce"})
-  vim.api.nvim_command("setlocal iskeyword=" .. isk)
+  vim.api.nvim_buf_set_option(0, 'iskeyword', isk)
 
   return cw, {
     from = from,

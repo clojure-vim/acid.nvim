@@ -1,20 +1,11 @@
 -- luacheck: globals vim
 local connections = require("acid.connections")
 local ops = require("acid.ops")
-local utils = require("acid.utils")
 local core = require("acid.core")
-
-local pwd_to_key = function(pwd)
-  if not utils.ends_with(pwd, "/") then
-    return pwd .. "/"
-  end
-  return pwd
-end
 
 local sessions = {}
 
 sessions.store = {}
-
 
 sessions.register_session = function(connection_ix, session)
   if sessions.store[connection_ix] == nil then

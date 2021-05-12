@@ -105,6 +105,7 @@ class Acid(object):
     def acid_new_file(self, args):
         ns = args[0]
         has_path = len(args) > 1
+        log_debug("Args: {}", args)
         if not has_path:
             fname = "{}.clj".format(ns_to_path(ns))
             base = 'test' if ns.endswith('-test') else 'src'
@@ -112,6 +113,8 @@ class Acid(object):
             path = os.path.join(current_path, base, fname)
         else:
             path = args[1]
+
+        log_debug("path: {}", path)
 
         if os.path.exists(path):
             log_debug("File already exists. Aborting.")

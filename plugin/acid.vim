@@ -61,8 +61,6 @@ function! AcidFnAddRequire(req)
 endfunction
 
 function! AcidCleanNs()
-  call search("(ns")
-  exec "normal vaf\<Esc>"
   lua require("acid.features").clean_ns()
 endfunction
 
@@ -94,10 +92,6 @@ function! AcidJobHandler(id, data, stream)
   call luaeval('require("acid.nrepl").handle[_A[1]](_A[2], _A[3])', [a:stream, a:data, a:id])
 endfunction
 
-function! AcidJobCleanup(id, data, _)
-  call luaeval('require("acid.nrepl").cleanup(_A[1])', [a:id])
-endfunction
-
 
 map <Plug>(acid-interrupt)        <Cmd>lua require("acid.features").interrupt()<CR>
 map <Plug>(acid-go-to)            <Cmd>lua require("acid.features").go_to()<CR>
@@ -113,6 +107,8 @@ map <Plug>(acid-eval-top-expr)    <Cmd>lua require("acid.features").eval_expr("t
 map <Plug>(acid-eval-expr)        <Cmd>lua require("acid.features").eval_expr()<CR>
 
 map <Plug>(acid-eval-print)       <Cmd>call AcidSendEval("eval_print")<CR>
+
+map <Plug>(acid-clear-ns)         <Cmd>lua require("acid.features").clean_ns()<CR>
 
 map <Plug>(acid-replace-op)       <Cmd>set opfunc=AcidEvalInplace<CR>g@
 map <Plug>(acid-replace-symbol)   <Cmd>call AcidEvalInplace("symbol")<CR>
@@ -135,6 +131,10 @@ map <Plug>(acid-output-clear)     <Cmd>call luaeval("require('acid.output').clea
 map <Plug>(acid-run-tests)       <Cmd>lua require("acid.features").run_test{}<CR>
 map <Plug>(acid-run-tests-here)  <Cmd>lua require("acid.features").run_test{['get-ns'] = true}<CR>
 map <Plug>(acid-run-the-tests)   <Cmd>lua require("acid.features").run_test{['get-symbol'] = true, ['get-ns'] = true}<CR>
+
+map <Plug>(acid-open-output-window)   <Cmd>lua require("acid.output").open()<CR>
+map <Plug>(acid-clear-output-window)  <Cmd>lua require("acid.output").clear()<CR>
+map <Plug>(acid-close-output-window)  <Cmd>lua require("acid.output").close()<CR>
 
 augroup acid
   autocmd!
@@ -180,6 +180,8 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure nmap <buffer> <silent> crt        <Plug>(acid-replace-top-expr)
     autocmd FileType clojure nmap <buffer> <silent> crr        <Plug>(acid-replace-expr)
 
+    autocmd FileType clojure map <buffer> <silent> <C-c>cl     <Plug>(acid-clear-ns)
+
     autocmd FileType clojure map <buffer> <silent> <C-c>ll     <Plug>(acid-virtualtext-clear-line)
     autocmd FileType clojure map <buffer> <silent> <C-c>ln     <Plug>(acid-virtualtext-toggle)
     autocmd FileType clojure map <buffer> <silent> <C-c>la     <Plug>(acid-virtualtext-clear-all)
@@ -187,6 +189,12 @@ if !g:acid_no_default_keymappings
     autocmd FileType clojure map <buffer> <silent> <C-c>oo     <Plug>(acid-output-open)
     autocmd FileType clojure map <buffer> <silent> <C-c>ox     <Plug>(acid-output-close)
     autocmd FileType clojure map <buffer> <silent> <C-c>ol     <Plug>(acid-output-clear)
+
+    autocmd FileType clojure map <buffer> <silent> coo         <Plug>(acid-open-output-window)
+    autocmd FileType clojure map <buffer> <silent> col         <Plug>(acid-clear-output-window)
+    autocmd FileType clojure map <buffer> <silent> coq         <Plug>(acid-close-output-window)
+
+
   augroup END
 endif
 
