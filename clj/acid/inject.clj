@@ -9,7 +9,7 @@
   (p/with-pprint-dispatch
     p/code-dispatch
     (p/pprint
-      (clojure.edn/read-string (pr-str code)))))
+      (clojure.edn/read-string code))))
 
 (defn update-ns-decl [ns-decl decl fn-]
   (let [seq-ns-decl (sequence (comp
