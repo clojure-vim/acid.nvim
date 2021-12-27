@@ -4,6 +4,24 @@
 -- @module acid.forms
 local forms = {}
 
+forms.ns_pos = function()
+  local curpos = vim.api.nvim_win_get_cursor(0)
+  local from = vim.api.nvim_call_function("searchpos", {"(ns", "bcnw"})
+
+  vim.api.nvim_win_set_cursor(0, {from[1], from[2] - 1})
+
+  local pos = forms.get_form_boundaries(true)
+
+  vim.api.nvim_win_set_cursor(0, curpos)
+
+  return pos
+end
+
+forms.ns = function()
+  local coordinates = forms.ns_pos()
+  return forms.extract(coordinates)
+end
+
 --- Returns the coordinates for the boundaries of the current form
 -- @tparam[opt] boolean top if true, recursively searches for top level.
 -- @treturn table coordinates {from = {row,col}, to = {row,col}}
@@ -114,12 +132,12 @@ end
 -- @treturn string symbol under cursor
 -- @treturn table coordinates {from = {row,col}, to = {row,col}, bofnr = 1}
 forms.symbol_under_cursor = function()
-  local isk = vim.api.nvim_get_option('iskeyword')
-  vim.api.nvim_command("setlocal iskeyword=" .. isk .. ",#,%,&,'")
+  local isk = vim.api.nvim_buf_get_option(0, 'iskeyword')
+  vim.api.nvim_buf_set_option(0, 'iskeyword', isk .. ",#,%,&,'")
   local cw = vim.api.nvim_call_function("expand", {"<cword>"})
   local from = vim.api.nvim_call_function("searchpos", {cw, "nc"})
   local to = vim.api.nvim_call_function("searchpos", {cw, "nce"})
-  vim.api.nvim_command("setlocal iskeyword=" .. isk)
+  vim.api.nvim_buf_set_option(0, 'iskeyword', isk)
 
   return cw, {
     from = from,

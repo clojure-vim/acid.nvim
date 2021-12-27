@@ -79,6 +79,7 @@ features.eval_expr = function(mode, replace, ns)
     form, coord = forms.form_under_cursor(true)
     payload.code = table.concat(form, "\n")
   else
+    local lines
     lines, coord = forms.form_from_motion(mode)
     payload.code = table.concat(lines, "\n")
   end
@@ -118,7 +119,8 @@ features.do_require = function(ns, ...)
     ns = vim.api.nvim_call_function("AcidGetNs", {})
   end
   acid.run(commands.req{ns = ns, mod = {...}}:with_handler(middlewares
-    .doautocmd{autocmd = "AcidRequired"}
+        .doautocmd{autocmd = "AcidRequired"}
+        .err{}
   ))
 end
 
@@ -128,7 +130,8 @@ end
 -- @tparam {string,...} symbols List of java symbols to be imported
 features.do_import = function(java_ns, symbols)
   acid.run(commands.import{java_ns = java_ns, symbols = symbols}:with_handler(middlewares
-    .doautocmd{autocmd = "AcidImported"}
+        .doautocmd{autocmd = "AcidImported"}
+        .err{}
   ))
 end
 
@@ -172,6 +175,12 @@ features.docs = function(symbol, ns)
         elseif data.member ~= nil then
           table.insert(lines, data.member)
         end
+        if data.eldoc == nil then
+          if utils.find(data.status, "no-eldoc") then
+          local log = require("acid.log")
+            log.msg("No documentation for symbol " .. symbol)
+          end
+        end
         for _, v in ipairs(data.eldoc) do
           table.insert(lines, "[" .. table.concat(v, " ") .. "]")
         end
@@ -212,24 +221,38 @@ end
 --`(:requires ...)` section.
 -- @tparam string req require vector, such as `[clojure.string :as str]`.
 features.add_require = function(req)
-  local lines, coords = forms.form_under_cursor()
+  local lines, coords = forms.ns()
   local content = table.concat(lines, "")
 
-  local code = "(format-code (upd-ns '" .. content .. " :require (partial add-req '" ..  req .. ")))"
+  local format = function(data)
+    if data.status ~= nil then
+      return
+    else
+      return ops.eval{
+        ns = "acid.inject",
+        code = '(format-code "' .. data.value .. '")'
+      }:with_handler(middlewares
+          .refactor(utils.merge({
+          accessor = function(dt)
+            return dt['out']
+          end
+        }, coords)))
+    end
+  end
 
-    acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
-      .refactor(coords)
-    ))
+  local code = "(update-ns-decl '" .. content .. " :require (add-req '" ..  req .. "))"
+
+    acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(format))
 end
 
 --- Refactor the current file to remove the given argument from the
 --`(:requires ...)` section.
 -- @tparam string req require namespace, such as `clojure.string`.
 features.remove_require = function(req)
-  local lines, coords = forms.form_under_cursor()
+  local lines, coords = forms.ns()
   local content = table.concat(lines, "")
 
-  local code = "(format-code (upd-ns '" ..  content .. " :require (partial rem-req '" ..  req .. ")))"
+  local code = "(format-code (upd-ns '" ..  content .. " :require (rem-req '" ..  req .. ")))"
 
     acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
       .refactor(coords)
@@ -238,15 +261,24 @@ end
 
 --- Refactor the current file so the `(:require ...)` form is sorted.
 features.sort_requires = function()
-  local lines, coords = forms.form_under_cursor()
+  local lines, coords = forms.ns()
   local content = table.concat(lines, "")
 
-  local code = "(format-code (upd-ns '" ..  content .. " :require sort-reqs))"
 
-    acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(middlewares
-      .refactor(coords)
-    ))
-end
+  local code = "(upd-ns '" ..  content .. " :require sort-reqs)"
+
+  acid.run(ops.eval{code = code, ns = "acid.inject"}:with_handler(
+      function(data)
+        return ops['format-code']{
+          code = data.out
+        }:with_handler(middlewares
+            .refactor(utils.merge({
+                accessor = function(dt)
+                  return dt['formatted-code']
+                end
+          }, coords)))
+        end))
+      end
 
 features.thread_first = function()
   local lines, coords = forms.form_under_cursor()
@@ -266,11 +298,11 @@ end
 
 --- Refactor the current file so the `(:require ...)` form is sorted.
 features.clean_ns = function()
-  local lines, coords = forms.form_under_cursor()
+  local _, coords = forms.ns()
   local fpath = vim.api.nvim_call_function('expand', {'%:p'})
 
-  coords.accessor = function(x)
-    return x.ns
+  coords.accessor = function(data)
+    return data.ns
   end
 
     acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
@@ -358,22 +390,6 @@ features.thread_last = function()
   ))
 end
 
---- Refactor the current file so the `(:require ...)` form is sorted.
-features.clean_ns = function()
-  local lines, coords = forms.form_under_cursor()
-  local fpath = vim.api.nvim_call_function('expand', {'%:p'})
-
-  coords.accessor = function(x)
-    return x.ns
-  end
-
-    acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
-      .refactor(coords)
-    ))
-
-end
-
-
 features.thread_first = function()
   local lines, coords = forms.form_under_cursor()
   local content = table.concat(lines, "\n")
@@ -390,19 +406,5 @@ features.thread_last = function()
   ))
 end
 
---- Refactor the current file so the `(:require ...)` form is sorted.
-features.clean_ns = function()
-  local lines, coords = forms.form_under_cursor()
-  local fpath = vim.api.nvim_call_function('expand', {'%:p'})
-
-  coords.accessor = function(x)
-    return x.ns
-  end
-
-    acid.run(ops['clean-ns']{path = fpath}:with_handler(middlewares
-      .refactor(coords)
-    ))
-
-end
 
 return features

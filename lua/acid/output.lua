@@ -59,7 +59,7 @@ output.draw = function(conn, lines)
   local buf = output.conn_to_buf[conn]
 
   if type(lines) == "string" then
-    old = lines
+    local old = lines
     lines = {}
     old:gsub("[^\n]+", function(dt) table.insert(lines, dt) end)
   end
@@ -71,10 +71,10 @@ output.draw = function(conn, lines)
 end
 
 
-output.open = function()
+output.open = function(opt)
   local conn = connections.peek()
 
-  output.window(conn)
+  output.window(conn, opt)
 end
 
 output.close = function()

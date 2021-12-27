@@ -2,7 +2,6 @@
 
 --- nRepl connectivity
 -- @module acid.nrepl
-local nvim = vim.api
 local log = require("acid.log")
 local utils = require("acid.utils")
 local connections = require("acid.connections")
@@ -11,13 +10,15 @@ local output = require("acid.output")
 local job_mapping = {}
 local nrepl = {}
 
+-- TODO Move to external resource
+-- TODO Allow to be globally configurable
 local deps = {
-  ['nrepl/nrepl'] = '{:mvn/version "0.6.0"}',
-  ['org.clojure/clojurescript'] =  '{:mvn/version "1.10.439"}',
-  ['cider/piggieback'] = '{:mvn/version "0.4.0"}',
-  ['cider/cider-nrepl'] = '{:mvn/version "0.24.0"}',
-  ['refactor-nrepl'] = '{:mvn/version "2.5.0"}',
-  ['iced-nrepl'] = '{:mvn/version "1.0.0"}'
+  ['nrepl/nrepl'] = '0.8.3',
+  ['org.clojure/clojurescript'] =  '1.10.844',
+  ['cider/piggieback'] = '0.4.0',
+  ['cider/cider-nrepl'] = '0.26.0',
+  ['refactor-nrepl/refactor-nrepl'] = '2.5.1',
+  ['com.github.liquidz/iced-nrepl'] = '1.2.4'
 }
 
 --- List of supported middlewares and the wrappers to invoke when spawning a nrepl process.
@@ -26,15 +27,15 @@ nrepl.middlewares = {
   ['nrepl/nrepl'] = {},
   ['cider/cider-nrepl'] = {'cider.nrepl/cider-middleware'},
   ['cider/piggieback'] = {'cider.piggieback/wrap-cljs-repl'},
-  ['refactor-nrepl'] = {'refactor-nrepl.middleware/wrap-refactor'},
-  ['iced-nrepl'] = {'iced.nrepl/wrap-iced'}
+  ['refactor-nrepl/refactor-nrepl'] = {'refactor-nrepl.middleware/wrap-refactor'},
+  ['com.github.liquidz/iced-nrepl'] = {'iced.nrepl/wrap-iced'}
 }
 
 local get_deps = function(selected)
   return "{:deps {" ..
   table.concat(
     utils.map(selected, function(k)
-      return k .. " " .. deps[k]
+      return k .. " " .. '{:mvn/version "' .. deps[k] .. '"}'
       end)
     , ", "
     )
@@ -42,7 +43,7 @@ local get_deps = function(selected)
 end
 
 local supplied = function(fname)
-  return table.concat(vim.api.nvim_call_function("readfile", {fname}), "\n")
+  return table.concat(vim.fn.readfile(fname), "\n")
 end
 
 local build_cmd = function(obj)
@@ -50,6 +51,7 @@ local build_cmd = function(obj)
     "clojure",
     "-Sdeps",
     get_deps(obj.selected),
+    "-M",
     "-m",
     "nrepl.cmdline",
     "--middleware",
@@ -64,9 +66,8 @@ local build_cmd = function(obj)
     opts[3] = supplied(obj.deps_file)
   end
 
-  if obj.alias ~= nil then
-    table.insert(opts, 4, "-C" .. table.concat(obj.alias, ""))
-    table.insert(opts, 4, "-R" .. table.concat(obj.alias, ""))
+  if obj.alias ~= nil and #obj.alias > 0 then
+    table.insert(opts, 4, "-A" .. table.concat(obj.alias, ""))
   end
 
   if obj.port ~= nil then
@@ -99,7 +100,7 @@ nrepl.default_middlewares = {'nrepl/nrepl', 'cider/cider-nrepl', 'refactor-nrepl
 -- @tparam[opt] boolean obj.disable_output_capture disables output capturing.
 -- @treturn boolean Whether it was possible to spawn a nrepl process
 nrepl.start = function(obj)
-  local pwd = utils.ensure_path(obj.pwd or vim.api.nvim_call_function("getcwd", {}))
+  local pwd = utils.ensure_path(obj.pwd or vim.fn.getcwd())
 
   local selected = obj.middlewares or nrepl.default_middlewares
   local bind = obj.bind
@@ -113,13 +114,43 @@ nrepl.start = function(obj)
 
   bind = bind or "127.0.0.1"
 
-  local ret = nvim.nvim_call_function('jobstart', {
-      cmd , {
-        on_stdout = "AcidJobHandler",
-        on_stderr = "AcidJobHandler",
-        on_exit = "AcidJobCleanup",
-        cwd = pwd
-      }
+  local first_err = true
+
+  local ret = vim.fn.jobstart(
+    cmd, {
+      on_stdout = function(id, data, _)
+        local job = job_mapping[id]
+
+        if not job.init then
+          for _, ln in ipairs(data) do
+            if string.sub(ln, 1, 20) == "nREPL server started" then
+              local port = ln:match("%d+")
+              connections.store[job.conn][2] = port
+              connections.select(job.pwd, job.conn)
+              job_mapping[id].init = true
+              if not nrepl.cache[job.pwd].skip_autocmd then
+                log.msg("Connected on port", tostring(port))
+                vim.cmd[[doautocmd User AcidConnected]]
+              end
+              break
+            end
+          end
+        end
+
+        nrepl.handle.stdout(data, id)
+      end,
+      on_stderr = function(id, data, _)
+
+        if first_err then
+          print(vim.inspect(obj))
+          first_err = false
+        end
+
+        print(vim.inspect{error = data})
+        nrepl.handle.stderr(data, id)
+      end,
+      on_exit = nrepl.cleanup,
+      cwd = pwd
     })
 
    if ret <= 0 then
@@ -148,7 +179,7 @@ nrepl.start = function(obj)
 end
 
 nrepl.bbnrepl = function(obj)
-  local pwd = utils.ensure_path(obj.pwd or vim.api.nvim_call_function("getcwd", {}))
+  obj.pwd = utils.ensure_path(obj.pwd or vim.fn.getcwd())
 
   obj.port = obj.port or math.random(1024, 65535)
 
@@ -156,21 +187,21 @@ nrepl.bbnrepl = function(obj)
     "bb", "--nrepl-server", obj.port
   }
 
-  local ret = nvim.nvim_call_function('jobstart', {
-      cmd , {
-        on_exit = "AcidJobCleanup",
-        cwd = pwd
+  local ret = vim.fn.jobstart(
+      cmd, {
+        on_exit = nrepl.cleanup,
+        cwd = obj.pwd
       }
-    })
+    )
 
-   if ret <= 0 then
+   if ret < 0 then
      -- TODO log, inform..
      return false
    end
 
    local conn = {"127.0.0.1", obj.port}
 
-   nrepl.cache[pwd] = {
+   nrepl.cache[obj.pwd] = {
      skip_autocmd = true,
      job = ret,
      addr = conn
@@ -179,7 +210,7 @@ nrepl.bbnrepl = function(obj)
   local conn_id = connections.add(conn)
   connections.select(obj.pwd, conn_id)
 
-  nrepl.cache[pwd].id = conn_id
+  nrepl.cache[obj.pwd].id = conn_id
 
 end
 
@@ -187,7 +218,7 @@ end
 -- @tparam table obj Configuration for the nrepl process to be stopped
 -- @tparam string obj.pwd Path where the nrepl process was started
 nrepl.stop = function(obj)
-  nvim.nvim_call_function("jobstop", {nrepl.cache[obj.pwd].job})
+  vim.fn.jobstop(nrepl.cache[obj.pwd].job)
   connections.remove(nrepl.cache[obj.pwd].id)
   nrepl.cache[obj.pwd] = nil
 end
@@ -207,25 +238,6 @@ nrepl.handle = {
   _store = {},
   stdout = function(dt, ch)
     nrepl.handle._store[ch] = nrepl.handle._store[ch] or {}
-    local job = job_mapping[ch]
-
-    if not job.init then
-      for _, ln in ipairs(dt) do
-        if string.sub(ln, 1, 20) == "nREPL server started" then
-          local port = ln:match("%d+")
-          connections.store[job.conn][2] = port
-          connections.select(job.pwd, job.conn)
-          job_mapping[ch].init = true
-          if not nrepl.cache[job.pwd].skip_autocmd then
-            log.msg("Connected on port", tostring(port))
-            vim.api.nvim_command("doautocmd User AcidConnected")
-          end
-          break
-        end
-      end
-    end
-
-    output.draw(job.conn, dt)
     table.insert(nrepl.handle._store[ch], dt)
   end,
   stderr = function(dt, ch)
